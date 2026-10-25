@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
@@ -94,6 +95,38 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
             .PaginateAsync(pageInfo, ct);
 
         return await paginated.ToListAsync(ct);
+    }
+
+    public async Task<IEnumerable<FogTripTicket>> SearchForAdminAsync(
+        FogTripTicketSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(FogTripTicket.CreatedTime)] = SortOperator.Desc;
+        }
+
+        WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(FogTripTicket.Site));
+
+        var dbQuery = GetListQuery().Where(query.Filter);
+
+        if (!string.IsNullOrWhiteSpace(criteria.UserEmail))
+        {
+            var userEmail = criteria.UserEmail;
+
+            dbQuery = dbQuery.Where(t =>
+                t.TransporterEmailAddress!.Contains(userEmail)
+                || t.Transporter!.User!.Email!.Contains(userEmail)
+                || DbContext.ProfessionalUsers.Any(u =>
+                    u.ProfessionalId == t.ProfessionalId
+                    && u.IsAdmin
+                    && u.User!.Email!.Contains(userEmail)));
+        }
+
+        var paginated = await dbQuery
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
     }
 
     public async Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken)

@@ -176,6 +176,17 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return await _mailingInfoRedactionService.RedactAsync(dtos, cancelationToken);
     }
 
+    public async Task<IPagedData<FogTripTicketDto>> SearchForAdminAsync(
+        FogTripTicketSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Filter = query.ConvertFilterProperties<FogTripTicket, FogTripTicketDto>(Mapper);
+        query.Sort = query.ConvertSortProperties<FogTripTicket, FogTripTicketDto>(Mapper);
+
+        var tickets = await _repository.SearchForAdminAsync(criteria, pageInfo, query, cancellationToken);
+
+        return tickets.Select(Mapper.Map<FogTripTicketDto>).ToPagedData(pageInfo);
+    }
+
     public Task<InsuranceCheckDto> GetInsuranceCheckAsync(int waterSupplierId, CancellationToken cancellationToken)
     {
         return _insuranceService.CheckForWaterSupplierAsync(_authService.ProfessionalId, waterSupplierId, ProfessionalType.FogTransporter, cancellationToken);

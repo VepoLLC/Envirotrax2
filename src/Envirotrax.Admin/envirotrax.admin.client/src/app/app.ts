@@ -12,6 +12,7 @@ import { BackflowReplacementListComponent } from './backflow/replacements/list/b
 import { FogInspectionListComponent } from './fog/inspections/list/fog-inspection-list.component';
 import { FogInspectorListComponent } from './fog/inspectors/list/fog-inspector-list.component';
 import { FogDisposalSiteListComponent } from './fog/disposal-sites/list/fog-disposal-site-list.component';
+import { FogTripTicketListComponent } from './fog/trip-tickets/list/fog-trip-ticket-list.component';
 import { NavigationEnd, Router } from '@angular/router';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 import { filter } from 'rxjs';
@@ -124,6 +125,14 @@ export class App implements OnInit {
             type: 'separator'
           },
           {
+            title: 'Trip Ticket Search',
+            iconCss: 'fa-solid fa-magnifying-glass',
+            onClick: this.showFogTripTicketSearch.bind(this)
+          },
+          {
+            type: 'separator'
+          },
+          {
             title: 'Disposal Sites',
             iconCss: 'fa-solid fa-dumpster',
             onClick: this.showFogDisposalSites.bind(this)
@@ -217,6 +226,12 @@ export class App implements OnInit {
   public showFogInspectorSearch(): void {
     this._windowService.addWindow(FogInspectorListComponent, {
       title: 'FOG Inspector Search'
+    });
+  }
+
+  public showFogTripTicketSearch(): void {
+    this._windowService.addWindow(FogTripTicketListComponent, {
+      title: 'FOG Trip Ticket Search'
     });
   }
 

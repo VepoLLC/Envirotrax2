@@ -66,8 +66,15 @@ services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
 services.AddTransient<RenewalEmailVerificationService>();
 services.AddTransient<BackflowGaugeService>();
+services.AddTransient<BackflowTestService>();
+services.AddTransient<CsiInspectionService>();
+services.AddTransient<FogInspectionService>();
+services.AddTransient<FogDisposalSiteService>();
+services.AddTransient<FogVehicleService>();
+services.AddTransient<FogTripTicketService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
+services.AddTransient<ApiAccountService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -114,6 +121,36 @@ await siteLogService.MigrateAsync();
 var backflowGaugeService = provider.GetRequiredService<BackflowGaugeService>();
 await backflowGaugeService.MigrateAsync();
 
+// After the sites and the professionals, because a test is recorded against a site by a tester who
+// belongs to one of them, and before the notifications, whose RecordId points at a test by its V1 id.
+var backflowTestService = provider.GetRequiredService<BackflowTestService>();
+await backflowTestService.MigrateAsync();
+
+var csiInspectionService = provider.GetRequiredService<CsiInspectionService>();
+await csiInspectionService.MigrateAsync();
+
+// After the sites and the professionals, because an inspection is recorded against a site by an
+// inspector who belongs to one of them. Its photos and signature are moved into Azure Storage here too.
+var fogInspectionService = provider.GetRequiredService<FogInspectionService>();
+await fogInspectionService.MigrateAsync();
+
+// A global master list that depends on nothing else, but it has to land before the transporter
+// registrations and trip tickets, which find a disposal site by its V1 id through LegacyRecordId.
+var fogDisposalSiteService = provider.GetRequiredService<FogDisposalSiteService>();
+await fogDisposalSiteService.MigrateAsync();
+
+// After the professionals and the water suppliers: a vehicle belongs to a transporter's company, found
+// through the staging table the professional migration builds, and each permit is issued by a supplier.
+// Before the trip tickets, which find a vehicle by its V1 id through LegacyRecordId.
+var fogVehicleService = provider.GetRequiredService<FogVehicleService>();
+await fogVehicleService.MigrateAsync();
+
+// After the sites, the professionals, the disposal sites and the vehicles: a ticket records a pickup at a
+// site by a transporter, in one of their vehicles, delivered to a disposal site, and it finds each of them
+// by its V1 id through LegacyRecordId. Its signatures are moved into Azure Storage here too.
+var fogTripTicketService = provider.GetRequiredService<FogTripTicketService>();
+await fogTripTicketService.MigrateAsync();
+
 // After the supplier users: a notification setting is delivered to one of them, and V2 requires
 // that recipient, so a setting whose user is missing cannot be migrated at all.
 var notificationSettingService = provider.GetRequiredService<NotificationSettingService>();
@@ -124,3 +161,6 @@ await notificationSettingService.MigrateAsync();
 // unresolved: V2 row ids equal the V1 ids, so it lines up once the backflow test migration lands.
 var notificationService = provider.GetRequiredService<NotificationService>();
 await notificationService.MigrateAsync();
+
+var apiAccountService = provider.GetRequiredService<ApiAccountService>();
+await apiAccountService.MigrateAsync();

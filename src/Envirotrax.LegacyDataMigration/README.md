@@ -6,7 +6,7 @@ Moves data from the old (V1) system into the new Envirotrax2 (V2) database.
 
 ## How it works
 
-The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
+The app migrates one entity at a time — users, water suppliers, supplier users, professionals, GIS areas, sites, renewal email verifications, site logs, backflow gauges, backflow tests, FOG inspections, FOG disposal sites, FOG vehicles and their permits, FOG trip tickets, notification settings, then notifications — in that order, because later entities depend on earlier ones. Each entity's migration has two steps:
 
 1. **Run SQL scripts.** Files under `Scripts/<Entity>/`, named with a numeric prefix (`01_`, `02_`, ...), run in that order. They copy rows from the legacy database into the V2 tables.
 2. **Run C# cleanup code.** After the raw data is in place, C# fixes up anything SQL can't do well — legacy passwords come in as plain text and get hashed with ASP.NET Identity's password hasher, and site log file attachments get downloaded from the legacy file server and uploaded to Azure Storage.
@@ -20,7 +20,7 @@ One caveat, on the audit tables rather than the data: `Scripts/Users/02_`–`06_
 ## Project layout
 
 - `Scripts/` — SQL scripts, one subfolder per entity, run in filename order.
-- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
+- `Services/` — one service per entity (`UserService`, `WaterSupplierService`, `WaterSupplierUserService`, `ProfessionalService`, `GisAreaService`, `SiteService`, `SiteLogService`, `BackflowGaugeService`, `BackflowTestService`, `FogInspectionService`, `FogDisposalSiteService`, `FogVehicleService`, `FogTripTicketService`, `NotificationSettingService`, `NotificationService`, and the other professional services). Each has a `MigrateAsync()` that runs its scripts, then does any C#-side cleanup. `LegacyFileServerService` and `BlobStorageService` are helpers rather than entity migrations: they read files off the legacy file server and write them to Azure Storage.
 - `Data/` — EF Core `DbContext`s and entity models for the V2 database.
 - `Logs/` — one log file per service, written while the migration runs.
 
@@ -115,6 +115,204 @@ Four things are specific to notifications:
   though the settings table does, so V1 could never record that hazard against a notification.
 - **`SentTime` stays NULL.** V1 records no send time; its scheduled jobs select by `CreationDate`
   and interval instead of stamping a row once it has gone out.
+
+## How backflow tests are migrated
+
+This is the largest entity in the system: 176 columns, 135 of which carry the same name in both
+databases. Everything it points at — water suppliers, sites, professionals, professional users,
+supplier users and the seeded states — is migrated before it, so nothing here has to be backfilled.
+
+Like sites and water suppliers, a test keeps its V1 id: the insert runs under `IDENTITY_INSERT`, so
+`BackflowTests.Id` equals `SaveBackflowDeviceTests.ID`. That is what makes two earlier migrations
+resolve without any rewriting — `Notifications.RecordId` and `SiteLogs.LegacyAssemblyRecordId` both
+reference a test by its V1 id. `LegacyRecordId` is written as well, because `Id` alone cannot say
+whether a row came from V1 or was created in V2, and every guard in this script reads it.
+
+Four things are worth knowing:
+
+- **A test carries a BPAT or a CSI inspector, never both.** V2 gives them one shared
+  `ProfessionalId`, so the BPAT login is preferred and the inspector is left NULL when one resolves.
+  Mixing them would point the composite foreign key at a person from another company.
+  A test whose tester login matches no migrated professional user is recorded as skipped, because
+  `ProfessionalId` is NOT NULL.
+- **V2 made 55 value columns NOT NULL that V1 leaves nullable.** Each falls back to `0`, so a single
+  legacy NULL cannot roll back the whole run. `CreatedTime` is deliberately not defaulted: there is
+  no honest stand-in for when a test was recorded, so a NULL there should stop the run.
+- **The five test images are not migrated yet.** V1 stores no image columns at all: it rebuilds each
+  path from the record id (`backflow/<id rounded down to 10000>/<id>-ext|sn|bext|bsn|ag.jpg`) and
+  decides whether to show it with `File.Exists`, so which images exist is not knowable from the
+  database. Moving them needs a probe-and-upload pass of its own and is tracked separately; the five
+  `*ImagePath` columns stay NULL until then.
+- **Some V1 columns have no V2 counterpart** and are deliberately dropped: the master water supplier
+  and master BPAT ids, the per-component `Repair*Cleaned` / `Repair*Replaced` flags (V2 keeps only
+  the `Repair*` booleans and their details), the rain/freeze sensor make and model, `TestType`,
+  `PriorInstall` and `ManualUserID`.
+
+Tests that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedBackflowTests` — either the water supplier never migrated, or no
+migrated professional user matches the tester login the test was recorded under.
+
+## How FOG inspections are migrated
+
+V2 gives each inspection a new `Id`; the V1 `FogInspections.ID` goes into `LegacyRecordId`, which is
+what links the row back to V1 and what every guard in the script reads. (Only backflow tests, water
+suppliers and sites keep their V1 ids, because the customer-facing legacy API exposes them.) Water
+suppliers, sites, professionals and professional users are all migrated before it, so nothing here has
+to be backfilled.
+
+Five things are worth knowing:
+
+- **The inspector is matched within the company the inspection was filed under.** V1 names the
+  inspector by login (`InspectorID`) and their company by `MasterInspectorID`, which is empty when the
+  inspector is the company. One login can belong to more than one company in V2, so the script prefers
+  the pairing in that company, then any pairing flagged as a FOG inspector. `ProfessionalId` and
+  `InspectorId` are NOT NULL, so an inspection whose login matches no migrated professional user is
+  recorded as skipped.
+- **The site is required.** `SiteId` is NOT NULL in V2, so an inspection whose site did not migrate is
+  recorded as skipped too. If a later run migrates it, its entry in the skipped table is cleared.
+- **An unpaid inspection has a NULL `TransactionId`.** V1 marks one with an empty string, and some V2
+  checks, such as the one that blocks downloading the report before payment, only test for NULL.
+- **Facility type and coordinates change shape.** `FacilityType` is the text of a dropdown in V1 and an
+  enum in V2; it goes through the same table as sites. The interceptor's latitude and longitude are
+  text in V1 and numbers in V2, and a blank one becomes NULL rather than 0.
+- **Some columns have no counterpart on the other side.** The master water supplier ids,
+  `MasterInspectorID` (used only for the match above) and `InterceptorPhotograph` (read by V1 but never
+  written) are dropped. `InspectorJobTitle`, `LastTripTicketDate`, `TripTicketInterval` and `EmailPdf`
+  stay empty: V1 stores no job title or "email PDF" flag on a FOG inspection, and keeps the trip
+  ticket schedule on the site, which the sites migration already carries over.
+
+Inspections that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedFogInspections` — the water supplier or the site never migrated, or no
+migrated professional user matches the inspector login.
+
+### How FOG inspection images are migrated
+
+An inspection has up to three images, and V1 keeps them in two different places:
+
+- **The exterior and interior photos** are files on the legacy file server. V1 stores no path for
+  them: every page rebuilds it from the record id (`fog_inspections/<id rounded down to 10000>/<id>-ext.jpg`,
+  or `-int.jpg`) and shows the photo whenever `OutsideImageType` (or `InsideImageType`) is not NULL.
+  The script applies the same rule and writes that path into `LegacyExteriorImagePath` /
+  `LegacyInteriorImagePath`.
+- **The signature** is a PNG stored in the V1 `FogInspections.Signature` column. The script sets
+  `HasLegacySignature`, and the service reads the bytes back out of the legacy database.
+
+`FogInspectionService` then uploads each image to
+`professionals/<ProfessionalId>/fog-inspections/<exterior|interior|signature>/legacy-<V1 id>.<jpg|png>`,
+the same folders V2 uses, and only after that writes `ExteriorImagePath`, `InteriorImagePath` or
+`SignatureImagePath`. As with site log attachments, an image V2 has no path for yet shows as missing
+rather than as a broken link, and a re-run picks up only what is still pending. The same storage
+caveat applies too: the folder is the V2 `ProfessionalId`, which a rebuild of the V2 database reassigns.
+
+- **Still pending:** `SELECT COUNT(*) FROM FogInspections WHERE (LegacyExteriorImagePath IS NOT NULL AND ExteriorImagePath IS NULL) OR (LegacyInteriorImagePath IS NOT NULL AND InteriorImagePath IS NULL) OR (HasLegacySignature = 1 AND SignatureImagePath IS NULL)`
+- **Not found in V1:** logged to `Logs/FogInspectionService.log` with per-run counts, for example a
+  photo the legacy file server no longer has.
+
+## How FOG disposal sites are migrated
+
+Disposal sites are one global master list, not owned by a water supplier, and a site points at nothing
+V2 requires, so every V1 row migrates and there is no skipped table. V2 gives each site a new `Id`; the
+V1 id goes into `LegacyRecordId`. That matters later: transporter registrations and trip tickets both
+point at a disposal site by its V1 id, so their migrations look the site up through `LegacyRecordId`.
+
+Three V1 shapes change on the way across:
+
+- **`Active` becomes a soft delete.** V2 has no active flag; retiring a site there is a delete that
+  only sets `DeletedTime`. V1 only offers active sites for registration, so an inactive (or NULL) one
+  arrives deleted, with the migration time as `DeletedTime` because V1 records no date for switching a
+  site off. The row stays, so registrations and trip tickets that point at it still resolve. Unlike
+  V1, a deleted site is also left out of a transporter's own list, so it can no longer be picked on a
+  new trip ticket.
+- **`PhysicalType`** is free text in V1 and an enum in V2. "Landfill", "Transfer Station" and
+  "Processing Facility" (with or without the space) map to their V2 values, and anything else becomes
+  Other. V1 web only ever displays this text; the list itself is maintained in the Management Studio,
+  whose source is not available.
+- **Coordinates and state.** Latitude and longitude are text in V1 and numbers in V2, and a blank one
+  becomes NULL rather than 0. The state is matched by code or by full name, since it is typed in by hand.
+
+The five columns V2 requires (name, county, TCEQ region, registration number, permit number) fall back
+to an empty string when V1 leaves them NULL, so one blank field cannot drop a site that other records
+point at.
+
+## How FOG vehicles and permits are migrated
+
+`Scripts/FogVehicles` moves both: `02_FogVehicles.sql` the vehicles, then `03_FogVehiclePermits.sql` the
+permits water suppliers issue for them. V2 gives each vehicle a new `Id`; the V1 id goes into
+`LegacyRecordId`, which is how the permit script, and later the trip ticket migration, find a vehicle.
+A V2 permit has no id of its own (it is keyed by water supplier and vehicle), so `LegacyRecordId` on it
+is the only way back to V1.
+
+Four things are worth knowing:
+
+- **A vehicle belongs to its transporter's company.** V1 names the owner by login (`TransporterID`),
+  resolved through `MigrationLegacyProfessionalAccounts` exactly as gauges are, which already applies
+  the master/sub-account rule. The vehicle's own `MasterTransporterID` is not used: a vehicle a water
+  supplier adds never sets it, and a login rename only rewrites `TransporterID`.
+- **One permit per vehicle.** V2 enforces it with a unique index, and V1 does the same in practice:
+  issuing a permit first deletes every permit the vehicle already has, whichever supplier issued it.
+  Older V1 rows can still hold several, so the newest one is kept (ID breaks a tie) and the rest are
+  recorded as superseded. If V1 issues a newer permit after a vehicle's first permit was migrated, a
+  re-run records it instead of replacing the one already in V2.
+- **Deleted vehicles leave permits behind.** V1 deletes a vehicle outright and leaves its permits in
+  place, so a permit whose vehicle is gone is recorded as skipped. Every vehicle that does migrate is a
+  live one, so `DeletedTime` stays NULL.
+- **Dropped:** the permit's `MasterWaterSupplierID`, since V2 removed master suppliers (EN-184).
+
+Vehicles and permits that could not be migrated are queryable, told apart by `SourceTable`:
+
+`SELECT * FROM MigrationSkippedFogVehicles` — a vehicle whose transporter login has no migrated company,
+or a permit whose water supplier or vehicle did not migrate, or that lost to a newer permit for the same
+vehicle.
+
+## How FOG trip tickets are migrated
+
+V2 gives each ticket a new `Id`; the V1 `FogTripTickets.ID` goes into `LegacyRecordId`. A ticket points at
+a site, a transporter, a vehicle, a disposal site and sometimes the supplier user who approved it. All of
+them are migrated before it, and each is found through its own `LegacyRecordId`, or by login for people.
+
+Five things are worth knowing:
+
+- **The transporter is matched within the company the ticket was filed under**, as FOG inspections are.
+  V2 requires the company (`ProfessionalId`) but not the user (`TransporterId`), so a ticket whose
+  transporter login did not migrate still goes in under the company it was filed under
+  (`MasterTransporterID`, or the transporter's own login when they are the company). Only a ticket with
+  neither is skipped. A ticket whose site did not migrate is skipped too, because `SiteId` is required.
+- **Vehicles and disposal sites are optional links.** V1 deletes a vehicle outright, so a ticket can name
+  a vehicle that no longer exists; `VehicleId` is then NULL, and the vehicle columns on the ticket still
+  say which vehicle it was. `ReceiverDisposalSiteId` is set the same way. `ReceiverSiteId` stays NULL, as
+  it does on the tickets V2 creates, because V2 never reads it.
+- **Text is copied without `LEFT()`.** V1 declares every text column no wider than its V2 column, so
+  nothing can be cut, and a value that did not fit would stop the run instead of being shortened.
+- **Values that change shape:** an unpaid ticket's empty `TransactionID` becomes NULL, as for FOG
+  inspections. A capacity type of `-1` (V1's "not selected", shown with no unit) is kept as it is rather
+  than turned into a unit. `UpdatedBy` and `UpdatedTime` come from `LastModifiedBy` and `LastModifiedDate`,
+  which V1 writes only when a supplier user approves or disapproves a ticket; `ApprovedBy` is resolved the
+  same way, to that supplier's user.
+- **Dropped:** the master water supplier ids, since V2 removed master suppliers (EN-184).
+
+Tickets that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedFogTripTickets` — the water supplier or the site never migrated, or
+neither the transporter nor their company did.
+
+### How FOG trip ticket signatures are migrated
+
+V1 stores three signatures on each ticket as PNG bytes: the generator's and the receiver's, captured on
+the ticket, and a copy of the transporter's own signature taken when the ticket is submitted. The script
+sets `HasLegacyTransporterSignature`, `HasLegacyGeneratorSignature` and `HasLegacyReceiverSignature`.
+`FogTripTicketService` then reads the bytes out of the legacy database a batch of tickets at a time,
+uploads each to `professionals/<ProfessionalId>/fog-trip-tickets/<transporter|generator|receiver>/legacy-<V1 id>.png`,
+and only after that writes the matching `…SignaturePath`.
+
+V2 already uses the generator and receiver folders. It keeps no per-ticket transporter signature (a
+ticket it creates points at the transporter's own signature), so the copy V1 kept on each ticket gets a
+`transporter` folder of its own. V1 has no transporter signature date; `TransporterSignatureDate` is the
+ticket's creation date, the moment V1 copied the signature and V2 would stamp it.
+
+- **Still pending:** `SELECT COUNT(*) FROM FogTripTickets WHERE (HasLegacyTransporterSignature = 1 AND TransporterSignaturePath IS NULL) OR (HasLegacyGeneratorSignature = 1 AND GeneratorSignaturePath IS NULL) OR (HasLegacyReceiverSignature = 1 AND ReceiverSignaturePath IS NULL)`
+- **Not found in V1:** logged to `Logs/FogTripTicketService.log` with per-run counts.
 
 ## Running it
 

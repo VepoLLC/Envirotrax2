@@ -349,6 +349,11 @@ ticket's creation date, the moment V1 copied the signature and V2 would stamp it
 - **Still pending:** `SELECT COUNT(*) FROM FogTripTickets WHERE (HasLegacyTransporterSignature = 1 AND TransporterSignaturePath IS NULL) OR (HasLegacyGeneratorSignature = 1 AND GeneratorSignaturePath IS NULL) OR (HasLegacyReceiverSignature = 1 AND ReceiverSignaturePath IS NULL)`
 - **Not found in V1:** logged to `Logs/FogTripTicketService.log` with per-run counts.
 
+## How backflow renewal requirements are migrated
+
+**Note:** Re-running the migration after renewal requirements have been deleted or copied in V2 may restore
+original V1 records.
+
 ## Running it
 
 Before running, double-check every connection string in `Program.cs` points to `localhost` / `(localdb)` — never to a shared server — and check the storage account name right below them. Then run the project. Logs print to the console and to `Logs/<ServiceName>.log`.

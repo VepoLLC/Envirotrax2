@@ -75,6 +75,7 @@ services.AddTransient<FogTripTicketService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 services.AddTransient<ApiAccountService>();
+services.AddTransient<BackflowRenewalRequirementService>();
 services.AddTransient<SiteScheduleService>();
 
 var provider = services.BuildServiceProvider();
@@ -166,6 +167,9 @@ await notificationService.MigrateAsync();
 
 var apiAccountService = provider.GetRequiredService<ApiAccountService>();
 await apiAccountService.MigrateAsync();
+
+var backflowRenewalRequirementService = provider.GetRequiredService<BackflowRenewalRequirementService>();
+await backflowRenewalRequirementService.MigrateAsync();
 
 var siteScheduleService = provider.GetRequiredService<SiteScheduleService>();
 await siteScheduleService.MigrateAsync();

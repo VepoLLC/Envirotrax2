@@ -22,7 +22,7 @@ export class NotificationOptionsService {
     ];
 
     public readonly colorOptions: string[] = [
-        '#ffffff', '#e0e0e0', '#d0d0d0',
+        '#ffffff', '#e0e0e0',
         '#ff0000', '#ff33cc', '#cc33ff',
         '#0000ff', '#00ccff', '#00ffcc',
         '#00ff00', '#ffff00', '#ff9900'

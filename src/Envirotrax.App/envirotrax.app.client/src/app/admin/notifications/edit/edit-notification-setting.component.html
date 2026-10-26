@@ -34,7 +34,37 @@
                                 [style.background-color]="color"
                                 [attr.aria-label]="color"
                                 (click)="setColor(color)"></button>
+
+                        <input type="color"
+                               class="form-control form-control-color p-1"
+                               [class.border-dark]="isCustomColor"
+                               [class.border-3]="isCustomColor"
+                               style="width: 40px; height: 40px;"
+                               name="color"
+                               title="Any Color"
+                               [ngModel]="setting.color"
+                               (ngModelChange)="setColor($event)">
                     </div>
+                </div>
+
+                <div class="mb-3">
+                    <vp-input type="select"
+                              name="interval"
+                              label="Interval:"
+                              [options]="intervalOptions"
+                              [required]="true"
+                              [form]="form"
+                              [(ngModel)]="setting.interval" />
+                </div>
+
+                <div class="mb-3">
+                    <vp-input type="select"
+                              name="deliveryType"
+                              label="Type:"
+                              [options]="deliveryTypeOptions"
+                              [required]="true"
+                              [form]="form"
+                              [(ngModel)]="setting.deliveryType" />
                 </div>
             </div>
 
@@ -80,26 +110,6 @@
                                (ngModelChange)="onPropertyTypeAnyChanged()">
                         <label for="notification-property-type-any" class="form-check-label">Any</label>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <vp-input type="select"
-                              name="interval"
-                              label="Interval:"
-                              [options]="intervalOptions"
-                              [required]="true"
-                              [form]="form"
-                              [(ngModel)]="setting.interval" />
-                </div>
-
-                <div class="mb-3">
-                    <vp-input type="select"
-                              name="deliveryType"
-                              label="Type:"
-                              [options]="deliveryTypeOptions"
-                              [required]="true"
-                              [form]="form"
-                              [(ngModel)]="setting.deliveryType" />
                 </div>
             </div>
 

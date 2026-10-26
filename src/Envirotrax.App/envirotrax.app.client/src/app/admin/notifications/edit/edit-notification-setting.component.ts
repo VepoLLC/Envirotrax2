@@ -17,6 +17,7 @@ export class EditNotificationSettingComponent implements OnInit {
     public setting: NotificationSetting;
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
+    public isCustomColor: boolean = false;
 
     public readonly reasonForTestOptions: InputOption[];
     public readonly intervalOptions: InputOption[];
@@ -37,6 +38,8 @@ export class EditNotificationSettingComponent implements OnInit {
         this.intervalOptions = options.intervalOptions;
         this.deliveryTypeOptions = options.deliveryTypeOptions;
         this.colorOptions = options.colorOptions;
+
+        this.updateIsCustomColor();
     }
 
     public async ngOnInit(): Promise<void> {
@@ -50,6 +53,7 @@ export class EditNotificationSettingComponent implements OnInit {
             this.isLoading = true;
 
             this.setting = await this._service.get(id);
+            this.updateIsCustomColor();
         } finally {
             this.isLoading = false;
         }
@@ -68,6 +72,11 @@ export class EditNotificationSettingComponent implements OnInit {
 
     public setColor(color: string): void {
         this.setting.color = color;
+        this.updateIsCustomColor();
+    }
+
+    private updateIsCustomColor(): void {
+        this.isCustomColor = !!this.setting.color && !this.colorOptions.includes(this.setting.color);
     }
 
     public onPropertyTypeAnyChanged(): void {

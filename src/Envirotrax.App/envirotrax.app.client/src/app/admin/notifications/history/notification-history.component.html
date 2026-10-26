@@ -1,0 +1,200 @@
+<ng-template #colorCell let-row="rowData">
+    <div class="d-inline-block p-3 border rounded"
+         [style.background-color]="row.notification.color"></div>
+</ng-template>
+
+<ng-template #dateCell let-row="rowData">
+    <div class="text-nowrap">{{ row.notification.createdTime | date: 'MM/dd/yyyy h:mm a' }}</div>
+    <div>{{ row.account }}</div>
+</ng-template>
+
+<ng-template #descriptionCell let-row="rowData">
+    <div class="d-flex align-items-center gap-2">
+        <span>{{ row.notification.description }}</span>
+        <button type="button" class="btn btn-link p-0" title="View notification settings" (click)="showDetails(row)">
+            <i class="fa-regular fa-eye"></i>
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #propertyLines let-property>
+    <div *ngIf="property.businessName" class="fw-semibold">{{ property.businessName }}</div>
+    @for (line of property.lines; track $index) {
+        <div>{{ line }}</div>
+    }
+</ng-template>
+
+<ng-template #propertyCell let-row="rowData">
+    <div class="d-flex gap-2 align-items-center">
+        <i *ngIf="row.property.iconCss" class="fa-solid fs-5" [ngClass]="row.property.iconCss"></i>
+
+        @if (row.property.siteId) {
+            <a [routerLink]="['/sites', row.property.siteId, 'edit']" target="_blank">
+                <ng-container *ngTemplateOutlet="propertyLines; context: { $implicit: row.property }"></ng-container>
+            </a>
+        } @else {
+            <div>
+                <ng-container *ngTemplateOutlet="propertyLines; context: { $implicit: row.property }"></ng-container>
+            </div>
+        }
+    </div>
+</ng-template>
+
+<ng-template #assemblyCell let-row="rowData">
+    @if (row.assembly) {
+        <div><span class="fw-bold">Assembly Desc:</span> {{ row.assembly.description }}</div>
+        <div><span class="fw-bold">Serial #:</span> {{ row.assembly.serialNumber }}</div>
+        <div><span class="fw-bold">Test Date:</span> {{ row.assembly.testDate | date: 'MM/dd/yyyy' }}</div>
+        <div>
+            <span class="fw-bold">Exp Date:</span>
+            <span class="badge ms-1" [ngClass]="row.assembly.expirationCssClass">
+                @if (row.assembly.expirationDate) {
+                    {{ row.assembly.expirationDate | date: 'MM/dd/yyyy' }}
+                } @else {
+                    N/A
+                }
+            </span>
+        </div>
+    } @else {
+        <div>{{ row.notification.recordDescription }}</div>
+    }
+</ng-template>
+
+<ng-template #actionsCell let-row="rowData">
+    <div class="d-flex flex-column gap-1">
+        <a class="btn btn-sm btn-primary text-nowrap" [routerLink]="['/backflow/tests', row.notification.recordId, 'view']">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>View
+        </a>
+
+        <button *ngIf="canModify"
+                type="button"
+                class="btn btn-sm text-nowrap"
+                [ngClass]="row.notification.hidden ? 'btn-success' : 'btn-danger'"
+                (click)="toggleHidden(row)">
+            <i class="fa-regular me-1" [ngClass]="row.notification.hidden ? 'fa-eye' : 'fa-eye-slash'"></i>{{ row.notification.hidden ? 'Show' : 'Hide' }}
+        </button>
+    </div>
+</ng-template>
+
+<vp-section header="Notification Search Filters" [isExpanded]="false" class="d-block mb-3">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <div class="row gy-3">
+            <div class="col-md-6 col-xl-2">
+                <div class="fw-bold mb-1">User Account</div>
+                <vp-input type="select"
+                          name="userId"
+                          [(ngModel)]="filters.userId"
+                          [options]="accountOptions" />
+            </div>
+
+            <div class="col-md-6 col-xl-2">
+                <div class="fw-bold mb-1">Backflow Test Type</div>
+                <vp-input type="select"
+                          name="reasonForTest"
+                          [(ngModel)]="filters.reasonForTest"
+                          [options]="reasonForTestOptions" />
+            </div>
+
+            @for (group of flagGroups; track group.anyField) {
+                <div [class]="group.cssClass">
+                    <div class="fw-bold mb-1">{{ group.title }}</div>
+
+                    @for (option of group.options; track option.field) {
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   [id]="'notification-search-' + option.field"
+                                   [name]="option.field"
+                                   [(ngModel)]="filters.criteria[option.field]" />
+                            <label class="form-check-label" [for]="'notification-search-' + option.field">{{ option.text }}</label>
+                        </div>
+                    }
+
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               [id]="'notification-search-' + group.anyField"
+                               [name]="group.anyField"
+                               [(ngModel)]="filters.criteria[group.anyField]" />
+                        <label class="form-check-label" [for]="'notification-search-' + group.anyField">Any</label>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6 col-xl-3">
+                <div class="row g-2 align-items-start">
+                    <label class="col-4 col-form-label fw-bold text-end">Interval:</label>
+                    <div class="col-8">
+                        <vp-input type="select"
+                                  name="interval"
+                                  [(ngModel)]="filters.interval"
+                                  [options]="intervalOptions" />
+                    </div>
+
+                    <label class="col-4 col-form-label fw-bold text-end">From Date: <span class="text-danger">*</span></label>
+                    <div class="col-8">
+                        <vp-input type="date"
+                                  name="fromDate"
+                                  validationLabel="From Date"
+                                  [required]="true"
+                                  [form]="searchForm"
+                                  [(ngModel)]="filters.fromDate" />
+                    </div>
+
+                    <label class="col-4 col-form-label fw-bold text-end">To Date: <span class="text-danger">*</span></label>
+                    <div class="col-8">
+                        <vp-input type="date"
+                                  name="toDate"
+                                  validationLabel="To Date"
+                                  [required]="true"
+                                  [form]="searchForm"
+                                  [(ngModel)]="filters.toDate" />
+                    </div>
+                </div>
+
+                <div class="form-check mt-2">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="notification-search-show-hidden"
+                           name="showHidden"
+                           [(ngModel)]="filters.showHidden" />
+                    <label class="form-check-label" for="notification-search-show-hidden">Show hidden notifications</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <button type="submit" class="btn btn-primary vp-section-button">
+                <i class="fa-solid fa-magnifying-glass me-1"></i>
+                Search
+            </button>
+        </div>
+    </form>
+</vp-section>
+
+<vp-section [header]="header">
+    <vp-section-actions>
+        @if (table.items && table.items.data.length > 0) {
+            <button type="button" class="btn btn-primary btn-sm" (click)="exportResults()">
+                <i class="fa-regular fa-file-export me-1"></i>
+                Export Results
+            </button>
+        }
+    </vp-section-actions>
+
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading" message="Loading notifications" />
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getNotifications()" />
+
+        <p *ngIf="table.items && table.items.data.length === 0" class="text-muted text-center py-3">
+            No notifications exist for the selected period.
+        </p>
+    </div>
+</vp-section>

@@ -235,7 +235,8 @@
 @if (showResults) {
     <div>
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0">
+            <button type="button" class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
+                    (click)="showDownloadManager()">
                 <i class="fa-regular fa-file-export me-1"></i>
                 Export Results
             </button>
@@ -253,45 +254,47 @@
 
         <vp-section
                     header="Trip Ticket Matching the Search Filter — {{table.items?.pageInfo?.totalItems || 0}} Results">
-            <div class="container mb-3" #printableSection>
-                <div class="row gap-2 justify-content-center mb-3">
-                    <div class="col-auto mb-2">
-                        <vp-status-icon imageSrc="/images/icons/bstatus-green-half.png" text="Completed Pickup" />
-                        <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Completed Ticket" />
-                    </div>
-                    <div class="col-auto mb-2">
-                        <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
-                        <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
-                    </div>
-                    <div class="col-auto mb-2">
-                        <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
-                        <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
-                    </div>
-                    <div class="col-auto mb-2">
-                        <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />
-                        <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+            <div #printableSection>
+                <div class="container mb-3">
+                    <div class="row gap-2 justify-content-center mb-3">
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-half.png" text="Completed Pickup" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Completed Ticket" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-orange-on.png" text="Paid" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-orange-off.png" text="Unpaid" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon imageSrc="/images/icons/bstatus-cyan-on.png" text="Approved" />
+                            <vp-status-icon imageSrc="/images/icons/bstatus-cyan-off.png" text="Disapproved" />
+                        </div>
+                        <div class="col-auto mb-2">
+                            <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />
+                            <vp-status-icon iconClass="fa-solid fa-building text-danger" text="Commercial" />
+                        </div>
                     </div>
                 </div>
+
+                @if (table.items && table.items.data && table.items.data.length > 0) {
+                    <vp-table [columns]="table.columns!"
+                              [data]="table.items.data"
+                              [(pageInfo)]="table.items.pageInfo"
+                              (pageInfoChange)="getTripTickets()"
+                              [(query)]="table.query"
+                              (queryChange)="getTripTickets()"
+                              (queryReset)="getTripTickets()"
+                              [canViewDetails]="true"
+                              (viewDetails)="viewDetails($event)"
+                              [freeTextSearch]="table.freeTextSearch" />
+                }
+
+                @if (table.items?.data?.length === 0) {
+                    <div class="text-center py-3 text-muted">
+                        No records found matching the search criteria.
+                    </div>
+                }
             </div>
-
-            @if (table.items && table.items.data && table.items.data.length > 0) {
-                <vp-table [columns]="table.columns!"
-                          [data]="table.items.data"
-                          [(pageInfo)]="table.items.pageInfo"
-                          (pageInfoChange)="getTripTickets()"
-                          [(query)]="table.query"
-                          (queryChange)="getTripTickets()"
-                          (queryReset)="getTripTickets()"
-                          [canViewDetails]="true"
-                          (viewDetails)="viewDetails($event)"
-                          [freeTextSearch]="table.freeTextSearch" />
-            }
-
-            @if (table.items?.data?.length === 0) {
-                <div class="text-center py-3 text-muted">
-                    No records found matching the search criteria.
-                </div>
-            }
         </vp-section>
     </div>
 }

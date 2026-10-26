@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -12,6 +12,11 @@ import { InterceptorType } from '../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { PrintableTableService } from '../../../shared/services/printable-table.service';
+import { DownloadConfig } from '../../../shared/models/download-config';
+import { DownloadService } from '../../../shared/services/download.service';
+
+type DownloadCategory = 'property' | 'interceptor' | 'inspector' | 'mailing';
 
 @Component({
     standalone: false,
@@ -52,6 +57,9 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
 
     @ViewChild('resultCell', { static: true })
     public resultCell?: TemplateRef<CellTemplateData<FogInspection>>;
+
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
 
     public inspectionResultOptions: InputOption[] = [
         { id: '', text: 'All Results' },
@@ -101,12 +109,61 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
         { id: PropertyType.Commercial.toString(), text: 'Commercial' }
     ];
 
+    public downloadConfig: DownloadConfig<DownloadCategory>;
+
     constructor(
         private readonly _fogInspectionService: FogInspectionService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _containerHelper: AppContainerHelperService
-    ) { }
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _printService: PrintableTableService,
+        private readonly _downloadService: DownloadService
+    ) {
+        this.downloadConfig = {
+            fileName: 'FOG Inspections',
+            endpoint: this._fogInspectionService.getAllEndpoint(),
+            pdfEndpoint: this._fogInspectionService.getAllPdfEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', 'PDF'],
+            categories: [
+                { name: 'property', caption: 'Property Information', isSelected: true },
+                { name: 'interceptor', caption: 'Interceptor Information', isSelected: true },
+                { name: 'inspector', caption: 'Inspector Information', isSelected: true },
+                { name: 'mailing', caption: 'Mailing Information', isSelected: true }
+            ],
+            columns: [
+                { field: 'inspectionDate', caption: 'InspectionDate' },
+                { field: 'site.accountNumber', caption: 'AccountNumber' },
+                { field: 'inspectionResult', caption: 'InspectionResult' },
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName', category: 'property' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber', category: 'property' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName', category: 'property' },
+                { field: 'propertyNumber', caption: 'PropertyNumber', category: 'property' },
+                { field: 'propertyCity', caption: 'PropertyCity', category: 'property' },
+                { field: 'propertyState.code', caption: 'PropertyState', category: 'property' },
+                { field: 'propertyZip', caption: 'PropertyZip', category: 'property' },
+                { field: 'interceptorType', caption: 'InterceptorType', category: 'interceptor' },
+                { field: 'interceptorCapacity', caption: 'InterceptorCapacity', category: 'interceptor' },
+                { field: 'interceptorLocationDescription', caption: 'InterceptorLocationDescription', category: 'interceptor' },
+                { field: 'totalCapacityPercent', caption: 'TotalCapacityPercent', category: 'interceptor' },
+                { field: 'inspectorCompanyName', caption: 'InspectorCompanyName', category: 'inspector' },
+                { field: 'inspectorContactName', caption: 'InspectorContactName', category: 'inspector' },
+                { field: 'inspectorAddress', caption: 'InspectorAddress', category: 'inspector' },
+                { field: 'inspectorCity', caption: 'InspectorCity', category: 'inspector' },
+                { field: 'inspectorState', caption: 'InspectorState', category: 'inspector' },
+                { field: 'inspectorZip', caption: 'InspectorZip', category: 'inspector' },
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName', category: 'mailing' },
+                { field: 'mailingContactName', caption: 'MailingContactName', category: 'mailing' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber', category: 'mailing' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName', category: 'mailing' },
+                { field: 'mailingNumber', caption: 'MailingNumber', category: 'mailing' },
+                { field: 'mailingCity', caption: 'MailingCity', category: 'mailing' },
+                { field: 'mailingState.code', caption: 'MailingState', category: 'mailing' },
+                { field: 'mailingZip', caption: 'MailingZip', category: 'mailing' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber', category: 'mailing' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress', category: 'mailing' }
+            ]
+        };
+    }
 
     public ngOnInit(): void {
         this.table.columns = this.getColumns();
@@ -232,5 +289,13 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
 
     public viewDetails(inspection: FogInspection): void {
         this._router.navigate([inspection.id], { relativeTo: this._activatedRoute });
+    }
+
+    public showDownloadManager(): void {
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 }

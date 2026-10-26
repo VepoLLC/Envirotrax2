@@ -76,6 +76,15 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         return Ok(result);
     }
 
+    [HttpGet("pdf")]
+    public async Task<IActionResult> GetProfessionalInspectionsPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] bool latestOnly, CancellationToken cancellationToken)
+    {
+        var result = await _inspectionService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
+        var pdf = await _inspectionService.GeneratePdfAsync(result.Data);
+
+        return File(pdf, "application/pdf");
+    }
+
     [HttpPost("submit")]
     public async Task<IActionResult> SubmitAsync([FromBody] CreateCsiInspectionDto request, CancellationToken cancellationToken)
     {

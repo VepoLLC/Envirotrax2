@@ -109,7 +109,7 @@ public class BackflowTestDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRed
 
     public ReferencedStateDto? MailingState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? MailingZip { get; set; }
 
     [StringLength(50)]

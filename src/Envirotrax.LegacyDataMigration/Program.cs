@@ -124,6 +124,7 @@ await backflowGaugeService.MigrateAsync();
 
 // After the sites and the professionals, because a test is recorded against a site by a tester who
 // belongs to one of them, and before the notifications, whose RecordId points at a test by its V1 id.
+// Its assembly, serial number, bypass and air gap images are moved into Azure Storage here too.
 var backflowTestService = provider.GetRequiredService<BackflowTestService>();
 await backflowTestService.MigrateAsync();
 

@@ -1,0 +1,132 @@
+<dp-loading-spinner *ngIf="isLoading" />
+
+<vp-section header="Water Suppliers Participating in the CSI and Backflow Program">
+    <div class="d-flex flex-wrap align-items-center gap-4 mb-3">
+        <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox"
+                   [(ngModel)]="selectAll"
+                   (ngModelChange)="onSelectAllChange()"
+                   name="letterGeneratorSelectAll" id="letterGeneratorSelectAll">
+            <label class="form-check-label" for="letterGeneratorSelectAll">Select/Unselect Water Suppliers</label>
+        </div>
+
+        <div class="col-12 col-md-4 col-xl-3">
+            <vp-input type="select"
+                      [(ngModel)]="showAllWaterSuppliers"
+                      (ngModelChange)="applyShowType()"
+                      name="letterGeneratorShowType"
+                      [options]="showTypeOptions" />
+        </div>
+
+        <button type="button" class="btn btn-primary vp-section-button ms-auto" (click)="loadWaterSuppliers()">
+            <i class="fa-solid fa-rotate me-1"></i>
+            Refresh Water Suppliers
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered table-hover align-middle text-nowrap mb-0">
+            <thead>
+                <tr>
+                    <th colspan="6" class="border-0"></th>
+                    <th colspan="9" class="text-center text-bg-success">Backflow Letters</th>
+                    <th class="border-0"></th>
+                    <th colspan="8" class="text-center bg-primary text-white">CSI Letters</th>
+                </tr>
+                <tr class="vp-table-header">
+                    <th></th>
+                    <th></th>
+                    <th>ID</th>
+                    <th>MID</th>
+                    <th class="w-100">Water Supplier</th>
+                    <th></th>
+
+                    <th>Renewal 1</th>
+                    <th>Renewal 2</th>
+                    <th>Expired 1</th>
+                    <th>Expired 2</th>
+                    <th>Non-Comp 1</th>
+                    <th>Print NC 1</th>
+                    <th>Non-Comp 2</th>
+                    <th>Print NC 2</th>
+                    <th>Unk Asm</th>
+
+                    <th></th>
+
+                    <th>Impending 1</th>
+                    <th>Impending 2</th>
+                    <th>Past Due 1</th>
+                    <th>Past Due 2</th>
+                    <th>Non-Comp 1</th>
+                    <th>Print NC 1</th>
+                    <th>Non-Comp 2</th>
+                    <th>Print NC 2</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let waterSupplier of visibleWaterSuppliers">
+                    <td>
+                        <input class="form-check-input" type="checkbox"
+                               [(ngModel)]="waterSupplier.isSelected"
+                               title="Process Water Supplier">
+                    </td>
+                    <td>
+                        <i class="fa-solid fa-table-cells-large"
+                           [class.text-primary]="!waterSupplier.parentId"
+                           [class.text-secondary]="waterSupplier.parentId"
+                           [title]="waterSupplier.parentId ? 'Sub Account' : 'Master Account'"></i>
+                    </td>
+                    <td>{{ waterSupplier.id }}</td>
+                    <td>{{ waterSupplier.parentId || 0 }}</td>
+                    <td>{{ waterSupplier.name }}</td>
+                    <td>
+                        <button type="button" class="btn btn-link p-0" title="Letter Settings" (click)="showSettings(waterSupplier)">
+                            <i class="fa-solid fa-gear text-primary"></i>
+                        </button>
+                    </td>
+
+                    <td class="bg-success-subtle">{{ waterSupplier.expiringNotice1 ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.expiringNotice2 ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.expiredNotice1 ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.expiredNotice2 ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.backflowNonCompliant1 ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">
+                        <input class="form-check-input" type="checkbox"
+                               [(ngModel)]="waterSupplier.backflowNonCompliantPrint1"
+                               (ngModelChange)="savePrintSettings(waterSupplier)"
+                               title="Include in print file">
+                    </td>
+                    <td class="bg-success-subtle">{{ waterSupplier.backflowNonCompliant2 ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">
+                        <input class="form-check-input" type="checkbox"
+                               [(ngModel)]="waterSupplier.backflowNonCompliantPrint2"
+                               (ngModelChange)="savePrintSettings(waterSupplier)"
+                               title="Include in print file">
+                    </td>
+                    <td class="bg-success-subtle">{{ waterSupplier.unknownAssembliesNotice ? 0 : '-' }}</td>
+
+                    <td></td>
+
+                    <td class="bg-primary-subtle">{{ waterSupplier.impendingNotice1 ? 0 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.impendingNotice2 ? 0 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.pastDueNotice1 ? 0 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.pastDueNotice2 ? 0 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.csiNonCompliant1 ? 0 : '-' }}</td>
+                    <td class="bg-primary-subtle">
+                        <input class="form-check-input" type="checkbox"
+                               [(ngModel)]="waterSupplier.csiNonCompliantPrint1"
+                               (ngModelChange)="savePrintSettings(waterSupplier)"
+                               title="Include in print file">
+                    </td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.csiNonCompliant2 ? 0 : '-' }}</td>
+                    <td class="bg-primary-subtle">
+                        <input class="form-check-input" type="checkbox"
+                               [(ngModel)]="waterSupplier.csiNonCompliantPrint2"
+                               (ngModelChange)="savePrintSettings(waterSupplier)"
+                               title="Include in print file">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</vp-section>

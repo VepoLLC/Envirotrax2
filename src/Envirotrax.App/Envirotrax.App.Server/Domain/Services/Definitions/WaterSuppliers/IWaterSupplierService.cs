@@ -14,6 +14,8 @@ public interface IWaterSupplierService : IService<WaterSupplier, WaterSupplierDt
 
     Task<IEnumerable<int>> GetSupplierIdsAsync(bool hasBackflowTests, CancellationToken cancellationToken);
 
+    Task<IEnumerable<WaterSupplierLetterSettingsDto>> GetAllLetterSettingsAsync(CancellationToken cancellationToken);
+
     Task<WaterSupplierDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken);
 
     Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details);

@@ -413,8 +413,8 @@
                   [(query)]="table.query"
                   (queryChange)="getSites()"
                   (queryReset)="getSites()"
-                  [canEdit]="true"
-                  (edit)="edit($event)"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewDetails($event)"
                   [freeTextSearch]="table.freeTextSearch" />
     </vp-section>
 </div>

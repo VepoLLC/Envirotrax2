@@ -19,6 +19,16 @@ public class FogTripTicketController : WaterSupplierCrudController<FogTripTicket
         _tripTicketService = service;
     }
 
+    [HttpGet("pdf")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetAllPdfAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var tickets = await _tripTicketService.GetAllAsync(pageInfo, query, cancellationToken);
+        var pdfBytes = await _tripTicketService.GeneratePdfAsync(tickets.Data);
+
+        return File(pdfBytes, "application/pdf");
+    }
+
     [HttpPut("{id}/approval")]
     [HasPermission(PermissionAction.CanModify)]
     public async Task<IActionResult> UpdateApprovalAsync(int id, [FromBody] bool disapproved, CancellationToken cancellationToken)

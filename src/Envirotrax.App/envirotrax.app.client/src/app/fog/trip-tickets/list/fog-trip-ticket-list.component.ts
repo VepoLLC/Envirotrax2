@@ -13,6 +13,8 @@ import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from '../../../shared/services/helpers/app-contaner-helper.service';
 import { PrintableTableService } from '../../../shared/services/printable-table.service';
+import { DownloadConfig } from '../../../shared/models/download-config';
+import { DownloadService } from '../../../shared/services/download.service';
 
 @Component({
     standalone: false,
@@ -101,6 +103,8 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
         { id: FogTripTicketDateType.WasteDeliveredDate, text: 'Waste delivered date' }
     ];
 
+    public downloadConfig: DownloadConfig;
+
     public get selectedDateType(): string {
         return this.table.query.filter?.find(qp => qp.columnName === 'dateType')?.value ?? '';
     }
@@ -110,8 +114,59 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _containerHelper: AppContainerHelperService,
-        private readonly _printService: PrintableTableService
-    ) { }
+        private readonly _printService: PrintableTableService,
+        private readonly _downloadService: DownloadService
+    ) {
+        this.downloadConfig = {
+            fileName: 'FOG Trip Tickets',
+            endpoint: this._fogTripTicketService.getAllEndpoint(),
+            pdfEndpoint: this._fogTripTicketService.getAllPdfEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel', 'PDF'],
+            columns: [
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName' },
+                { field: 'propertyType', caption: 'PropertyType' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName' },
+                { field: 'propertyNumber', caption: 'PropertyNumber' },
+                { field: 'propertyCity', caption: 'PropertyCity' },
+                { field: 'propertyState.code', caption: 'PropertyState' },
+                { field: 'propertyZip', caption: 'PropertyZIP' },
+                { field: 'transporterCompanyName', caption: 'TransporterCompanyName' },
+                { field: 'transporterContactName', caption: 'TransporterContactName' },
+                { field: 'transporterAddress', caption: 'TransporterAddress' },
+                { field: 'transporterCity', caption: 'TransporterCity' },
+                { field: 'transporterState', caption: 'TransporterState' },
+                { field: 'transporterZip', caption: 'TransporterZIP' },
+                { field: 'transporterWorkNumber', caption: 'TransporterWorkNumber' },
+                { field: 'transporterEmailAddress', caption: 'TransporterEmailAddress' },
+                { field: 'generatorContactName', caption: 'GeneratorContactName' },
+                { field: 'interceptorType', caption: 'InterceptorType' },
+                { field: 'interceptorOtherDescription', caption: 'InterceptorOtherDescription' },
+                { field: 'interceptorCapacity', caption: 'InterceptorCapacity' },
+                { field: 'interceptorCapacityType', caption: 'InterceptorCapacityType' },
+                { field: 'interceptorWasteRemovedAmount', caption: 'InterceptorWasteRemovedAmount' },
+                { field: 'interceptorWasteRemovedType', caption: 'InterceptorWasteRemovedType' },
+                { field: 'interceptorWasteRemovedDate', caption: 'InterceptorWasteRemovedDate' },
+                { field: 'vehicleLicensePlateNumber', caption: 'VehicleLicensePlateNumber' },
+                { field: 'vehicleManufacturer', caption: 'VehicleManufacturer' },
+                { field: 'vehicleYear', caption: 'VehicleYear' },
+                { field: 'vehicleCapacity', caption: 'VehicleCapacity' },
+                { field: 'vehicleCapacityType', caption: 'VehicleCapacityType' },
+                { field: 'vehicleStickerNumber', caption: 'VehicleStickerNumber' },
+                { field: 'receiverCompanyName', caption: 'ReceiverCompanyName' },
+                { field: 'receiverContactName', caption: 'ReceiverContactName' },
+                { field: 'receiverAddress', caption: 'ReceiverAddress' },
+                { field: 'receiverCity', caption: 'ReceiverCity' },
+                { field: 'receiverState', caption: 'ReceiverState' },
+                { field: 'receiverZip', caption: 'ReceiverZIP' },
+                { field: 'receiverPhoneNumber', caption: 'ReceiverPhoneNumber' },
+                { field: 'receiverEmailAddress', caption: 'ReceiverEmailAddress' },
+                { field: 'receiverRegistrationNumber', caption: 'ReceiverRegistrationNumber' },
+                { field: 'receiverPermitNumber', caption: 'ReceiverPermitNumber' },
+                { field: 'receiverWasteDeliveredDate', caption: 'ReceiverWasteDeliveredDate' }
+            ]
+        };
+    }
 
     public ngOnInit(): void {
         this.table.columns = this.getColumns();
@@ -225,6 +280,10 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
 
     public viewDetails(ticket: FogTripTicket): void {
         this._router.navigate([ticket.id], { relativeTo: this._activatedRoute });
+    }
+
+    public showDownloadManager(): void {
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
     public viewPrintableTable(): void {

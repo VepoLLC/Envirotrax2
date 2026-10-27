@@ -7,6 +7,8 @@ import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { DownloadConfig } from "../../../shared/models/download-config";
+import { DownloadService } from "../../../shared/services/download.service";
 
 interface FogInspectorLicenseSearchVm {
     inspectorLicenseNumber?: string;
@@ -38,14 +40,33 @@ export class FogInspectorListComponent implements OnInit {
     @ViewChild('addressCell', { static: true })
     public addressCell?: TemplateRef<CellTemplateData<Professional>>;
 
+    public downloadConfig: DownloadConfig;
+
     private _licenseSearch: FogInspectorLicenseSearchVm = {};
 
     constructor(
         private readonly _fogInspectorService: FogInspectorService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _downloadService: DownloadService
     ) {
+        this.downloadConfig = {
+            fileName: 'FOG Inspectors',
+            endpoint: this._fogInspectorService.getAllEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel'],
+            columns: [
+                { field: 'name', caption: 'CompanyName' },
+                { field: 'companyEmail', caption: 'CompanyEmail' },
+                { field: 'address', caption: 'Address' },
+                { field: 'city', caption: 'City' },
+                { field: 'state.code', caption: 'State' },
+                { field: 'zipCode', caption: 'ZIP' },
+                { field: 'phoneNumber', caption: 'WorkNumber' },
+                { field: 'faxNumber', caption: 'FaxNumber' },
+                { field: 'webSiteUrl', caption: 'WebsiteUrl' }
+            ]
+        };
     }
 
     public async ngOnInit(): Promise<void> {
@@ -109,6 +130,16 @@ export class FogInspectorListComponent implements OnInit {
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
+    }
+
+    public showDownloadManager(): void {
+        const { inspectorLicenseNumber, insurancePolicyNumber } = this._licenseSearch;
+
+        this.downloadConfig.endpoint = (inspectorLicenseNumber || insurancePolicyNumber)
+            ? this._fogInspectorService.getSearchEndpoint(inspectorLicenseNumber, insurancePolicyNumber)
+            : this._fogInspectorService.getAllEndpoint();
+
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
     public openDetails(row: any): void {

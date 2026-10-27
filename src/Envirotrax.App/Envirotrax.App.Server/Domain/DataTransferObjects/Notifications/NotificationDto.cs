@@ -13,6 +13,7 @@ public class NotificationDto : IDto
 
     public NotificationModuleType ModuleType { get; set; }
     public int RecordId { get; set; }
+    public NotificationTestDto? Test { get; set; }
 
     public string Description { get; set; } = null!;
     public string Color { get; set; } = null!;

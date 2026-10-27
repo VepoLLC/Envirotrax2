@@ -34,6 +34,19 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
         return Ok(result);
     }
 
+    [HttpGet("pdf")]
+    public async Task<IActionResult> GetAllPdfAsync(
+        [FromQuery] PageInfo pageInfo,
+        [FromQuery] Query query,
+        [FromQuery] int? waterSupplierId,
+        CancellationToken ct)
+    {
+        var result = await _fogService.SearchForProfessionalAsync(pageInfo, query, waterSupplierId, ct);
+        var pdf = await _fogService.GeneratePdfAsync(result.Data);
+
+        return File(pdf, "application/pdf");
+    }
+
     [HttpGet("insurance-check")]
     public async Task<IActionResult> GetInsuranceCheckAsync([FromQuery] int waterSupplierId, CancellationToken ct)
     {

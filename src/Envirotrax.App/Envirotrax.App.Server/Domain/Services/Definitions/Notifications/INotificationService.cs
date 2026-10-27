@@ -10,4 +10,6 @@ public interface INotificationService : IService<Notification, NotificationDto>
     Task<List<Notification>> AddAsync(List<Notification> notifications, CancellationToken cancellationToken);
 
     Task MarkSentAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
+
+    Task<NotificationDto?> SetHiddenAsync(int id, bool hidden, CancellationToken cancellationToken);
 }

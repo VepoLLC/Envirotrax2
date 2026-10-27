@@ -75,6 +75,8 @@ services.AddTransient<FogTripTicketService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 services.AddTransient<ApiAccountService>();
+services.AddTransient<BackflowRenewalRequirementService>();
+services.AddTransient<SiteScheduleService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -123,6 +125,7 @@ await backflowGaugeService.MigrateAsync();
 
 // After the sites and the professionals, because a test is recorded against a site by a tester who
 // belongs to one of them, and before the notifications, whose RecordId points at a test by its V1 id.
+// Its assembly, serial number, bypass and air gap images are moved into Azure Storage here too.
 var backflowTestService = provider.GetRequiredService<BackflowTestService>();
 await backflowTestService.MigrateAsync();
 
@@ -164,3 +167,9 @@ await notificationService.MigrateAsync();
 
 var apiAccountService = provider.GetRequiredService<ApiAccountService>();
 await apiAccountService.MigrateAsync();
+
+var backflowRenewalRequirementService = provider.GetRequiredService<BackflowRenewalRequirementService>();
+await backflowRenewalRequirementService.MigrateAsync();
+
+var siteScheduleService = provider.GetRequiredService<SiteScheduleService>();
+await siteScheduleService.MigrateAsync();

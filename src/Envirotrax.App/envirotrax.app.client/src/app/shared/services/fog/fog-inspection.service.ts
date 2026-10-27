@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { FogInspection } from "../../models/fog/fog-inspection";
+import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
     providedIn: 'root'
@@ -27,6 +28,20 @@ export class FogInspectionService {
         const observable = this._http.get<PagedData<FogInspection>>(url, { params });
 
         return await lastValueFrom(observable);
+    }
+
+    public getAllEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/fog/inspections')
+        };
+    }
+
+    public getAllPdfEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/fog/inspections/pdf')
+        };
     }
 
     public getById(id: number): Promise<FogInspection> {

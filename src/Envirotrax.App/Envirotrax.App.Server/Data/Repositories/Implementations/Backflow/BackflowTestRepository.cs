@@ -103,6 +103,22 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
             .ToListAsync(cancellationToken);
     }
 
+    // IgnoreQueryFilters: a parent supplier's notification setting fires on its child suppliers' tests, and the
+    // tenant filter would drop those. Scoping is restored explicitly to the current supplier and its children.
+    public async Task<List<BackflowTest>> GetForNotificationListAsync(IEnumerable<int> ids, CancellationToken cancellationToken)
+    {
+        var waterSupplierId = _tenantProvider.WaterSupplierId;
+
+        return await DbContext.BackflowTests
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Include(t => t.PropertyState)
+            .Where(t => ids.Contains(t.Id)
+                && t.DeletedTime == null
+                && (t.WaterSupplierId == waterSupplierId || t.WaterSupplier!.ParentId == waterSupplierId))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Dictionary<int, BackflowTest>> FindPreviousTestsAsync(
         IReadOnlyCollection<BackflowTest> tests, CancellationToken cancellationToken)
     {

@@ -22,6 +22,7 @@ public class AppDbContext : TenantDbContextBase<WaterSupplier>
     public DbSet<SiteLog> SiteLogs { get; set; }
     public DbSet<ProfessionalInsurance> ProfessionalInsurances { get; set; }
     public DbSet<BackflowGauge> BackflowGauges { get; set; }
+    public DbSet<BackflowTest> BackflowTests { get; set; }
     public DbSet<FogInspection> FogInspections { get; set; }
     public DbSet<FogTripTicket> FogTripTickets { get; set; }
     public DbSet<CsiInspectionImage> CsiInspectionImages { get; set; }

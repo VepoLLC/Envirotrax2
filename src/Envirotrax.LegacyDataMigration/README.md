@@ -138,11 +138,12 @@ Four things are worth knowing:
 - **V2 made 55 value columns NOT NULL that V1 leaves nullable.** Each falls back to `0`, so a single
   legacy NULL cannot roll back the whole run. `CreatedTime` is deliberately not defaulted: there is
   no honest stand-in for when a test was recorded, so a NULL there should stop the run.
-- **The five test images are not migrated yet.** V1 stores no image columns at all: it rebuilds each
-  path from the record id (`backflow/<id rounded down to 10000>/<id>-ext|sn|bext|bsn|ag.jpg`) and
-  decides whether to show it with `File.Exists`, so which images exist is not knowable from the
-  database. Moving them needs a probe-and-upload pass of its own and is tracked separately; the five
-  `*ImagePath` columns stay NULL until then.
+- **Text is copied without `LEFT()`.** V1 declares eight text columns wider than V2 does (the BPAT
+  company, contact, address, city and ZIP, the property and mailing ZIPs, and the gauge serial
+  number), but in the real V1 data only `MailingZIP` ever holds a longer value: seven tests from one
+  misaligned import carry a 23-character phone number there. `MailingZip` on tests was widened to 50
+  to match sites and FOG inspections, so nothing is cut, and a value that did not fit would stop the
+  run instead of being shortened.
 - **Some V1 columns have no V2 counterpart** and are deliberately dropped: the master water supplier
   and master BPAT ids, the per-component `Repair*Cleaned` / `Repair*Replaced` flags (V2 keeps only
   the `Repair*` booleans and their details), the rain/freeze sensor make and model, `TestType`,
@@ -152,6 +153,40 @@ Tests that could not be migrated are queryable:
 
 `SELECT * FROM MigrationSkippedBackflowTests` — either the water supplier never migrated, or no
 migrated professional user matches the tester login the test was recorded under.
+
+### How backflow test images are migrated
+
+A test has up to five images: the assembly and its serial number, the bypass assembly and its serial
+number (detectors only: DCD, DCD2, RPPD, RPPD2), and the air gap (air gaps only, which have no other).
+They are files on the legacy file server. V1 stores no path for them: every page rebuilds it from the
+record id (`backflow/<id rounded down to 10000>/<id>-ext.jpg`, or `-sn`, `-bext`, `-bsn`, `-ag`) and
+shows the image when that file exists. Which images exist is only partly recorded:
+
+- **A tester's upload** is also written to `SaveBackflowDeviceImages`, where an image type that is not
+  NULL means the file was written. About 132,000 images are known this way.
+- **A water supplier's upload** writes only the file. The one trace it leaves is the save around it,
+  which stamps the test's `LastModifiedBy` (or `ManualUserID`, on a test the supplier entered). For
+  such a test every image its device type can have is queued as a guess, about 181,000 more requests,
+  and most of them are expected to find nothing.
+
+`03_BackflowTestImages.sql` writes those paths into `LegacyAssemblyImagePath`,
+`LegacySerialNumberImagePath`, `LegacyBypassAssemblyImagePath`, `LegacyBypassSerialNumberImagePath` and
+`LegacyAirGapImagePath`, sets `LegacyImagesUnrecorded` on a test a supplier saved, and marks every test it
+looked at with `LegacyImagesQueued` so it never queues the same test twice.
+
+`BackflowTestService` then moves the images eight at a time, uploading each to
+`backflow-tests/<test id>/<assembly|serial-number|bypass-assembly|bypass-serial-number|air-gap>/legacy-<V1 id>.jpg`,
+the folders V2 uses when a supplier replaces a test image, and writes `AssemblyImagePath` and the
+others once a batch is up, in one save. A migrated test keeps its V1 id, so unlike the other image
+migrations these names survive a rebuild of the V2 database, and a re-run overwrites them in place.
+A guess the file server does not have loses its legacy path, so no later run asks for it again; a
+recorded image it does not have stays queued and is tried again, the way the other image migrations
+treat a missing file. As with site log attachments, an image V2 has no path for yet shows as missing
+rather than as a broken link.
+
+- **Still pending:** `SELECT COUNT(*) FROM BackflowTests WHERE (LegacyAssemblyImagePath IS NOT NULL AND AssemblyImagePath IS NULL) OR (LegacySerialNumberImagePath IS NOT NULL AND SerialNumberImagePath IS NULL) OR (LegacyBypassAssemblyImagePath IS NOT NULL AND BypassAssemblyImagePath IS NULL) OR (LegacyBypassSerialNumberImagePath IS NOT NULL AND BypassSerialNumberImagePath IS NULL) OR (LegacyAirGapImagePath IS NOT NULL AND AirGapImagePath IS NULL)`
+- **Not found in V1:** each recorded image the legacy file server no longer has is logged to
+  `Logs/BackflowTestService.log`; guesses that found nothing are only counted, per run.
 
 ## How FOG inspections are migrated
 
@@ -313,6 +348,11 @@ ticket's creation date, the moment V1 copied the signature and V2 would stamp it
 
 - **Still pending:** `SELECT COUNT(*) FROM FogTripTickets WHERE (HasLegacyTransporterSignature = 1 AND TransporterSignaturePath IS NULL) OR (HasLegacyGeneratorSignature = 1 AND GeneratorSignaturePath IS NULL) OR (HasLegacyReceiverSignature = 1 AND ReceiverSignaturePath IS NULL)`
 - **Not found in V1:** logged to `Logs/FogTripTicketService.log` with per-run counts.
+
+## How backflow renewal requirements are migrated
+
+**Note:** Re-running the migration after renewal requirements have been deleted or copied in V2 may restore
+original V1 records.
 
 ## Running it
 

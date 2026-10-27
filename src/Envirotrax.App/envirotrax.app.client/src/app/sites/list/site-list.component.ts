@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { Site } from "../../shared/models/sites/site";
 import { SiteService } from "../../shared/services/sites/site.service";
@@ -18,6 +18,7 @@ import { DownloadService } from "../../shared/services/download.service";
 import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { GeneralSettingsService } from "../../shared/services/settings/general-settings.service";
+import { PrintableTableService } from "../../shared/services/printable-table.service";
 
 @Component({
     standalone: false,
@@ -98,6 +99,9 @@ export class SiteListComponent implements OnInit {
     @ViewChild('keyIndicators', { static: true })
     public keyIndicators?: TemplateRef<CellTemplateData<Site>>;
 
+    @ViewChild('printableSection')
+    private _printableSection!: ElementRef;
+
     constructor(
         private readonly _siteService: SiteService,
         private readonly _router: Router,
@@ -109,7 +113,8 @@ export class SiteListComponent implements OnInit {
         private readonly _authService: AuthService,
         private readonly _downloadService: DownloadService,
         private readonly _containerHelper: AppContainerHelperService,
-        private readonly _generalSettingsService: GeneralSettingsService
+        private readonly _generalSettingsService: GeneralSettingsService,
+        private readonly _printService: PrintableTableService
     ) {
 
     }
@@ -323,6 +328,10 @@ export class SiteListComponent implements OnInit {
 
     public showDownloadManager(): void {
         this._downloadService.showDownloadManager(this.downloadConfig!, this.table.query);
+    }
+
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 
     private buildMapMarkers(sites: Site[]): MapMarker<Site>[] {

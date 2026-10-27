@@ -9,7 +9,8 @@ import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 import { PrintableTableService } from '../../../../shared/services/printable-table.service';
 import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
-
+import { DownloadConfig } from '../../../../shared/models/download-config';
+import { DownloadService } from '../../../../shared/services/download.service';
 
 @Component({
     standalone: false,
@@ -61,16 +62,55 @@ export class CsiInspectionListComponent implements OnInit {
         { id: PropertyType.Commercial.toString(), text: 'Commercial' }
     ];
 
+    public downloadConfig: DownloadConfig;
+
     constructor(
         private readonly _inspectionService: CsiInspectionService,
         private readonly _supplierService: ProfessionalSupplierService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _printService: PrintableTableService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _downloadService: DownloadService
     ) {
         this.inspections.query.filter = [this.paidFilter()];
-     }
+
+        this.downloadConfig = {
+            fileName: 'CSI Inspections',
+            endpoint: this._inspectionService.getProfessionalInspectionsEndpoint(this.latestOnly),
+            pdfEndpoint: this._inspectionService.getProfessionalInspectionsPdfEndpoint(this.latestOnly),
+            suppoertedFormats: ['CSV', 'Excel', 'PDF'],
+            columns: [
+                { field: 'inspectionDate', caption: 'InspectionDate' },
+                { field: 'inspectionResult', caption: 'PassedInspection' },
+                { field: 'site.accountNumber', caption: 'AccountNumber' },
+                { field: 'propertyBusinessName', caption: 'PropertyBusinessName' },
+                { field: 'propertyStreetNumber', caption: 'PropertyStreetNumber' },
+                { field: 'propertyStreetName', caption: 'PropertyStreetName' },
+                { field: 'propertyNumber', caption: 'PropertyNumber' },
+                { field: 'propertyCity', caption: 'PropertyCity' },
+                { field: 'propertyState.code', caption: 'PropertyState' },
+                { field: 'propertyZip', caption: 'PropertyZIP' },
+                { field: 'mailingCompanyName', caption: 'MailingCompanyName' },
+                { field: 'mailingContactName', caption: 'MailingContactName' },
+                { field: 'mailingStreetNumber', caption: 'MailingStreetNumber' },
+                { field: 'mailingStreetName', caption: 'MailingStreetName' },
+                { field: 'mailingNumber', caption: 'MailingNumber' },
+                { field: 'mailingCity', caption: 'MailingCity' },
+                { field: 'mailingState.code', caption: 'MailingState' },
+                { field: 'mailingZip', caption: 'MailingZIP' },
+                { field: 'mailingPhoneNumber', caption: 'MailingPhoneNumber' },
+                { field: 'mailingEmailAddress', caption: 'MailingEmailAddress' },
+                { field: 'inspectorCompanyName', caption: 'InspectorCompanyName' },
+                { field: 'inspectorContactName', caption: 'InspectorContactName' },
+                { field: 'inspectorAddress', caption: 'InspectorAddress' },
+                { field: 'inspectorCity', caption: 'InspectorCity' },
+                { field: 'inspectorState', caption: 'InspectorState' },
+                { field: 'inspectorZip', caption: 'InspectorZip' },
+                { field: 'comments', caption: 'Remarks' }
+            ]
+        };
+    }
 
     public async ngOnInit(): Promise<void> {
         this.inspections.columns = this.buildColumns();
@@ -181,6 +221,13 @@ export class CsiInspectionListComponent implements OnInit {
                 cellTemplate: this.inspectorTemplate
             }
         ];
+    }
+
+    public showDownloadManager(): void {
+        this.downloadConfig.endpoint = this._inspectionService.getProfessionalInspectionsEndpoint(this.latestOnly);
+        this.downloadConfig.pdfEndpoint = this._inspectionService.getProfessionalInspectionsPdfEndpoint(this.latestOnly);
+
+        this._downloadService.showDownloadManager(this.downloadConfig, this.inspections.query);
     }
 
     public viewPrintableTable(): void {

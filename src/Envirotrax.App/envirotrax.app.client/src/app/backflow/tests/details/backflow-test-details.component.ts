@@ -138,8 +138,8 @@ export class BackflowTestDetailsComponent implements OnInit {
 
         try {
             this.isLoading = true;
-            const blob = await this._testService.getPdf(this.test.id);
-            this._downloadService.downloadFileFromBlob(blob);
+            const testId = this.test.id;
+            await this._downloadService.openBlobInNewWindow(() => this._testService.getPdf(testId));
         } finally {
             this.isLoading = false;
         }

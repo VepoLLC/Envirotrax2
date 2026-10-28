@@ -79,9 +79,7 @@ export class PublicCsiInspectionViewComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const blob = await this._publicSearchService.getCsiInspectionPdf(this._id);
-
-            this._downloadService.downloadFileFromBlob(blob, `csi-inspection-${this._id}.pdf`);
+            await this._downloadService.openBlobInNewWindow(() => this._publicSearchService.getCsiInspectionPdf(this._id));
         } finally {
             this.isLoading = false;
         }

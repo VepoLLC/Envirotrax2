@@ -121,6 +121,7 @@ export class FogTripTicketListComponent implements OnInit, OnDestroy {
             fileName: 'FOG Trip Tickets',
             endpoint: this._fogTripTicketService.getAllEndpoint(),
             pdfEndpoint: this._fogTripTicketService.getAllPdfEndpoint(),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             columns: [
                 { field: 'propertyBusinessName', caption: 'PropertyBusinessName' },

@@ -123,6 +123,7 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
             fileName: 'FOG Inspections',
             endpoint: this._fogInspectionService.getAllEndpoint(),
             pdfEndpoint: this._fogInspectionService.getAllPdfEndpoint(),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },

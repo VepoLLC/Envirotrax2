@@ -83,10 +83,23 @@
                 <div class="row gy-3">
                     <div class="col-md-6">
                         <div class="fw-bold mb-1">User Account</div>
-                        <vp-input type="select"
-                                  name="userId"
-                                  [(ngModel)]="filters.userId"
-                                  [options]="accountOptions" />
+                        <div class="d-flex gap-1">
+                            <div class="flex-fill">
+                                <vp-lookup-field name="account"
+                                                 [canSearch]="true"
+                                                 [displayText]="filters.account?.emailAddress ?? 'Any account'"
+                                                 (search)="lookupAccount()" />
+                            </div>
+
+                            <button *ngIf="filters.account"
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    title="Clear account"
+                                    aria-label="Clear account"
+                                    (click)="clearAccount()">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="col-md-6">

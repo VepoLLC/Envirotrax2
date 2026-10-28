@@ -79,6 +79,7 @@ export class CsiInspectionListComponent implements OnInit {
             fileName: 'CSI Inspections',
             endpoint: this._inspectionService.getProfessionalInspectionsEndpoint(this.latestOnly),
             pdfEndpoint: this._inspectionService.getProfessionalInspectionsPdfEndpoint(this.latestOnly),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             columns: [
                 { field: 'inspectionDate', caption: 'InspectionDate' },

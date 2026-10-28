@@ -71,8 +71,8 @@ export class FogTripTicketViewComponent implements OnInit {
         try {
             this.isLoading = true;
             
-            const blob = await this._tripTicketService.getPdf(this.ticket.id);
-            this._downloadService.downloadFileFromBlob(blob);
+            const ticketId = this.ticket.id;
+            await this._downloadService.openBlobInNewWindow(() => this._tripTicketService.getPdf(ticketId));
         } finally {
             this.isLoading = false;
         }

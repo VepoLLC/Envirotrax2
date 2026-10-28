@@ -88,6 +88,7 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
             fileName: 'CSI Inspections',
             endpoint: this._csiInspectionService.getAllEndpoint(),
             pdfEndpoint: this._csiInspectionService.getAllPdfEndpoint(),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', "PDF"],
             columns: [
                 { field: 'inspectionDate', caption: 'InspectionDate' },

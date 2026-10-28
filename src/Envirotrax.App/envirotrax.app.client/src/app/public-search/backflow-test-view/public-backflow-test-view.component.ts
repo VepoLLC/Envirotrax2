@@ -44,9 +44,9 @@ export class PublicBackflowTestViewComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const blob = await this._publicSearchService.getBackflowTestPdf(this.test.id);
+            const testId = this.test.id;
 
-            this._downloadService.downloadFileFromBlob(blob, `backflow-test-${this.test.id}.pdf`);
+            await this._downloadService.openBlobInNewWindow(() => this._publicSearchService.getBackflowTestPdf(testId));
         } finally {
             this.isLoading = false;
         }

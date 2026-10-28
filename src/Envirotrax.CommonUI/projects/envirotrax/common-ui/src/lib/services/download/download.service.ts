@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { QueryHelperService } from "../helpers/query-helper.service";
 import { lastValueFrom } from "rxjs";
@@ -140,14 +140,24 @@ export class DownloadService {
         return params;
     }
 
-    private async downloadPdf(config: DownloadConfig): Promise<void> {
+    private requestPdf(config: DownloadConfig): Promise<HttpResponse<Blob>> {
         const observable = this._http.request(config.pdfEndpoint!.method || 'GET', config.pdfEndpoint!.url, {
             responseType: 'blob',
             observe: 'response',
             params: this.buildEndpointParams(config.pdfEndpoint!)
         });
 
-        const response = await lastValueFrom(observable);
+        return lastValueFrom(observable);
+    }
+
+    private async downloadPdf(config: DownloadConfig): Promise<void> {
+        if (config.openPdfInNewWindow) {
+            await this.openBlobInNewWindow(async () => (await this.requestPdf(config)).body!);
+
+            return;
+        }
+
+        const response = await this.requestPdf(config);
         const fileName = this.getFileNameFromResponse(response.headers.get('Content-Disposition'), config.fileName ?? 'document.pdf');
 
         this.downloadFileFromBlob(response.body!, fileName);

@@ -12,6 +12,7 @@ import { BackflowTestService } from '../../../shared/services/backflow/backflow-
 import { BackflowTestOptionsService } from '../../../shared/services/backflow/backflow-test-options.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { SiteEditComponent } from '../../../sites/edit/site-edit.component';
 import { WindowReference } from '../../../window/window-config';
 import { BackflowTestAdditionalInformationComponent } from './additional-information/backflow-test-additional-information.component';
@@ -175,6 +176,7 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
 
         this._windowService.addWindow(SiteEditComponent, {
             title: this.test.site?.accountNumber ?? 'Site',
+            color: MODULE_COLORS.SITE,
             model: {
                 siteId: siteId,
                 waterSupplierId: this.test.waterSupplier?.id

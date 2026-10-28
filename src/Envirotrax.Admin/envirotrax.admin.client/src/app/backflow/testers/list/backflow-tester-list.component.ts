@@ -6,6 +6,7 @@ import { SharedComponentsModule } from '../../../shared/components/shared.compon
 import { Professional } from '../../../shared/models/professionals/professional';
 import { BackflowTesterSearchCriteria, BackflowTesterService } from '../../../shared/services/backflow/backflow-tester.service';
 import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { BackflowTesterDetailsComponent } from '../details/backflow-tester-details.component';
 
 /**
@@ -62,6 +63,7 @@ export class BackflowTesterListComponent implements OnInit {
     public openDetails(tester: Professional): void {
         this._windowService.addWindow(BackflowTesterDetailsComponent, {
             title: this.buildTitle(tester),
+            color: MODULE_COLORS.BACKFLOW,
             model: tester
         });
     }

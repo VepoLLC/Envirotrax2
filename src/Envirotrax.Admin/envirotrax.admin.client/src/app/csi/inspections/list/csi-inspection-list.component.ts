@@ -15,6 +15,7 @@ import { PropertyType } from '../../../shared/models/sites/site';
 import { CsiInspectionService } from '../../../shared/services/csi/csi-inspection.service';
 import { WaterSupplierService } from '../../../shared/services/water-suppliers/water-supplier.service';
 import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { CsiInspectionDetailsComponent } from '../details/csi-inspection-details.component';
 
 @Component({
@@ -87,6 +88,7 @@ export class CsiInspectionListComponent implements OnInit {
     public openDetails(inspection: CsiInspection): void {
         this._windowService.addWindow(CsiInspectionDetailsComponent, {
             title: `${inspection.id} - ${this.buildPropertyAddress(inspection)}`,
+            color: MODULE_COLORS.CSI,
             model: inspection
         });
     }

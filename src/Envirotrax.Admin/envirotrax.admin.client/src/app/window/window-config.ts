@@ -1,6 +1,7 @@
 
 export interface WindowConfig<T> {
     title: string;
+    color?: string;
     model?: T;
 }
 

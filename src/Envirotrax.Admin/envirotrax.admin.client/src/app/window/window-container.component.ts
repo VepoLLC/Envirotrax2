@@ -2,6 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, Type, ViewChild } from "@angu
 import { WindowConfig } from "./window-config";
 import { WindowService } from "../shared/services/window.service";
 import { Subscription } from "rxjs";
+import { resolveWindowColors, WindowColors } from "./window-colors";
 
 @Component({
     standalone: false,
@@ -48,7 +49,8 @@ export class WindowContainerComponent implements OnInit, OnDestroy {
     public addWindow<TComponent, TData>(component: Type<TComponent>, config: WindowConfig<TData>): void {
         this.windows.push({
             componentType: component,
-            config: config
+            config: config,
+            colors: resolveWindowColors(config)
         });
 
         this.windows = [...this.windows];
@@ -75,5 +77,6 @@ export class WindowContainerComponent implements OnInit, OnDestroy {
 export interface WindowVm<TComponent, TData> {
     componentType: Type<TComponent>;
     config: WindowConfig<TData>;
+    colors: WindowColors;
     isMinimized?: boolean;
 }

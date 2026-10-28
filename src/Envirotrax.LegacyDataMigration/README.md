@@ -196,7 +196,7 @@ suppliers and sites keep their V1 ids, because the customer-facing legacy API ex
 suppliers, sites, professionals and professional users are all migrated before it, so nothing here has
 to be backfilled.
 
-Five things are worth knowing:
+Six things are worth knowing:
 
 - **The inspector is matched within the company the inspection was filed under.** V1 names the
   inspector by login (`InspectorID`) and their company by `MasterInspectorID`, which is empty when the
@@ -211,6 +211,9 @@ Five things are worth knowing:
 - **Facility type and coordinates change shape.** `FacilityType` is the text of a dropdown in V1 and an
   enum in V2; it goes through the same table as sites. The interceptor's latitude and longitude are
   text in V1 and numbers in V2, and a blank one becomes NULL rather than 0.
+- **Text is copied without `LEFT()`.** V1 declares no text column wider than V2 does, and in the real
+  V1 data the longest value of any column is well inside its V2 size, so nothing can be cut and no V2
+  column needed widening. A value that did not fit would stop the run instead of being shortened.
 - **Some columns have no counterpart on the other side.** The master water supplier ids,
   `MasterInspectorID` (used only for the match above) and `InterceptorPhotograph` (read by V1 but never
   written) are dropped. `InspectorJobTitle`, `LastTripTicketDate`, `TripTicketInterval` and `EmailPdf`

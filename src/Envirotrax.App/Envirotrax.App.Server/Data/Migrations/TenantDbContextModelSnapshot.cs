@@ -3994,6 +3994,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("NonCompliantMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("NonCompliantPrint1")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("NonCompliantPrint2")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NonCompliantTitle")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -4003,6 +4009,13 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("NoticeBodyFontSize")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NoticeImageFitSize")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<int>("NoticeImageFitType")
                         .HasColumnType("int");
 
                     b.Property<bool>("OutOfServiceRequiresApproval")
@@ -4031,6 +4044,31 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Property<int>("TestingMethod")
                         .HasColumnType("int");
+
+                    b.Property<string>("UnknownAssembliesLettersBackgroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("UnknownAssembliesLettersBorderColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("UnknownAssembliesLettersForegroundColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("UnknownAssembliesMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("UnknownAssembliesNotice")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UnknownAssembliesTitle")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("WaterSupplierId");
 
@@ -4100,6 +4138,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("NonCompliantMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("NonCompliantPrint1")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("NonCompliantPrint2")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NonCompliantTitle")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -4109,6 +4153,13 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("NoticeBodyFontSize")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NoticeImageFitSize")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<int>("NoticeImageFitType")
                         .HasColumnType("int");
 
                     b.Property<string>("PastDueLettersBackgroundColor")

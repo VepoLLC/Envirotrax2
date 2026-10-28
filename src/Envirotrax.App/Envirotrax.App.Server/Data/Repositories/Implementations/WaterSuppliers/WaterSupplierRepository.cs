@@ -5,6 +5,7 @@ using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.Common;
 using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,53 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
                 && !supplier.GeneralSettings.AdministrativeOnly)
             .Select(supplier => supplier.Id)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<WaterSupplierLetterSettingsDto>> GetAllLetterSettingsAsync(CancellationToken cancellationToken)
+    {
+        var query =
+            from supplier in DbContext.WaterSuppliers
+            where supplier.DeletedTime == null
+                && supplier.GeneralSettings != null
+                && (supplier.GeneralSettings.BackflowTesting || supplier.GeneralSettings.CsiInspections)
+
+            join backflowSettings in DbContext.BackflowSettings
+                on supplier.Id equals backflowSettings.WaterSupplierId into backflowSettingsGroup
+            from backflowSettings in backflowSettingsGroup.DefaultIfEmpty()
+
+            join csiSettings in DbContext.CsiSettings
+                on supplier.Id equals csiSettings.WaterSupplierId into csiSettingsGroup
+            from csiSettings in csiSettingsGroup.DefaultIfEmpty()
+
+            orderby supplier.Name
+
+            select new WaterSupplierLetterSettingsDto
+            {
+                Id = supplier.Id,
+                Name = supplier.Name,
+                ParentId = supplier.ParentId,
+
+                ExpiringNotice1 = backflowSettings.ExpiringNotice1,
+                ExpiringNotice2 = backflowSettings.ExpiringNotice2,
+                ExpiredNotice1 = backflowSettings.ExpiredNotice1,
+                ExpiredNotice2 = backflowSettings.ExpiredNotice2,
+                BackflowNonCompliant1 = backflowSettings.BackflowNonCompliant1,
+                BackflowNonCompliant2 = backflowSettings.BackflowNonCompliant2,
+                BackflowNonCompliantPrint1 = backflowSettings.NonCompliantPrint1,
+                BackflowNonCompliantPrint2 = backflowSettings.NonCompliantPrint2,
+                UnknownAssembliesNotice = backflowSettings.UnknownAssembliesNotice,
+
+                ImpendingNotice1 = csiSettings.ImpendingNotice1,
+                ImpendingNotice2 = csiSettings.ImpendingNotice2,
+                PastDueNotice1 = csiSettings.PastDueNotice1,
+                PastDueNotice2 = csiSettings.PastDueNotice2,
+                CsiNonCompliant1 = csiSettings.NonCompliant1,
+                CsiNonCompliant2 = csiSettings.NonCompliant2,
+                CsiNonCompliantPrint1 = csiSettings.NonCompliantPrint1,
+                CsiNonCompliantPrint2 = csiSettings.NonCompliantPrint2
+            };
+
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<WaterSupplier?> GetUnscopedAsync(int waterSupplierId, CancellationToken cancellationToken)

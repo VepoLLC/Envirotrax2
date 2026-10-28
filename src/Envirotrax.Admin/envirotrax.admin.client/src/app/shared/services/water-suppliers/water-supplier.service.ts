@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { InputOption, MAX_PAGE_SIZE, PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { WaterSupplierDetails } from "../../models/water-suppliers/water-supplier-details";
+import { WaterSupplierLetterSettings } from "../../models/water-suppliers/water-supplier-letter-settings";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({
@@ -34,6 +35,12 @@ export class WaterSupplierService {
         );
 
         return (result.data ?? []).map(supplier => ({ id: String(supplier.id), text: supplier.name, data: supplier }));
+    }
+
+    public async getAllLetterSettings(): Promise<WaterSupplierLetterSettings[]> {
+        const url = this._urlResolver.resolveUrl('/api/water-suppliers/letter-settings');
+
+        return await lastValueFrom(this._http.get<WaterSupplierLetterSettings[]>(url));
     }
 
     public async getDetails(id: number): Promise<WaterSupplierDetails> {

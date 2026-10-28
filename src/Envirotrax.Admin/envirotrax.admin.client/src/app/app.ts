@@ -13,6 +13,7 @@ import { FogInspectionListComponent } from './fog/inspections/list/fog-inspectio
 import { FogInspectorListComponent } from './fog/inspectors/list/fog-inspector-list.component';
 import { FogDisposalSiteListComponent } from './fog/disposal-sites/list/fog-disposal-site-list.component';
 import { FogTripTicketListComponent } from './fog/trip-tickets/list/fog-trip-ticket-list.component';
+import { LetterGeneratorComponent } from './management-tools/letter-generator/letter-generator.component';
 import { NavigationEnd, Router } from '@angular/router';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 import { filter } from 'rxjs';
@@ -138,6 +139,17 @@ export class App implements OnInit {
             onClick: this.showFogDisposalSites.bind(this)
           }
         ]
+      },
+      {
+        title: 'Management Tools',
+        iconCss: 'fa-solid fa-screwdriver-wrench',
+        children: [
+          {
+            title: 'Letter Generator',
+            iconCss: 'fa-solid fa-envelopes-bulk',
+            onClick: this.showLetterGenerator.bind(this)
+          }
+        ]
       }
     ];
   }
@@ -238,6 +250,12 @@ export class App implements OnInit {
   public showFogDisposalSites(): void {
     this._windowService.addWindow(FogDisposalSiteListComponent, {
       title: 'FOG Disposal Sites'
+    });
+  }
+
+  public showLetterGenerator(): void {
+    this._windowService.addWindow(LetterGeneratorComponent, {
+      title: 'Letter Generator'
     });
   }
 }

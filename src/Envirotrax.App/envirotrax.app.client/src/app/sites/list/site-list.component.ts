@@ -320,7 +320,7 @@ export class SiteListComponent implements OnInit {
             .subscribe(_ => this.getSites());
     }
 
-    public edit(site: Site): void {
+    public viewDetails(site: Site): void {
         this._router.navigate([site.id, 'edit'], {
             relativeTo: this._activatedRoute
         });

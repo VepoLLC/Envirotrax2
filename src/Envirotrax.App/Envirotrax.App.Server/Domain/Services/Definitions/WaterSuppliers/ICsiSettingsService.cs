@@ -5,4 +5,5 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 
 public interface ICsiSettingsService : IService<CsiSettings, CsiSettingsDto>
 {
+    Task<CsiSettingsDto> AddOrUpdateAsync(int waterSupplierId, CsiSettingsDto settings);
 }

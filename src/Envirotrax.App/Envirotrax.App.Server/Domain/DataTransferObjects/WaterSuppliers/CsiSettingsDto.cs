@@ -1,4 +1,5 @@
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.WaterSuppliers;
 
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 
@@ -18,6 +19,8 @@ public class CsiSettingsDto : IDto
     public CsiPastDueType PastDueNotice2 { get; set; }
     public CsiNonCompliantType NonCompliant1 { get; set; }
     public CsiNonCompliantType NonCompliant2 { get; set; }
+    public bool NonCompliantPrint1 { get; set; }
+    public bool NonCompliantPrint2 { get; set; }
 
     // CSI Letter Header Settings
     public string ImpendingLettersBackgroundColor { get; set; } = "#d3d3d3";
@@ -33,6 +36,8 @@ public class CsiSettingsDto : IDto
     // CSI Letter Message Settings
     public string? NoticeBodyFont { get; set; }
     public int? NoticeBodyFontSize { get; set; }
+    public LetterImageFitType NoticeImageFitType { get; set; }
+    public decimal NoticeImageFitSize { get; set; }
     public string? ImpendingTitle { get; set; }
     public string? ImpendingMessage { get; set; }
     public string? PastDueTitle { get; set; }

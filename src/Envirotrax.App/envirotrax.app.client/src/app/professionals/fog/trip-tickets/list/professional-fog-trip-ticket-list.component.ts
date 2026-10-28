@@ -279,7 +279,7 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
-    public viewPrintableTable(): void {
-        this._printService.open(this._printableSection.nativeElement);
+    public async viewPrintableTable(): Promise<void> {
+        await this._printService.open(this.table, () => this.getTripTickets(), () => this._printableSection.nativeElement);
     }
 }

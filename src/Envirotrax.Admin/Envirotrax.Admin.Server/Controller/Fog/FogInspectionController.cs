@@ -39,6 +39,22 @@ public class FogInspectionController : AdminBaseController
         return inspection == null ? NotFound() : Ok(inspection);
     }
 
+    [HttpPut("{id}/validation-hold")]
+    public async Task<IActionResult> UpdateValidationHoldAsync(int id, [FromQuery] int waterSupplierId, [FromBody] bool onHold, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.UpdateValidationHoldAsync(id, waterSupplierId, onHold, cancellationToken);
+
+        return inspection == null ? NotFound() : Ok(inspection);
+    }
+
+    [HttpPut("{id}/needs-validation")]
+    public async Task<IActionResult> UpdateNeedsValidationAsync(int id, [FromQuery] int waterSupplierId, [FromBody] bool needsValidation, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.UpdateNeedsValidationAsync(id, waterSupplierId, needsValidation, cancellationToken);
+
+        return inspection == null ? NotFound() : Ok(inspection);
+    }
+
     [HttpPost("{id}/images/{imageType}")]
     public async Task<IActionResult> UploadImageAsync(int id, string imageType, [FromQuery] int waterSupplierId, [FromForm] IFormFile file, CancellationToken cancellationToken)
     {

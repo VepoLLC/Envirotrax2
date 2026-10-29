@@ -180,6 +180,7 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public bool NeedsValidation { get; set; }
     public bool ValidationNewSite { get; set; }
     public bool ValidationSiteInformationChanged { get; set; }
+    public bool ValidationOnHold { get; set; }
 
     // Payment / transaction
     [StringLength(100)]

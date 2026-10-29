@@ -152,6 +152,41 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         return ticket;
     }
 
+    // Submission Validations window: the Hold checkbox and the Clear action.
+    public async Task<FogTripTicket?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken)
+    {
+        var ticket = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (ticket == null)
+        {
+            return null;
+        }
+
+        ticket.ValidationOnHold = onHold;
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        return ticket;
+    }
+
+    // Trip tickets have no record log, so the clearing date goes on the ticket itself, as in V1.
+    public async Task<FogTripTicket?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken)
+    {
+        var ticket = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (ticket == null)
+        {
+            return null;
+        }
+
+        ticket.NeedsValidation = needsValidation;
+        ticket.ValidationClearedDate = needsValidation ? null : DateTime.UtcNow;
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        return ticket;
+    }
+
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
         return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null, cancellationToken);

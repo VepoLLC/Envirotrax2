@@ -27,6 +27,7 @@ export enum BackflowTestResult {
 
 export class CsiInspection {
     id?: number;
+    waterSupplier?: WaterSupplier;
     inspectionDate?: string;
     inspectionResult?: boolean;
     transactionId?: string;
@@ -42,6 +43,11 @@ export class CsiInspection {
     inspectorContactName?: string;
     inspectorLicenseType?: string;
     inspectorLicenseNumber?: string;
+    needsValidation?: boolean;
+    validationNewSite?: boolean;
+    validationSiteInformationChanged?: boolean;
+    validationOnHold?: boolean;
+    createdTime?: string;
 }
 
 export class CsiInspectionDetails {

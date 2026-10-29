@@ -78,6 +78,15 @@ export class BackflowTest {
     bpatCompanyName?: string;
     bpatContactName?: string;
     bpatLicenseNumber?: string;
+    needsValidation?: boolean;
+    validationNewSite?: boolean;
+    validationSiteInformationChanged?: boolean;
+    validationUnknownSerialNumber?: boolean;
+    validationDeviceInformationChanged?: boolean;
+    validationDeviceMoved?: boolean;
+    validationHazardTypeChanged?: boolean;
+    validationCreatedFromCsi?: boolean;
+    validationOnHold?: boolean;
 }
 
 export class BackflowTestReviewer {

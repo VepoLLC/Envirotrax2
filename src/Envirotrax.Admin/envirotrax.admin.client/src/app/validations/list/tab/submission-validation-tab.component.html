@@ -1,0 +1,72 @@
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div class="d-flex flex-wrap gap-4 justify-content-center mb-3">
+    <span class="d-flex align-items-center gap-1" *ngFor="let flag of legend">
+        <vp-submission-validation-badge [flag]="flag" />
+        {{ flag.label }}
+    </span>
+</div>
+
+<vp-table *ngIf="table.items"
+          [columns]="table.columns!"
+          [data]="table.items.data"
+          [canViewDetails]="canViewDetails"
+          (viewDetails)="openDetails($event)"
+          [customActions]="customActions"
+          [(pageInfo)]="table.items.pageInfo"
+          (pageInfoChange)="load()"
+          [(query)]="table.query"
+          (queryChange)="load()"
+          (queryReset)="load()" />
+
+<ng-template #holdCell let-rowData="rowData">
+    <div class="form-check d-flex justify-content-center mb-0">
+        <input class="form-check-input"
+               type="checkbox"
+               aria-label="Hold"
+               [checked]="rowData?.validationOnHold"
+               (change)="toggleHold(rowData, $event)">
+    </div>
+</ng-template>
+
+<ng-template #statusCell let-rowData="rowData">
+    <vp-submission-validation-badge [flag]="rowData?.statusFlag" />
+</ng-template>
+
+<ng-template #reasonCell let-rowData="rowData">
+    <div class="d-flex gap-1">
+        <vp-submission-validation-badge *ngFor="let flag of rowData?.reasonFlags" [flag]="flag" />
+    </div>
+</ng-template>
+
+<ng-template #propertyCell let-rowData="rowData">
+    <div class="d-flex gap-2">
+        <i class="fa-solid fa-house text-primary"
+           title="Residential"
+           *ngIf="rowData?.propertyType === propertyType.Residential"></i>
+        <i class="fa-solid fa-building text-danger"
+           title="Commercial"
+           *ngIf="rowData?.propertyType === propertyType.Commercial"></i>
+
+        <div>
+            <div class="fw-semibold"
+                 *ngIf="rowData?.propertyType === propertyType.Commercial && rowData?.propertyBusinessName">
+                {{ rowData.propertyBusinessName }}
+            </div>
+
+            <div>{{ rowData?.propertyAddress }}</div>
+
+            <div>{{ rowData?.propertyCityStateZip }}</div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #infoCell let-rowData="rowData">
+    <div>
+        <div *ngFor="let line of rowData?.infoLines">
+            <span class="fw-semibold">{{ line.label }}:</span>
+            <span class="ms-1" *ngIf="line.date">{{ line.date | date }}</span>
+            <span class="ms-1" *ngIf="!line.date">{{ line.text }}</span>
+        </div>
+    </div>
+</ng-template>

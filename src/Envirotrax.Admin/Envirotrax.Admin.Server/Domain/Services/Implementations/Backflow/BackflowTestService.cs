@@ -39,6 +39,16 @@ public class BackflowTestService : IBackflowTestService
         return _apiClient.PutAsync<BackflowTestUpdateRequest, BackflowTestDetailsDto>(waterSupplierId, $"{BaseUrl}/{id}", request, cancellationToken);
     }
 
+    public Task<BackflowTestDto?> UpdateValidationHoldAsync(int id, int waterSupplierId, bool onHold, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<bool, BackflowTestDto>(waterSupplierId, $"{BaseUrl}/{id}/validation-hold", onHold, cancellationToken);
+    }
+
+    public Task<BackflowTestDto?> UpdateNeedsValidationAsync(int id, int waterSupplierId, bool needsValidation, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<bool, BackflowTestDto>(waterSupplierId, $"{BaseUrl}/{id}/needs-validation", needsValidation, cancellationToken);
+    }
+
     public Task<BackflowTestDetailsDto?> UploadImageAsync(int id, int waterSupplierId, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken)
     {
         var formFields = new Dictionary<string, string>();

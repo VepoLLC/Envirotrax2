@@ -162,5 +162,14 @@ public class FogInspectionDto
 
     public string? SignatureImageUrl { get; set; }
 
+    // Validation
+    public bool NeedsValidation { get; set; }
+
+    public bool ValidationNewSite { get; set; }
+
+    public bool ValidationSiteInformationChanged { get; set; }
+
+    public bool ValidationOnHold { get; set; }
+
     public DateTime CreatedTime { get; set; }
 }

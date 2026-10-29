@@ -89,5 +89,16 @@ public class FogTripTicketDto
 
     public string? TransactionId { get; set; }
 
+    // Validation
+    public bool NeedsValidation { get; set; }
+
+    public bool ValidationOnHold { get; set; }
+
+    public bool ValidationNewSite { get; set; }
+
+    public bool ValidationSiteInformationChanged { get; set; }
+
+    public bool ValidationReceiverInformationChanged { get; set; }
+
     public DateTime CreatedTime { get; set; }
 }

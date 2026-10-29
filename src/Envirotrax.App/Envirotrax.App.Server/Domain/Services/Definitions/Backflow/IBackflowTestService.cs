@@ -58,6 +58,8 @@ public interface IBackflowTestService : IService<BackflowTest, BackflowTestDto>
     Task<BackflowReplacementDto?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken);
     Task<BackflowReplacementDto?> UpdateReplacementHoldAsync(int id, bool onHold);
     Task<BackflowReplacementDto?> UpdateReplacementClearedAsync(int id, bool cleared);
+    Task<BackflowTestDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default);
+    Task<BackflowTestDto?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken = default);
 
     Task<BackflowTestDto?> UpdateForProfessionalAsync(
         int id,

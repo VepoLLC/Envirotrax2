@@ -58,6 +58,8 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<BackflowTest?> GetReplacedAssemblyAsync(int id, CancellationToken cancellationToken);
     Task<BackflowTest?> UpdateReplacementHoldAsync(int id, bool onHold);
     Task<BackflowTest?> UpdateReplacementClearedAsync(int id, bool cleared);
+    Task<BackflowTest?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken);
+    Task<BackflowTest?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken);
 
     Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken);
 

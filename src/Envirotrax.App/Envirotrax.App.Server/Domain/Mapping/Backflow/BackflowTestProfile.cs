@@ -74,6 +74,10 @@ public class BackflowTestProfile : Profile
             .ForMember(m => m.ApprovedById, opt => opt.MapFrom(dto => dto.ApprovedBy != null ? dto.ApprovedBy.Id : (int?)null))
             .ForMember(m => m.RejectedBy, opt => opt.Ignore())
             .ForMember(m => m.RejectedById, opt => opt.MapFrom(dto => dto.RejectedBy != null ? dto.RejectedBy.Id : (int?)null))
+            // Server-owned: the CSI assembly flow sets ValidationCreatedFromCsi and only the admin validation workflow
+            // puts a test on hold, so a submission can never set either one.
+            .ForMember(m => m.ValidationCreatedFromCsi, opt => opt.Ignore())
+            .ForMember(m => m.ValidationOnHold, opt => opt.Ignore())
             .ForMember(m => m.UpdatedBy, opt => opt.Ignore())
             .ForMember(m => m.CreatedBy, opt => opt.Ignore())
             .ForMember(m => m.DeletedBy, opt => opt.Ignore());

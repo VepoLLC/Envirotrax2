@@ -18,6 +18,10 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
 
     Task<FogInspection?> UpdateForAdminAsync(int id, FogInspectionAdminUpdateRequest request);
 
+    Task<FogInspection?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken);
+
+    Task<FogInspection?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken);
+
     Task<FogInspection?> UpdateImagePathAsync(int id, string imagePathPropertyName, string newPath);
 
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);

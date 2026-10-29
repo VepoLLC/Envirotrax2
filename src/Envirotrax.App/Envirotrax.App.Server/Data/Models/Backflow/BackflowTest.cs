@@ -271,6 +271,10 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public bool ValidationSiteInformationChanged { get; set; }
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
+    public bool ValidationDeviceMoved { get; set; }
+    public bool ValidationHazardTypeChanged { get; set; }
+    public bool ValidationCreatedFromCsi { get; set; }
+    public bool ValidationOnHold { get; set; }
 
     [StringLength(255)]
     public string? ValidationNotes { get; set; }

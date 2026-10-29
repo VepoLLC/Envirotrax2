@@ -10,6 +10,8 @@ public interface ICsiInspectionRepository : IRepository<CsiInspection>
     Task<IEnumerable<CsiInspection>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken);
     Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken);
     Task<CsiInspection?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request);
+    Task<CsiInspection?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken);
+    Task<CsiInspection?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken);
     Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model);
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
 

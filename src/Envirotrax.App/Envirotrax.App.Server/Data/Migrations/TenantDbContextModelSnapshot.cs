@@ -814,7 +814,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("ValidationCreatedFromCsi")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("ValidationDeviceInformationChanged")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ValidationDeviceMoved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ValidationHazardTypeChanged")
                         .HasColumnType("bit");
 
                     b.Property<bool>("ValidationNewSite")
@@ -823,6 +832,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<string>("ValidationNotes")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("ValidationOnHold")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("ValidationReplacementCleared")
                         .HasColumnType("bit");
@@ -1151,6 +1163,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("ValidationNewSite")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ValidationOnHold")
                         .HasColumnType("bit");
 
                     b.Property<bool>("ValidationSiteInformationChanged")
@@ -1709,6 +1724,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("ValidationNewSite")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ValidationOnHold")
                         .HasColumnType("bit");
 
                     b.Property<bool>("ValidationSiteInformationChanged")

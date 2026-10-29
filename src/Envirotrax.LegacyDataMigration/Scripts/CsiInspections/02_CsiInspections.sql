@@ -70,7 +70,7 @@ BEGIN TRY
          AiOssf, AiWaterWell, AiFireSystem, AiFireSystem2, AiGreaseTrap, AiSandGrit, AiReclaimedWater, AiIrrigationSystem,
          AiIrrigationSystem2, AiHasDomesticPremisesIsolation, AiRequiresDomesticPremisesIsolation,
 
-         Comments, NeedsValidation, ValidationNewSite, ValidationSiteInformationChanged,
+         Comments, NeedsValidation, ValidationNewSite, ValidationSiteInformationChanged, ValidationOnHold,
 
          TransactionId, TransactionDate, Amount, AmountShare, EmailPdf,
 
@@ -126,6 +126,7 @@ BEGIN TRY
 
         NULLIF(CAST(legacyInspections.Comments AS NVARCHAR(MAX)), ''), ISNULL(legacyInspections.NeedsValidation, 0),
         ISNULL(legacyInspections.ValidationNewSite, 0), ISNULL(legacyInspections.ValidationSiteInformationChanged, 0),
+        ISNULL(legacyInspections.ValidationOnHold, 0),
 
         -- An empty TransactionID is an unpaid inspection still in the inspector's cart.
         NULLIF(legacyInspections.TransactionID, ''), legacyInspections.TransactionDate,

@@ -569,6 +569,20 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         return dto;
     }
 
+    public async Task<FogInspectionDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default)
+    {
+        var inspection = await _repository.UpdateValidationHoldAsync(id, onHold, cancellationToken);
+
+        return MapToDto(inspection);
+    }
+
+    public async Task<FogInspectionDto?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken = default)
+    {
+        var inspection = await _repository.UpdateNeedsValidationAsync(id, needsValidation, cancellationToken);
+
+        return MapToDto(inspection);
+    }
+
     public async Task<FogInspectionDto?> UpdateImageForAdminAsync(int id, string imageType, Stream fileStream, string fileName)
     {
         if (!ValidImageTypes.Contains(imageType))

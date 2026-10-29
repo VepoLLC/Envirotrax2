@@ -35,4 +35,20 @@ export class FogTripTicketService {
 
         return await lastValueFrom(observable);
     }
+
+    public async updateValidationHold(id: number, waterSupplierId: number, onHold: boolean): Promise<FogTripTicket> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}/validation-hold?waterSupplierId=${waterSupplierId}`);
+
+        const observable = this._http.put<FogTripTicket>(url, onHold);
+
+        return await lastValueFrom(observable);
+    }
+
+    public async updateNeedsValidation(id: number, waterSupplierId: number, needsValidation: boolean): Promise<FogTripTicket> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}/needs-validation?waterSupplierId=${waterSupplierId}`);
+
+        const observable = this._http.put<FogTripTicket>(url, needsValidation);
+
+        return await lastValueFrom(observable);
+    }
 }

@@ -98,7 +98,7 @@ BEGIN TRY
          LastTripTicketDate, TripTicketInterval,
 
         -- Validation
-         NeedsValidation, ValidationNewSite, ValidationSiteInformationChanged,
+         NeedsValidation, ValidationNewSite, ValidationSiteInformationChanged, ValidationOnHold,
 
         -- Payment / Transaction
          TransactionId, TransactionDate, Amount, AmountShare, EmailPdf,
@@ -213,7 +213,7 @@ BEGIN TRY
 
         -- Validation
         ISNULL(legacyInspections.NeedsValidation, 0), ISNULL(legacyInspections.ValidationNewSite, 0),
-        ISNULL(legacyInspections.ValidationSiteInformationChanged, 0),
+        ISNULL(legacyInspections.ValidationSiteInformationChanged, 0), ISNULL(legacyInspections.ValidationOnHold, 0),
 
         -- Payment / Transaction. V1 marks an unpaid inspection with an empty TransactionID, V2 with NULL,
         -- and some V2 checks only test for NULL - the report download among them - so '' must not survive.

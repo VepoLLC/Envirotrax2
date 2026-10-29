@@ -55,6 +55,22 @@ export class BackflowTestService {
         return await lastValueFrom(observable);
     }
 
+    public async updateValidationHold(id: number, waterSupplierId: number, onHold: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/validation-hold?waterSupplierId=${waterSupplierId}`);
+
+        const observable = this._http.put<BackflowTest>(url, onHold);
+
+        return await lastValueFrom(observable);
+    }
+
+    public async updateNeedsValidation(id: number, waterSupplierId: number, needsValidation: boolean): Promise<BackflowTest> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/needs-validation?waterSupplierId=${waterSupplierId}`);
+
+        const observable = this._http.put<BackflowTest>(url, needsValidation);
+
+        return await lastValueFrom(observable);
+    }
+
     public async uploadImage(id: number, waterSupplierId: number, imageType: string, file: File): Promise<BackflowTestDetails> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/images/${imageType}?waterSupplierId=${waterSupplierId}`);
 

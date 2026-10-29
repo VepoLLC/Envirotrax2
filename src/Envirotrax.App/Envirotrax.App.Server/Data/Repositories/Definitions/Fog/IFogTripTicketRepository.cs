@@ -12,6 +12,10 @@ public interface IFogTripTicketRepository : IRepository<FogTripTicket>
 
     Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken);
 
+    Task<FogTripTicket?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken);
+
+    Task<FogTripTicket?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken);
+
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
 
     // Checkout

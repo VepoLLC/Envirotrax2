@@ -175,6 +175,40 @@ public class CsiInspectionRepository : Repository<CsiInspection>, ICsiInspection
         return inspection;
     }
 
+    // Submission Validations window: the Hold checkbox and the Clear action. The record log keeps who changed
+    // the flag and when, which V1 stored in ValidatedBy and ValidationClearedDate.
+    public async Task<CsiInspection?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken)
+    {
+        var inspection = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (inspection == null)
+        {
+            return null;
+        }
+
+        inspection.ValidationOnHold = onHold;
+
+        await SaveChangesAsync(logData: true, cancellationToken);
+
+        return inspection;
+    }
+
+    public async Task<CsiInspection?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken)
+    {
+        var inspection = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (inspection == null)
+        {
+            return null;
+        }
+
+        inspection.NeedsValidation = needsValidation;
+
+        await SaveChangesAsync(logData: true, cancellationToken);
+
+        return inspection;
+    }
+
     public async Task<CsiInspection?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken)
     {
         var inspection = await GetAsync(id, cancellationToken);

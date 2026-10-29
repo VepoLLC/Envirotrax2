@@ -40,6 +40,16 @@ public class CsiInspectionService : ICsiInspectionService
         return _apiClient.PutAsync<CsiInspectionUpdateRequest, CsiInspectionDetailsDto>(waterSupplierId, $"{BaseUrl}/{id}", request, cancellationToken);
     }
 
+    public Task<CsiInspectionDto?> UpdateValidationHoldAsync(int id, int waterSupplierId, bool onHold, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<bool, CsiInspectionDto>(waterSupplierId, $"{BaseUrl}/{id}/validation-hold", onHold, cancellationToken);
+    }
+
+    public Task<CsiInspectionDto?> UpdateNeedsValidationAsync(int id, int waterSupplierId, bool needsValidation, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<bool, CsiInspectionDto>(waterSupplierId, $"{BaseUrl}/{id}/needs-validation", needsValidation, cancellationToken);
+    }
+
     public Task<CsiInspectionCountsDto?> GetCountsAsync(int id, CancellationToken cancellationToken)
     {
         return _apiClient.GetAsync<CsiInspectionCountsDto>($"{BaseUrl}/{id}/counts", cancellationToken);

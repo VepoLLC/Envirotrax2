@@ -38,6 +38,18 @@ export class FogInspectionService {
         return await lastValueFrom(this._http.put<FogInspection>(url, request));
     }
 
+    public async updateValidationHold(id: number, waterSupplierId: number, onHold: boolean): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}/validation-hold?waterSupplierId=${waterSupplierId}`);
+
+        return await lastValueFrom(this._http.put<FogInspection>(url, onHold));
+    }
+
+    public async updateNeedsValidation(id: number, waterSupplierId: number, needsValidation: boolean): Promise<FogInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}/needs-validation?waterSupplierId=${waterSupplierId}`);
+
+        return await lastValueFrom(this._http.put<FogInspection>(url, needsValidation));
+    }
+
     public async uploadImage(id: number, waterSupplierId: number, imageType: string, file: File): Promise<FogInspection> {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}/images/${imageType}?waterSupplierId=${waterSupplierId}`);
 

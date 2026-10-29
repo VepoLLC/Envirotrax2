@@ -20,4 +20,14 @@ public class FogTripTicketService : IFogTripTicketService
     {
         return _apiClient.GetAsync<FogTripTicketDto>(BaseUrl, pageInfo, query, criteria.ToParameters(), cancellationToken);
     }
+
+    public Task<FogTripTicketDto?> UpdateValidationHoldAsync(int id, int waterSupplierId, bool onHold, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<bool, FogTripTicketDto>(waterSupplierId, $"{BaseUrl}/{id}/validation-hold", onHold, cancellationToken);
+    }
+
+    public Task<FogTripTicketDto?> UpdateNeedsValidationAsync(int id, int waterSupplierId, bool needsValidation, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<bool, FogTripTicketDto>(waterSupplierId, $"{BaseUrl}/{id}/needs-validation", needsValidation, cancellationToken);
+    }
 }

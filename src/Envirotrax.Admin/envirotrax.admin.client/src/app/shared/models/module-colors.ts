@@ -8,7 +8,7 @@ export const MODULE_COLORS = {
     LICENSES: '#800080'
 } as const;
 
-export const DEFAULT_WINDOW_COLOR = '#d3d3d3';
+export const DEFAULT_WINDOW_COLOR = '#e9ecef';
 
 export interface ContrastClasses {
     text: string;

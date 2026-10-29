@@ -6,20 +6,23 @@ BEGIN TRY
     INSERT INTO CsiSettings
         (WaterSupplierId, ModificationGracePeriodDays, NewlyCreatedBackflowTestExpirationDays, RequireInspectionImages,
          ImpendingNotice1, ImpendingNotice2, PastDueNotice1, PastDueNotice2, NonCompliant1, NonCompliant2,
+         NonCompliantPrint1, NonCompliantPrint2,
          ImpendingLettersBackgroundColor, ImpendingLettersForegroundColor, ImpendingLettersBorderColor,
          PastDueLettersBackgroundColor, PastDueLettersForegroundColor, PastDueLettersBorderColor,
          NonCompliantLettersBackgroundColor, NonCompliantLettersForegroundColor, NonCompliantLettersBorderColor,
-         NoticeBodyFont, NoticeBodyFontSize,
+         NoticeBodyFont, NoticeBodyFontSize, NoticeImageFitType, NoticeImageFitSize,
          ImpendingTitle, ImpendingMessage, PastDueTitle, PastDueMessage, NonCompliantTitle, NonCompliantMessage)
     SELECT
         newWaterSuppliers.Id, WaterSuppliers.CsiModificationDays, WaterSuppliers.CsiBackflowExpirationDays, WaterSuppliers.RequireCsiInspectionImages,
         WaterSuppliers.CsiNoticeImpending1, WaterSuppliers.CsiNoticeImpending2,
         WaterSuppliers.CsiNoticePastDue1, WaterSuppliers.CsiNoticePastDue2,
         WaterSuppliers.CsiNonCompliant, WaterSuppliers.CsiNonCompliant2,
+        WaterSuppliers.CsiNonCompliantPrint1, WaterSuppliers.CsiNonCompliantPrint2,
         WaterSuppliers.CsiNoticeHeaderBackgroundColor1, WaterSuppliers.CsiNoticeHeaderForegroundColor1, WaterSuppliers.CsiNoticeHeaderBorderColor1,
         WaterSuppliers.CsiNoticeHeaderBackgroundColor2, WaterSuppliers.CsiNoticeHeaderForegroundColor2, WaterSuppliers.CsiNoticeHeaderBorderColor2,
         WaterSuppliers.CsiNoticeHeaderBackgroundColor3, WaterSuppliers.CsiNoticeHeaderForegroundColor3, WaterSuppliers.CsiNoticeHeaderBorderColor3,
         WaterSuppliers.CsiNoticeBodyFont, WaterSuppliers.CsiNoticeBodyFontSize,
+        WaterSuppliers.CsiNoticeImageFitType, WaterSuppliers.CsiNoticeImageFitSize,
         WaterSuppliers.CsiImpendingTitle, WaterSuppliers.CsiImpendingMessage,
         WaterSuppliers.CsiPastDueTitle, WaterSuppliers.CsiPastDueMessage,
         WaterSuppliers.CsiNonCompliantTitle, WaterSuppliers.CsiNonCompliantMessage

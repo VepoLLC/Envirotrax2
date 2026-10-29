@@ -13,5 +13,13 @@
             aria-label="Click to search">
         <i class="fa-solid fa-magnifying-glass"></i>
     </button>
+    <button *ngIf="canClear && displayText"
+            type="button"
+            title="Click to Clear Selection"
+            class="btn btn-primary"
+            aria-label="Click to Clear Selection"
+            (click)="onClear($event)">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
 </div>
 <vp-validation-field *ngIf="form" [fieldName]="name" [form]="form" [fieldLabel]="label" />

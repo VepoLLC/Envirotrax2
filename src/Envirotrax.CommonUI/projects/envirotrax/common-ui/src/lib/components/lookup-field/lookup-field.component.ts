@@ -37,6 +37,12 @@ export class LookupFieldComponent implements OnInit {
     @Output()
     public search: EventEmitter<void> = new EventEmitter();
 
+    @Input()
+    public canClear: boolean = false;
+
+    @Output()
+    public clear: EventEmitter<void> = new EventEmitter();
+
     public ngOnInit(): void {
         LookupFieldComponent._counter++;
 
@@ -48,6 +54,14 @@ export class LookupFieldComponent implements OnInit {
     public onSearch(): void {
         if (this.canSearch) {
             this.search.emit();
+        }
+    }
+
+    public onClear(event: MouseEvent): void {
+        event.stopPropagation();
+
+        if (this.canClear) {
+            this.clear.emit();
         }
     }
 }

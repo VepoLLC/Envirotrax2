@@ -47,7 +47,8 @@
         <div><span class="fw-bold">Test Date:</span> {{ row.assembly.testDate | date: 'MM/dd/yyyy' }}</div>
         <div>
             <span class="fw-bold">Exp Date:</span>
-            <span class="rounded-pill px-2 text-white text-nowrap fw-bold ms-1" [ngClass]="row.assembly.expirationCssClass">
+            <span class="rounded-pill px-2 text-white text-nowrap fw-bold ms-1"
+                  [ngClass]="row.assembly.expirationCssClass">
                 @if (row.assembly.expirationDate) {
                     {{ row.assembly.expirationDate | date: 'MM/dd/yyyy' }}
                 } @else {
@@ -62,7 +63,8 @@
 
 <ng-template #actionsCell let-row="rowData">
     <div class="d-flex flex-column gap-1">
-        <a class="btn btn-sm btn-primary text-nowrap" [routerLink]="['/backflow/tests', row.notification.recordId, 'view']">
+        <a class="btn btn-sm btn-primary text-nowrap"
+           [routerLink]="['/backflow/tests', row.notification.recordId, 'view']">
             <i class="fa-solid fa-magnifying-glass me-1"></i>View
         </a>
 
@@ -71,7 +73,8 @@
                 class="btn btn-sm text-nowrap"
                 [ngClass]="row.notification.hidden ? 'btn-success' : 'btn-danger'"
                 (click)="toggleHidden(row)">
-            <i class="fa-regular me-1" [ngClass]="row.notification.hidden ? 'fa-eye' : 'fa-eye-slash'"></i>{{ row.notification.hidden ? 'Show' : 'Hide' }}
+            <i class="fa-regular me-1"
+               [ngClass]="row.notification.hidden ? 'fa-eye' : 'fa-eye-slash'"></i>{{ row.notification.hidden ? 'Show' : 'Hide' }}
         </button>
     </div>
 </ng-template>
@@ -83,10 +86,16 @@
                 <div class="row gy-3">
                     <div class="col-md-6">
                         <div class="fw-bold mb-1">User Account</div>
-                        <vp-input type="select"
-                                  name="userId"
-                                  [(ngModel)]="filters.userId"
-                                  [options]="accountOptions" />
+                        <div class="d-flex gap-1">
+                            <div class="flex-fill">
+                                <vp-lookup-field name="account"
+                                                 [canSearch]="true"
+                                                 [displayText]="filters.account?.emailAddress ?? 'Any account'"
+                                                 (search)="lookupAccount()"
+                                                 [canClear]="!!filters.account"
+                                                 (clear)="clearAccount()" />
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-md-6">
@@ -108,7 +117,8 @@
                                       [options]="intervalOptions" />
                         </div>
 
-                        <label class="col-4 col-form-label fw-bold text-end">From Date: <span class="text-danger">*</span></label>
+                        <label class="col-4 col-form-label fw-bold text-end">From Date: <span
+                                  class="text-danger">*</span></label>
                         <div class="col-8">
                             <vp-input type="date"
                                       name="fromDate"
@@ -118,7 +128,8 @@
                                       [(ngModel)]="filters.fromDate" />
                         </div>
 
-                        <label class="col-4 col-form-label fw-bold text-end">To Date: <span class="text-danger">*</span></label>
+                        <label class="col-4 col-form-label fw-bold text-end">To Date: <span
+                                  class="text-danger">*</span></label>
                         <div class="col-8">
                             <vp-input type="date"
                                       name="toDate"
@@ -135,7 +146,8 @@
                                id="notification-search-show-hidden"
                                name="showHidden"
                                [(ngModel)]="filters.showHidden" />
-                        <label class="form-check-label" for="notification-search-show-hidden">Show hidden notifications</label>
+                        <label class="form-check-label" for="notification-search-show-hidden">Show hidden
+                            notifications</label>
                     </div>
                 </div>
             </div>
@@ -151,7 +163,8 @@
                                    [id]="'notification-search-' + option.field"
                                    [name]="option.field"
                                    [(ngModel)]="filters.criteria[option.field]" />
-                            <label class="form-check-label" [for]="'notification-search-' + option.field">{{ option.text }}</label>
+                            <label class="form-check-label"
+                                   [for]="'notification-search-' + option.field">{{ option.text }}</label>
                         </div>
                     }
 

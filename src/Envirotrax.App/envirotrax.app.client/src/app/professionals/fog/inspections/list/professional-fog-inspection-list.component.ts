@@ -255,7 +255,7 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
         window.open(url, '_blank');
     }
 
-    public viewPrintableTable(): void {
-        this._printService.open(this._printableSection.nativeElement);
+    public async viewPrintableTable(): Promise<void> {
+        await this._printService.open(this.table, () => this.getInspections(), () => this._printableSection.nativeElement);
     }
 }

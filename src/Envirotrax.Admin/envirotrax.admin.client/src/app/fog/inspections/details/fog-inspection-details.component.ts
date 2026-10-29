@@ -13,6 +13,7 @@ import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { SiteEditComponent } from '../../../sites/edit/site-edit.component';
 import { WindowReference } from '../../../window/window-config';
 import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { FogInspectionImagesComponent } from './images/fog-inspection-images.component';
 import { FogInspectionMailingComponent } from './mailing/fog-inspection-mailing.component';
 import { FogInspectionPropertyComponent } from './property/fog-inspection-property.component';
@@ -150,6 +151,7 @@ export class FogInspectionDetailsComponent implements OnInit {
 
         this._windowService.addWindow(SiteEditComponent, {
             title: this.inspection.site?.accountNumber ?? 'Site',
+            color: MODULE_COLORS.SITE,
             model: {
                 siteId: siteId,
                 waterSupplierId: this.inspection.waterSupplier?.id

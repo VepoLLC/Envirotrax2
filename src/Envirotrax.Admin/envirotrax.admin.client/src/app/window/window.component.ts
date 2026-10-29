@@ -1,16 +1,30 @@
 import { Component, ComponentRef, EventEmitter, InjectOptions, Injector, input, Input, OnDestroy, OnInit, Output, ProviderToken, Type, ViewChild, ViewContainerRef } from "@angular/core";
 import { WindowConfig, WindowReference } from "./window-config";
+import { WindowColors } from "./window-colors";
 
 @Component({
     standalone: false,
     selector: 'vp-window',
-    templateUrl: './window.component.html'
+    templateUrl: './window.component.html',
+    styles: `
+    .vp-window-frame {
+        border: 1px solid var(--vp-window-color);
+    }
+
+    .vp-window-body {
+        border: 1px solid var(--vp-window-color);
+        border-top: 0;
+    }
+    `
 })
 export class WindowComponent implements OnInit, OnDestroy {
     private _componentRef!: ComponentRef<any>;
 
     @Input()
     public config!: WindowConfig<any>;
+
+    @Input()
+    public colors!: WindowColors;
 
     @Input()
     public componentType!: Type<any>;

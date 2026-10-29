@@ -21,6 +21,7 @@ import {
 import { PropertyType } from '../../../shared/models/sites/site';
 import { FogInspectionOptionsService } from '../../../shared/services/fog/fog-inspection-options.service';
 import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { FogInspectionDetailsComponent } from '../details/fog-inspection-details.component';
 import { FogInspectionService } from '../../../shared/services/fog/fog-inspection.service';
 import { WaterSupplierService } from '../../../shared/services/water-suppliers/water-supplier.service';
@@ -134,6 +135,7 @@ export class FogInspectionListComponent implements OnInit {
     public openDetails(inspection: FogInspectionRow): void {
         this._windowService.addWindow(FogInspectionDetailsComponent, {
             title: this.buildTitle(inspection),
+            color: MODULE_COLORS.FOG,
             model: inspection
         });
     }

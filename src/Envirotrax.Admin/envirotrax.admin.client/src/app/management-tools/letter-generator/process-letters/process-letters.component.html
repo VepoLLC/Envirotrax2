@@ -70,11 +70,9 @@
                                [(ngModel)]="waterSupplier.isSelected"
                                title="Process Water Supplier">
                     </td>
-                    <td>
-                        <i class="fa-solid fa-table-cells-large"
-                           [class.text-primary]="!waterSupplier.parentId"
-                           [class.text-secondary]="waterSupplier.parentId"
-                           [title]="waterSupplier.parentId ? 'Sub Account' : 'Master Account'"></i>
+                    <td class="text-center">
+                        <img *ngIf="!waterSupplier.parentId" src="/images/icons/account-master.png" width="20" height="20" alt="Master Account" title="Master Account">
+                        <img *ngIf="waterSupplier.parentId" src="/images/icons/account-sub.png" width="20" height="20" alt="Sub Account" title="Sub Account">
                     </td>
                     <td>{{ waterSupplier.id }}</td>
                     <td>{{ waterSupplier.parentId || 0 }}</td>

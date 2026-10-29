@@ -61,6 +61,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         var query =
             from supplier in DbContext.WaterSuppliers
             where supplier.DeletedTime == null
+                && supplier.Domain != WaterSupplier.EnvirotraxAdminDomain
                 && supplier.GeneralSettings != null
                 && (supplier.GeneralSettings.BackflowTesting || supplier.GeneralSettings.CsiInspections)
 
@@ -78,7 +79,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             {
                 Id = supplier.Id,
                 Name = supplier.Name,
-                ParentId = supplier.ParentId,
+                ParentId = supplier.Parent!.Domain != WaterSupplier.EnvirotraxAdminDomain ? supplier.ParentId : null,
 
                 ExpiringNotice1 = backflowSettings.ExpiringNotice1,
                 ExpiringNotice2 = backflowSettings.ExpiringNotice2,

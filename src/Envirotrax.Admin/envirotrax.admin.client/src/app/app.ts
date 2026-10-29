@@ -11,6 +11,7 @@ import { BackflowTesterListComponent } from './backflow/testers/list/backflow-te
 import { BackflowReplacementListComponent } from './backflow/replacements/list/backflow-replacement-list.component';
 import { FogInspectionListComponent } from './fog/inspections/list/fog-inspection-list.component';
 import { FogInspectorListComponent } from './fog/inspectors/list/fog-inspector-list.component';
+import { FogTransporterListComponent } from './fog/transporters/list/fog-transporter-list.component';
 import { FogDisposalSiteListComponent } from './fog/disposal-sites/list/fog-disposal-site-list.component';
 import { FogTripTicketListComponent } from './fog/trip-tickets/list/fog-trip-ticket-list.component';
 import { LetterGeneratorComponent } from './management-tools/letter-generator/letter-generator.component';
@@ -131,6 +132,11 @@ export class App implements OnInit {
             onClick: this.showFogTripTicketSearch.bind(this)
           },
           {
+            title: 'Transporter Search',
+            iconCss: 'fa-solid fa-user',
+            onClick: this.showFogTransporterSearch.bind(this)
+          },
+          {
             type: 'separator'
           },
           {
@@ -244,6 +250,12 @@ export class App implements OnInit {
   public showFogTripTicketSearch(): void {
     this._windowService.addWindow(FogTripTicketListComponent, {
       title: 'FOG Trip Ticket Search'
+    });
+  }
+
+  public showFogTransporterSearch(): void {
+    this._windowService.addWindow(FogTransporterListComponent, {
+      title: 'FOG Transporter Search'
     });
   }
 

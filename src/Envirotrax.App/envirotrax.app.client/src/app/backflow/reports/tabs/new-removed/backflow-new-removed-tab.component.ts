@@ -114,7 +114,7 @@ export class BackflowNewRemovedTabComponent implements OnInit, OnDestroy {
     public async downloadPDF(): Promise<void> {
         try {
             this.isLoading = true;
-            await this._downloadService.openBlobInNewWindow(() => this._reportService.getNewRemovedPdf());
+            await this._downloadService.openBlobInNewWindow(() => this._reportService.getNewRemovedPdf(), 'backflow-new-removed.pdf');
         } finally {
             this.isLoading = false;
         }

@@ -53,7 +53,7 @@ export class CsiInspectionViewComponent implements OnInit {
         try {
             this.isLoading = true;
             const inspectionId = this.inspection.id!;
-            await this._downloadService.openBlobInNewWindow(() => this._inspectionService.getPdfForProfessional(inspectionId));
+            await this._downloadService.openBlobInNewWindow(() => this._inspectionService.getPdfForProfessional(inspectionId), `csi-inspection-${inspectionId}.pdf`);
         } catch (e) {
             const validationErrors: string[] = [];
             if (this._helper.parseValidationErrors(e, validationErrors)) {

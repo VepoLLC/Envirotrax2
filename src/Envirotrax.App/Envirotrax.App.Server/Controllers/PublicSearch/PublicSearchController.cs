@@ -4,6 +4,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.PublicSearch;
 using Envirotrax.App.Server.Domain.Services.Definitions.PublicSearch;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace Envirotrax.App.Server.Controllers.PublicSearch;
 
@@ -58,7 +59,7 @@ public class PublicSearchController : EnvirotraxBaseController
         return Ok(test);
     }
 
-    [HttpGet("backflow-tests/{id}/pdf")]
+    [HttpGet("backflow-tests/{id}/pdf/{fileName?}")]
     public async Task<IActionResult> GetBackflowTestPdfAsync(int id, CancellationToken cancellationToken)
     {
         var pdf = await _publicSearchService.GetBackflowTestPdfAsync(id, cancellationToken);
@@ -67,6 +68,8 @@ public class PublicSearchController : EnvirotraxBaseController
         {
             return NoContent();
         }
+
+        Response.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline") { FileName = $"backflow-test-{id}.pdf" }.ToString();
 
         return File(pdf, "application/pdf");
     }
@@ -95,7 +98,7 @@ public class PublicSearchController : EnvirotraxBaseController
         return Ok(images);
     }
 
-    [HttpGet("csi-inspections/{id}/pdf")]
+    [HttpGet("csi-inspections/{id}/pdf/{fileName?}")]
     public async Task<IActionResult> GetCsiInspectionPdfAsync(int id, CancellationToken cancellationToken)
     {
         var pdf = await _publicSearchService.GetCsiInspectionPdfAsync(id, cancellationToken);
@@ -104,6 +107,8 @@ public class PublicSearchController : EnvirotraxBaseController
         {
             return NoContent();
         }
+
+        Response.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline") { FileName = $"csi-inspection-{id}.pdf" }.ToString();
 
         return File(pdf, "application/pdf");
     }

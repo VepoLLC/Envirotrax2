@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { PublicSearchService } from "../../shared/services/public-search/public-search.service";
-import { DownloadService } from "../../shared/services/download.service";
 import { PublicBackflowTestDetails } from "../../shared/models/public-search/public-backflow-test-details";
 
 @Component({
@@ -15,8 +14,7 @@ export class PublicBackflowTestViewComponent implements OnInit {
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _publicSearchService: PublicSearchService,
-        private readonly _downloadService: DownloadService
+        private readonly _publicSearchService: PublicSearchService
     ) {
 
     }
@@ -36,19 +34,11 @@ export class PublicBackflowTestViewComponent implements OnInit {
         }
     }
 
-    public async exportPdf(): Promise<void> {
+    public exportPdf(): void {
         if (!this.test) {
             return;
         }
 
-        try {
-            this.isLoading = true;
-
-            const testId = this.test.id;
-
-            await this._downloadService.openBlobInNewWindow(() => this._publicSearchService.getBackflowTestPdf(testId));
-        } finally {
-            this.isLoading = false;
-        }
+        window.open(this._publicSearchService.getBackflowTestPdfUrl(this.test.id), '_blank');
     }
 }

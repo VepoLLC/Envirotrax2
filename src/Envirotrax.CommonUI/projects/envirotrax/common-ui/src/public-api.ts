@@ -8,6 +8,7 @@ export * from './lib/components/loading-spinner/app-loading-spinner.module';
 
 // Injection Token
 export * from './lib/tokens/api-url.token';
+export * from './lib/tokens/pdf-view-url-factory.token';
 
 // Components (referenced by type in consuming code)
 export * from './lib/components/data-components/pagination/pagination.component';

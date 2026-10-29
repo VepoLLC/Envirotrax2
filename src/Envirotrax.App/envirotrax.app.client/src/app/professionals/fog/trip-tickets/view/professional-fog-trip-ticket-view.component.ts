@@ -61,7 +61,7 @@ export class ProfessionalFogTripTicketViewComponent implements OnInit {
         try {
             this.isLoading = true;
             const ticketId = this.ticket.id;
-            await this._downloadService.openBlobInNewWindow(() => this._tripTicketService.getPdfForProfessional(ticketId));
+            await this._downloadService.openBlobInNewWindow(() => this._tripTicketService.getPdfForProfessional(ticketId), `fog-trip-ticket-${ticketId}.pdf`);
         } catch (e) {
             const validationErrors: string[] = [];
             if (this._helper.parseValidationErrors(e, validationErrors)) {

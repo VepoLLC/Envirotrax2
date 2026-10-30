@@ -184,8 +184,8 @@ export class PropertyLogManagementComponent implements OnInit {
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
-    public async viewPrintableTable(): Promise<void> {
-        await this._printService.open(this.table, () => this.getPropertyLogs(), () => this._printableSection.nativeElement);
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 
     public async getPropertyLogs(): Promise<void> {

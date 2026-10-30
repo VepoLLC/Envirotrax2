@@ -296,7 +296,7 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
-    public async viewPrintableTable(): Promise<void> {
-        await this._printService.open(this.table, () => this.getInspections(), () => this._printableSection.nativeElement);
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 }

@@ -9,6 +9,8 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Notifications;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Logs;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Notifications;
+using Envirotrax.App.Server.Data.Repositories.Definitions.TableSettings;
+using Envirotrax.App.Server.Data.Repositories.Implementations.TableSettings;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Users;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
@@ -123,6 +125,8 @@ public static class ServiceRegistration
 
         services.AddTransient<INotificationSettingRepository, NotificationSettingRepository>();
         services.AddTransient<INotificationRepository, NotificationRepository>();
+
+        services.AddTransient<ITableSettingRepository, TableSettingRepository>();
 
         services.AddTransient<IApiAccountRepository, ApiAccountRepository>();
         services.AddTransient<ILegacyQueryRepository, LegacyQueryRepository>();

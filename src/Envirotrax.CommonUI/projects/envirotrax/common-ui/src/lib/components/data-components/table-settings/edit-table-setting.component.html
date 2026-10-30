@@ -1,0 +1,40 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <p *ngIf="isNew">
+            The template saves the current search criteria.
+        </p>
+
+        <div class="mb-3">
+            <vp-input [(ngModel)]="setting.name"
+                      name="name"
+                      label="Template Name:"
+                      [required]="true"
+                      [maxLength]="255"
+                      [form]="form" />
+        </div>
+
+        <div *ngIf="!isNew" class="form-check mb-3">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="table-setting-save-current-filters"
+                   name="saveCurrentFilters"
+                   [(ngModel)]="saveCurrentFilters" />
+            <label class="form-check-label" for="table-setting-save-current-filters">
+                Replace Saved Criteria with Current Search Criteria
+            </label>
+        </div>
+
+        <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+        <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-primary w-100" (click)="cancel()">
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-primary w-100">
+                Save
+            </button>
+        </div>
+    </form>
+</div>

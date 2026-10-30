@@ -17,6 +17,7 @@ using System.Reflection;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers.Features;
 using Envirotrax.App.Server.Data.Models.GisAreas;
 using Envirotrax.App.Server.Data.Models.Notifications;
+using Envirotrax.App.Server.Data.Models.TableSettings;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
@@ -43,6 +44,8 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
 
     public DbSet<NotificationSetting> NotificationSettings { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+
+    public DbSet<TableSetting> TableSettings { get; set; }
 
     public DbSet<ApiAccount> ApiAccounts { get; set; }
 

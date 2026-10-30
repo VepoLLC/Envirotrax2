@@ -23,6 +23,13 @@ public class WaterSupplierController : AdminBaseController
         return Ok(suppliers);
     }
 
+    [HttpGet("letter-settings")]
+    public async Task<IActionResult> GetAllLetterSettingsAsync(CancellationToken cancellationToken)
+    {
+        var letterSettings = await _waterSupplierService.GetAllLetterSettingsAsync(cancellationToken);
+        return Ok(letterSettings);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
     {

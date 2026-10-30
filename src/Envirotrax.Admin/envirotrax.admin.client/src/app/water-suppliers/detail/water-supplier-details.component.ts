@@ -7,6 +7,7 @@ import { WindowReference } from '../../window/window-config';
 import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
 import { GeneralSettings } from '../../shared/models/water-suppliers/general-settings';
 import { BackflowOutOfServiceType, BackflowSettings, BackflowTestingMethodType } from '../../shared/models/water-suppliers/backflow-settings';
+import { CsiSettings } from '../../shared/models/water-suppliers/csi-settings';
 import { WaterSupplierService } from '../../shared/services/water-suppliers/water-supplier.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
 import { WaterSupplierUserListComponent } from './users/water-supplier-user-list.component';
@@ -26,6 +27,7 @@ export class WaterSupplierDetailsComponent implements OnInit {
     public supplier: WaterSupplier = {};
     public generalSettings: GeneralSettings = {};
     public backflowSettings: BackflowSettings = {};
+    public csiSettings: CsiSettings = {};
 
     public states: InputOption[] = [];
 
@@ -91,6 +93,7 @@ export class WaterSupplierDetailsComponent implements OnInit {
             this.supplier = details.waterSupplier;
             this.generalSettings = details.generalSettings;
             this.backflowSettings = details.backflowSettings;
+            this.csiSettings = details.csiSettings;
         } finally {
             this.isLoading = false;
         }
@@ -111,12 +114,14 @@ export class WaterSupplierDetailsComponent implements OnInit {
             const saved = await this._waterSupplierService.updateDetails(this.supplierId, {
                 waterSupplier: this.supplier,
                 generalSettings: this.generalSettings,
-                backflowSettings: this.backflowSettings
+                backflowSettings: this.backflowSettings,
+                csiSettings: this.csiSettings
             });
 
             this.supplier = saved.waterSupplier;
             this.generalSettings = saved.generalSettings;
             this.backflowSettings = saved.backflowSettings;
+            this.csiSettings = saved.csiSettings;
 
             this.isSaved = true;
         } catch (error) {

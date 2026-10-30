@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { PublicSearchService } from "../../shared/services/public-search/public-search.service";
+import { DownloadService } from "../../shared/services/download.service";
 import { CsiInspection } from "../../shared/models/csi/csi-inspection";
 import { CsiInspectionAssembly } from "../../shared/models/csi/csi-inspection-assembly";
 import { CsiInspectionImage } from "../../shared/models/csi/csi-inspection-image";
@@ -32,7 +33,8 @@ export class PublicCsiInspectionViewComponent implements OnInit {
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _publicSearchService: PublicSearchService
+        private readonly _publicSearchService: PublicSearchService,
+        private readonly _downloadService: DownloadService
     ) {
 
     }
@@ -69,12 +71,18 @@ export class PublicCsiInspectionViewComponent implements OnInit {
         }
     }
 
-    public exportPdf(): void {
+    public async exportPdf(): Promise<void> {
         if (!this.inspection) {
             return;
         }
 
-        window.open(this._publicSearchService.getCsiInspectionPdfUrl(this._id), '_blank');
+        try {
+            this.isLoading = true;
+
+            await this._downloadService.openBlobInNewWindow(() => this._publicSearchService.getCsiInspectionPdf(this._id), `csi-inspection-${this._id}.pdf`);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     private async loadAssemblies(): Promise<void> {

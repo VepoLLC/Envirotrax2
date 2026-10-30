@@ -59,8 +59,10 @@ export class PublicSearchService {
         return lastValueFrom(this._http.get<PublicBackflowTestDetails | null>(url));
     }
 
-    public getBackflowTestPdfUrl(id: number): string {
-        return this._urlResolver.resolveUrl(`/api/public-search/backflow-tests/${id}/pdf/backflow-test-${id}.pdf`);
+    public getBackflowTestPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/public-search/backflow-tests/${id}/pdf`);
+
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     public getCsiInspection(id: number): Promise<CsiInspection | null> {
@@ -81,8 +83,10 @@ export class PublicSearchService {
         return lastValueFrom(this._http.get<CsiInspectionImage[]>(url));
     }
 
-    public getCsiInspectionPdfUrl(id: number): string {
-        return this._urlResolver.resolveUrl(`/api/public-search/csi-inspections/${id}/pdf/csi-inspection-${id}.pdf`);
+    public getCsiInspectionPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/public-search/csi-inspections/${id}/pdf`);
+
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     private buildSearchParams(criteria: PublicSearchCriteria, pageInfo: PageInfo): HttpParams {

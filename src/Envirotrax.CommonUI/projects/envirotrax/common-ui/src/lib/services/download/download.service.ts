@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from "@angular/common/http";
-import { Inject, Injectable, Optional } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { QueryHelperService } from "../helpers/query-helper.service";
 import { lastValueFrom } from "rxjs";
 import { MAX_PAGE_SIZE } from "../../models/page-info";
@@ -7,7 +7,6 @@ import { DownloadConfig, DownloadEndpoint, FileFormat } from "../../models/downl
 import { Query } from "../../models/query";
 import { DownloadManagerComponent } from "../../components/data-components/download-manager/download-manager.component";
 import { ModalHelperService } from "../helpers/modal-helper.service";
-import { PDF_VIEW_URL_FACTORY, PdfViewUrlFactory } from "../../tokens/pdf-view-url-factory.token";
 
 const LOADING_WINDOW_TITLE = 'Loading...';
 
@@ -49,8 +48,7 @@ export class DownloadService {
     constructor(
         private readonly _http: HttpClient,
         private readonly _queryHelper: QueryHelperService,
-        private readonly _modalHelper: ModalHelperService,
-        @Optional() @Inject(PDF_VIEW_URL_FACTORY) private readonly _pdfViewUrlFactory: PdfViewUrlFactory | null
+        private readonly _modalHelper: ModalHelperService
     ) {
 
     }
@@ -84,11 +82,6 @@ export class DownloadService {
     }
 
     public async openBlobInNewWindow(loadBlob: () => Promise<Blob>, fileName?: string): Promise<void> {
-        if (fileName && this._pdfViewUrlFactory) {
-            await this.openNamedBlobInNewWindow(loadBlob, fileName, this._pdfViewUrlFactory);
-            return;
-        }
-
         const newWindow = window.open('', '_blank');
 
         if (!newWindow) {
@@ -109,6 +102,10 @@ export class DownloadService {
             newWindow.location.href = objectUrl;
             isOpened = true;
 
+            if (fileName) {
+                this.downloadFileFromUrl(objectUrl, fileName);
+            }
+
             window.setTimeout(function () {
                 URL.revokeObjectURL(objectUrl);
             }, 5000);
@@ -116,17 +113,6 @@ export class DownloadService {
             if (!isOpened) {
                 newWindow.close();
             }
-        }
-    }
-
-    // The window is opened straight at the final URL (no intermediate about:blank window), like a plain link would,
-    // so the PDF viewer shows the file name as its title. If the browser blocks the late popup, the file is downloaded.
-    private async openNamedBlobInNewWindow(loadBlob: () => Promise<Blob>, fileName: string, createViewUrl: PdfViewUrlFactory): Promise<void> {
-        const blob = await loadBlob();
-        const viewUrl = await createViewUrl(blob, fileName);
-
-        if (!window.open(viewUrl, '_blank')) {
-            this.downloadFileFromBlob(blob, fileName);
         }
     }
 

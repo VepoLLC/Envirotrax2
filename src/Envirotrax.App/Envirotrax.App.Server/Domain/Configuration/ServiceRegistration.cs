@@ -56,9 +56,6 @@ public static class ServiceRegistration
         services.AddTransient<ILegacyResponseWriter, LegacyResponseWriter>();
         services.AddTransient<ITimeZoneHelperService, TimeZoneHelperService>();
 
-        services.AddMemoryCache();
-        services.AddSingleton<IPdfViewService, PdfViewService>();
-
         services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
         services.AddTransient<IFileStorageService, FileStorageService>();
 

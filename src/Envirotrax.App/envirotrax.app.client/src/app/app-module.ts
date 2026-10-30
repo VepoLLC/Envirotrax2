@@ -10,8 +10,7 @@ import { AppTitleStrategy } from './shared/services/helpers/title/app-title-stra
 import { AuthInterceptor } from './shared/services/auth/auth.iterceptor';
 import { GlobalErrorHandler } from './shared/services/http/global-error-handler';
 import { HomeComponent } from './home/home.component';
-import { API_BASE_URL, PDF_VIEW_URL_FACTORY, PdfViewUrlFactory, TimeZoneInterceptor } from '@envirotrax/common-ui';
-import { PdfViewService } from './shared/services/helpers/pdf-view.service';
+import { API_BASE_URL, TimeZoneInterceptor } from '@envirotrax/common-ui';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -28,12 +27,6 @@ import { environment } from '../environments/environment';
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptorsFromDi()),
     { provide: API_BASE_URL, useValue: environment.apiUrl },
-    {
-      provide: PDF_VIEW_URL_FACTORY,
-      useFactory: (pdfViewService: PdfViewService): PdfViewUrlFactory =>
-        (blob, fileName) => pdfViewService.createViewUrl(blob, fileName),
-      deps: [PdfViewService]
-    },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     {
       provide: TitleStrategy,

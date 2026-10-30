@@ -51,6 +51,7 @@ public static class ServiceRegistration
                 services.AddTransient<IBackflowReplacementService, BackflowReplacementService>();
                 services.AddTransient<IFogInspectionService, FogInspectionService>();
                 services.AddTransient<IFogInspectorService, FogInspectorService>();
+                services.AddTransient<IFogTransporterService, FogTransporterService>();
                 services.AddTransient<IFogTripTicketService, FogTripTicketService>();
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
 

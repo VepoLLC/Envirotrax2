@@ -1,12 +1,12 @@
 ﻿<header class="vp-header">
-    <nav class="vp-navbar align-items-start bg-gradient bg-primary d-flex navbar navbar-expand-lg py-0"
+    <nav class="vp-navbar align-items-start bg-body-secondary d-flex navbar navbar-expand-lg py-0"
          [class.show]="isNavbarVisible">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <img src="/images/logo-navbar.svg" alt="Envirotrax Logo" class="vp-logo">
+                <img src="/images/logo.svg" alt="Envirotrax Logo" class="vp-logo">
             </a>
 
-            <button class="border-0 navbar-toggler text-white"
+            <button class="border-0 navbar-toggler"
                     type="button"
                     ata-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent"
@@ -23,9 +23,10 @@
                 <div class="d-flex justify-content-center justify-content-lg-end">
                     <ul class="navbar-nav mb-2 mb-lg-0">
                         <ng-container *ngFor="let item of menuItems">
-                            <li class="nav-item pb-3 pb-lg-0">
+                            <li class="border-4 border-bottom mx-1 nav-item pb-3 pb-lg-0"
+                                [style.--bs-border-color]="item.color ?? 'transparent'">
                                 <a role="button"
-                                   class="fw-bold nav-link p1 rounded-3"
+                                   class="fw-bold nav-link p1 rounded-3 text-body"
                                    #dropdownButton
                                    (click)="toggleExpanded($event, dropdownButton, dropdownContent, item)">
                                     <i [class]="item.iconCss"></i>

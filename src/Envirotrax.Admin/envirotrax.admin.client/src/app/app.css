@@ -20,6 +20,11 @@
     }
 }
 
+.vp-navbar .nav-link:hover,
+.vp-navbar .nav-link:focus {
+    border-color: var(--bs-border-color-translucent);
+}
+
 /* Header */
 .vp-header {
     width: 100%;

@@ -1,18 +1,25 @@
 <div class="d-flex gap-1">
     <ng-container *ngFor="let window of windows">
         <div *ngIf="window.isMinimized" class="mb-2">
-            <div
-                 class="align-items-center bg-info d-flex gap-3 justify-content-between py-1 px-2 rounded text-nowrap text-white">
+            <div class="align-items-center d-flex gap-3 justify-content-between py-1 px-2 rounded text-nowrap"
+                 [class]="window.colors.contrast.text"
+                 [style.background-color]="window.colors.background">
                 <div>
                     {{window.config.title}}
                 </div>
 
                 <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="border btn btn-sm text-white px-2" (click)="maximizeWindow(window)">
+                    <button type="button"
+                            class="border btn btn-sm px-2"
+                            [class]="window.colors.contrast.button"
+                            (click)="maximizeWindow(window)">
                         <i class="fa-solid fa-window-maximize"></i>
                     </button>
 
-                    <button type="button" class="border btn btn-sm text-white px-2" (click)="removeWindow(window)">
+                    <button type="button"
+                            class="border btn btn-sm px-2"
+                            [class]="window.colors.contrast.button"
+                            (click)="removeWindow(window)">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
@@ -24,6 +31,7 @@
 <div class="vp-window-container d-flex gap-2 w-100 flex-fill" #container>
     <div *ngFor="let window of windows" class="vp-window-wrapper flex-fill" [hidden]="window.isMinimized">
         <vp-window [config]="window.config"
+                   [colors]="window.colors"
                    [componentType]="window.componentType"
                    (close)="removeWindow(window)"
                    (minimize)="minimizeWindow(window)" />

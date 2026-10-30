@@ -19,7 +19,7 @@ public class FogTransporterController : AdminBaseController
     [HttpGet]
     public async Task<IActionResult> SearchAsync([FromQuery] FogTransporterSearchDto criteria, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var transporters = await _transporterService.SearchForAdminAsync(criteria, pageInfo, query, cancellationToken);
+        var transporters = await _transporterService.SearchAsync(criteria, pageInfo, query, cancellationToken);
 
         return Ok(transporters);
     }

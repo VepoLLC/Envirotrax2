@@ -12,7 +12,7 @@ import { FogTransporterSearchCriteria, FogTransporterService } from '../../../sh
  * window uses.
  */
 const CRITERIA_FIELDS: (keyof FogTransporterSearchCriteria)[] = [
-    'licenseNumber',
+    'registrationNumber',
     'insurancePolicyNumber',
     'userEmail',
     'contactName',

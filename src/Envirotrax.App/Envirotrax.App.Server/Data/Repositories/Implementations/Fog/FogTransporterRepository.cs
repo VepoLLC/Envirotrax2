@@ -23,89 +23,33 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog
             .Where(p => p.HasFogTransportation);
         }
 
-        public async Task<IEnumerable<Professional>> SearchAsync(string? registrationNumber, string? insurancePolicyNumber, PageInfo pageInfo, CancellationToken cancellationToken)
-        {
-            var query = GetListQuery();
-
-            if (!string.IsNullOrWhiteSpace(registrationNumber))
-            {
-                query = query.Where(p => DbContext.ProfessionalLicenses.Any(l =>
-                    l.ProfessionalId == p.Id &&
-                    l.ProfessionalType == ProfessionalType.FogTransporter &&
-                    l.LicenseNumber.Contains(registrationNumber)));
-            }
-
-            if (!string.IsNullOrWhiteSpace(insurancePolicyNumber))
-            {
-                query = query.Where(p => DbContext.ProfessionalInsurances.Any(i =>
-                    i.ProfessionalId == p.Id &&
-                    i.InsuranceNumber.Contains(insurancePolicyNumber)));
-            }
-
-            var paginated = await query
-                .OrderBy(p => p.Name)
-                .PaginateAsync(pageInfo, cancellationToken);
-
-            return await paginated.ToListAsync(cancellationToken);
-        }
-
-        public async Task<IEnumerable<Professional>> SearchForAdminAsync(FogTransporterSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Professional>> SearchAsync(FogTransporterSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
         {
             var dbQuery = GetListQuery()
-                .Where(query.Filter);
-
-            if (!string.IsNullOrWhiteSpace(criteria.LicenseNumber))
-            {
-                var licenseNumber = criteria.LicenseNumber;
-
-                dbQuery = dbQuery.Where(p => DbContext.ProfessionalLicenses.Any(l =>
+                .Where(query.Filter)
+                .WhereIf(!string.IsNullOrWhiteSpace(criteria.RegistrationNumber), p => DbContext.ProfessionalLicenses.Any(l =>
                     l.ProfessionalId == p.Id &&
                     l.ProfessionalType == ProfessionalType.FogTransporter &&
-                    l.LicenseNumber.Contains(licenseNumber)));
-            }
-
-            if (!string.IsNullOrWhiteSpace(criteria.InsurancePolicyNumber))
-            {
-                var insurancePolicyNumber = criteria.InsurancePolicyNumber;
-
-                dbQuery = dbQuery.Where(p => DbContext.ProfessionalInsurances.Any(i =>
+                    l.LicenseNumber.Contains(criteria.RegistrationNumber!)))
+                .WhereIf(!string.IsNullOrWhiteSpace(criteria.InsurancePolicyNumber), p => DbContext.ProfessionalInsurances.Any(i =>
                     i.ProfessionalId == p.Id &&
-                    i.InsuranceNumber.Contains(insurancePolicyNumber)));
-            }
-
-            if (!string.IsNullOrWhiteSpace(criteria.UserEmail))
-            {
-                var userEmail = criteria.UserEmail;
-
-                dbQuery = dbQuery.Where(p =>
-                    p.CompanyEmail!.Contains(userEmail) ||
+                    i.InsuranceNumber.Contains(criteria.InsurancePolicyNumber!)))
+                .WhereIf(!string.IsNullOrWhiteSpace(criteria.UserEmail), p =>
+                    p.CompanyEmail!.Contains(criteria.UserEmail!) ||
                     DbContext.ProfessionalUsers.Any(u =>
                         u.ProfessionalId == p.Id &&
                         u.IsFogTransporter &&
-                        u.User!.Email!.Contains(userEmail)));
-            }
-
-            if (!string.IsNullOrWhiteSpace(criteria.ContactName))
-            {
-                var contactName = criteria.ContactName;
-
-                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u =>
+                        u.User!.Email!.Contains(criteria.UserEmail!)))
+                .WhereIf(!string.IsNullOrWhiteSpace(criteria.ContactName), p => DbContext.ProfessionalUsers.Any(u =>
                     u.ProfessionalId == p.Id &&
                     u.IsFogTransporter &&
-                    u.ContactName!.Contains(contactName)));
-            }
-
-            if (!string.IsNullOrWhiteSpace(criteria.CellNumber))
-            {
-                var cellNumber = criteria.CellNumber;
-
-                dbQuery = dbQuery.Where(p =>
-                    p.CellPhoneNumber!.Contains(cellNumber) ||
+                    u.ContactName!.Contains(criteria.ContactName!)))
+                .WhereIf(!string.IsNullOrWhiteSpace(criteria.CellNumber), p =>
+                    p.CellPhoneNumber!.Contains(criteria.CellNumber!) ||
                     DbContext.ProfessionalUsers.Any(u =>
                         u.ProfessionalId == p.Id &&
                         u.IsFogTransporter &&
-                        u.User!.PhoneNumber!.Contains(cellNumber)));
-            }
+                        u.User!.PhoneNumber!.Contains(criteria.CellNumber!)));
 
             if (query.Sort.IsNullOrEmpty())
             {

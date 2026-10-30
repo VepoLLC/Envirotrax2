@@ -33,7 +33,7 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser
 
     public PropertyType PropertyType { get; set; }
 
-    [StringLength(10)]
+    [StringLength(50)]
     public string? PropertyStreetNumber { get; set; }
 
     [StringLength(100)]

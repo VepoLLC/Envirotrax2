@@ -97,4 +97,28 @@ export class HelperService {
 
         return String(value);
     }
+
+    public buildStreetAddress(streetNumber?: string, streetName?: string, number?: string): string {
+        let address = `${streetNumber ?? ''} ${streetName ?? ''}`.trim();
+
+        if (number) {
+            address = `${address} #${number}`.trim();
+        }
+
+        return address;
+    }
+
+    public buildCityStateZip(city?: string, state?: string, zip?: string): string {
+        let result = city ?? '';
+
+        if (state) {
+            result = result ? `${result}, ${state}` : state;
+        }
+
+        if (zip) {
+            result = result ? `${result}  ${zip}` : zip;
+        }
+
+        return result;
+    }
 }

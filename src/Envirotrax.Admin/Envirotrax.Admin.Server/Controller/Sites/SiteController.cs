@@ -62,6 +62,30 @@ public class SiteController : AdminBaseController
         return Ok();
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        await _siteService.DeleteAsync(id);
+
+        return Ok();
+    }
+
+    [HttpPost("{id}/copies")]
+    public async Task<IActionResult> CopyAsync(int id, [FromQuery] int waterSupplierId)
+    {
+        var copy = await _siteService.CopyAsync(id, waterSupplierId);
+
+        return Ok(copy);
+    }
+
+    [HttpPost("{id}/merges")]
+    public async Task<IActionResult> MergeAsync(int id, [FromQuery] int waterSupplierId, [FromBody] SiteMergeDto dto)
+    {
+        await _siteService.MergeAsync(id, waterSupplierId, dto);
+
+        return Ok();
+    }
+
     [HttpGet("{id}/logs")]
     public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
     {

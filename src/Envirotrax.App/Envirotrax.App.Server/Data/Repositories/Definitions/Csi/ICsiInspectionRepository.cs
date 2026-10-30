@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 
 namespace Envirotrax.App.Server.Data.Repositories.Definitions.Csi;
@@ -12,6 +13,7 @@ public interface ICsiInspectionRepository : IRepository<CsiInspection>
     Task<CsiInspection?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request);
     Task<CsiInspection?> UpdateForProfessionalAsync(CsiInspection model);
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
+    Task<int> TransferToSiteAsync(int sourceSiteId, Site destinationSite);
 
     // Checkout
     Task<List<CsiInspection>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId, CancellationToken cancellationToken);

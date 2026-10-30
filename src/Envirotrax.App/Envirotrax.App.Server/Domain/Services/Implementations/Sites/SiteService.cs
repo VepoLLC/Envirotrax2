@@ -13,7 +13,9 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.GisAreas;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
@@ -27,6 +29,7 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Sites;
 public class SiteService : Service<Site, SiteDto>, ISiteService
 {
     private readonly ISiteRepository _siteRepository;
+    private readonly ISiteLogRepository _siteLogRepository;
     private readonly ISiteLogService _siteLogService;
     private readonly IRecordLogService _recordLogService;
     private readonly IGeocodingService _geocodingService;
@@ -46,6 +49,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
     public SiteService(
         IMapper mapper,
         ISiteRepository repository,
+        ISiteLogRepository siteLogRepository,
         ISiteLogService siteLogService,
         IRecordLogService recordLogService,
         IGeocodingService geocodingService,
@@ -64,6 +68,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         : base(mapper, repository)
     {
         _siteRepository = repository;
+        _siteLogRepository = siteLogRepository;
         _siteLogService = siteLogService;
         _recordLogService = recordLogService;
         _geocodingService = geocodingService;
@@ -515,6 +520,145 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
         // recordLog manual
         await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, dto.WaterSupplierId, RecordLogType.Edit, $"Water Supplier changed from {previousWaterSupplierId} to {dto.WaterSupplierId}");
+
+        return true;
+    }
+
+    public async Task<bool> DeleteFromAdminAsync(int siteId)
+    {
+        var hasRecords = await _siteRepository.HasRecordsAsync(siteId, CancellationToken.None);
+
+        if (hasRecords)
+        {
+            throw new AppValidationException("Existing backflow, CSI, FOG records must be removed from the site before the record can be deleted.");
+        }
+
+        var deleted = await DeleteAsync(siteId);
+
+        return deleted != null;
+    }
+
+    public async Task<SiteDto?> CopyAsync(int siteId)
+    {
+        var site = await _siteRepository.GetAsync(siteId, CancellationToken.None);
+
+        if (site == null || site.DeletedTime.HasValue)
+        {
+            return null;
+        }
+
+        var copy = BuildCopy(site);
+
+        return await AddWithGeneratedAccountNumberAsync(copy);
+    }
+
+    private static SiteDto BuildCopy(Site site)
+    {
+        return new SiteDto
+        {
+            WaterSupplier = new ReferencedWaterSupplierDto { Id = site.WaterSupplierId },
+            SubArea = site.SubArea,
+            Active = site.Active,
+
+            PropertyType = site.PropertyType,
+            BusinessName = site.BusinessName,
+            StreetNumber = site.StreetNumber,
+            StreetName = site.StreetName,
+            PropertyNumber = site.PropertyNumber,
+            City = site.City,
+            State = site.StateId.HasValue ? new ReferencedStateDto { Id = site.StateId } : null,
+            ZipCode = site.ZipCode,
+
+            MailingCompanyName = site.MailingCompanyName,
+            MailingContactName = site.MailingContactName,
+            MailingStreetNumber = site.MailingStreetNumber,
+            MailingStreetName = site.MailingStreetName,
+            MailingNumber = site.MailingNumber,
+            MailingCity = site.MailingCity,
+            MailingState = site.MailingStateId.HasValue ? new ReferencedStateDto { Id = site.MailingStateId } : null,
+            MailingZipCode = site.MailingZipCode,
+            MailingPhoneNumber = site.MailingPhoneNumber,
+            MailingEmailAddress = site.MailingEmailAddress,
+            FogGeneratorPhoneNumber = site.FogGeneratorPhoneNumber,
+            FogGeneratorEmailAddress = site.FogGeneratorEmailAddress,
+            Comments = site.Comments,
+
+            NeedsCsiInspection = site.NeedsCsiInspection,
+            CsiRenewalDate = site.CsiRenewalDate,
+            NeedsFogInspection = site.NeedsFogInspection,
+            FogInspectionExpirationDate = site.FogInspectionExpirationDate,
+            NeedsFogPermit = site.NeedsFogPermit,
+            FogPermitExpirationDate = site.FogPermitExpirationDate,
+            LastTripTicketDate = site.LastTripTicketDate,
+            TripTicketInterval = site.TripTicketInterval,
+            IsFeeExempt = site.IsFeeExempt,
+            RainFreezeSensorType = site.RainFreezeSensorType,
+            HasOnSiteSewageFacility = site.HasOnSiteSewageFacility,
+            HasWaterWell = site.HasWaterWell,
+            HasAuxWaterSupply = site.HasAuxWaterSupply,
+            HasFireSystem = site.HasFireSystem,
+            FireSeparateWater = site.FireSeparateWater,
+            GreaseTrapType = site.GreaseTrapType,
+            HasGritTrap = site.HasGritTrap,
+            HasReclaimed = site.HasReclaimed,
+            HasIrrigation = site.HasIrrigation,
+            IrrigationSeparateWater = site.IrrigationSeparateWater,
+            InvalidMailingAddress = site.InvalidMailingAddress,
+            OutOfArea = site.OutOfArea,
+            FacilityType = site.FacilityType,
+            BackflowScheduleMonth = site.BackflowScheduleMonth,
+
+            GisLatitude = site.GisLatitude,
+            GisLongitude = site.GisLongitude,
+            GisStatus = (int)site.GisStatus,
+            GisDate = site.GisDate,
+            GisAreaId = site.GisAreaId,
+
+            ImportSiteId = site.ImportSiteId,
+            ImportSiteId2 = site.ImportSiteId2,
+            ImportId = site.ImportId,
+            ExcludeFromBackflowMailing = site.ExcludeFromBackflowMailing,
+            ExcludeFromCsiMailing = site.ExcludeFromCsiMailing,
+            NeedsValidation = site.NeedsValidation
+        };
+    }
+
+    public async Task<bool> MergeAsync(int siteId, int sourceSiteId)
+    {
+        if (siteId == sourceSiteId)
+        {
+            throw new AppValidationException("Cannot merge a site onto itself.");
+        }
+
+        var site = await _siteRepository.GetAsync(siteId, CancellationToken.None);
+        var sourceSite = await _siteRepository.GetAsync(sourceSiteId, CancellationToken.None);
+
+        if (site == null || site.DeletedTime.HasValue || sourceSite == null || sourceSite.DeletedTime.HasValue)
+        {
+            return false;
+        }
+
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            await _csiInspectionRepository.TransferToSiteAsync(sourceSiteId, site);
+
+            var transferredTestCount = await _backflowTestRepository.TransferToSiteAsync(sourceSiteId, site);
+
+            await _fogInspectionRepository.TransferToSiteAsync(sourceSiteId, site);
+            await _fogTripTicketRepository.TransferToSiteAsync(sourceSiteId, site);
+            await _siteLogRepository.TransferToSiteAsync(sourceSiteId, siteId);
+
+            await _siteRepository.DeleteAsync(sourceSiteId);
+
+            if (transferredTestCount > 0)
+            {
+                await _siteRepository.SetNeedsRenewalCheckAsync(siteId);
+            }
+
+            await _recordLogService.AddAsync(RecordLogTableNames.Sites, siteId, site.WaterSupplierId, RecordLogType.Edit, $"Site merged {sourceSiteId}");
+
+            scope.Complete();
+        }
 
         return true;
     }

@@ -570,8 +570,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("MailingZip")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Manufacturer")
                         .HasMaxLength(100)
@@ -659,8 +659,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PropertyZip")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("RainFreezeSensorInstalled")
                         .HasColumnType("bit");
@@ -1056,8 +1056,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("MailingZip")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("MaterialServiceLineCopper")
                         .HasColumnType("bit");
@@ -1124,8 +1124,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PropertyZip")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("ReasonForInspection")
                         .HasColumnType("int");
@@ -1893,8 +1893,8 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PropertyStreetNumber")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("PropertyType")
                         .HasColumnType("int");

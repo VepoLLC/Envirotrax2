@@ -182,9 +182,20 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
             });
 
             if (this.value) {
-                this._flatpickerInstance.setDate(this.value, false);
+                this._flatpickerInstance.setDate(this.getFlatpickrDate(), false);
             }
         }
+    }
+
+    // flatpickr takes a date range as an array of dates. It rejects the DateRange object a daterange input is bound to.
+    private getFlatpickrDate(): any {
+        const range = this.value as DateRange;
+
+        if (this.type == 'daterange' && range && typeof range == 'object' && ('startDate' in range || 'endDate' in range)) {
+            return [range.startDate, range.endDate].filter(date => !!date);
+        }
+
+        return this.value;
     }
 
     public writeValue(obj: any): void {
@@ -195,7 +206,7 @@ export class InputComponent implements ControlValueAccessor, Validator, OnInit, 
         }
 
         if (this._flatpickerInstance) {
-            this._flatpickerInstance.setDate(this.value, false);
+            this._flatpickerInstance.setDate(this.getFlatpickrDate(), false);
         }
 
         // Format decimals on initial load

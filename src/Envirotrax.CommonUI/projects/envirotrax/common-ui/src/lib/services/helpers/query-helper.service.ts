@@ -152,6 +152,36 @@ export class QueryHelperService {
                 };
             });
     }
+
+    /**
+     * The reverse of convertFilterPanelFields for one field: the value the field had when the filter was built.
+     * A field the filter has no property for gets the value of an empty field.
+     */
+    public getFilterPanelFieldValue(field: FilterFieldVm, queryProperties: QueryProperty[]): string | string[] | DateRange | undefined {
+        const property = queryProperties.find(p => p.columnName == field.fieldName);
+
+        switch (field.type) {
+            case 'multi-select':
+                return property?.children?.map(child => child.value!) ?? [];
+            case 'daterange':
+                return this.getDateRange(property);
+            case 'select':
+                return property?.value ?? '';
+            default:
+                return property?.value;
+        }
+    }
+
+    private getDateRange(property?: QueryProperty): DateRange | undefined {
+        const startDate = property?.children?.find(child => child.comparisonOperator == 'Gte')?.value;
+        const endDate = property?.children?.find(child => child.comparisonOperator == 'Lte')?.value;
+
+        if (!startDate && !endDate) {
+            return undefined;
+        }
+
+        return { startDate, endDate };
+    }
 }
 
 class ParamEncoder extends HttpUrlEncodingCodec {

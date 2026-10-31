@@ -39,6 +39,8 @@ import { InputAddOnComponent } from "./components/input/input-add-on.component";
 import { ToastContainerComponent } from "./components/toast-container/toast-container.component";
 import { RecordLogListComponent } from "./components/record-log/record-log-list.component";
 import { DownloadManagerComponent } from "./components/data-components/download-manager/download-manager.component";
+import { TableSettingsComponent } from "./components/data-components/table-settings/table-settings.component";
+import { EditTableSettingComponent } from "./components/data-components/table-settings/edit-table-setting.component";
 
 @NgModule({
     declarations: [
@@ -76,6 +78,8 @@ import { DownloadManagerComponent } from "./components/data-components/download-
         ToastContainerComponent,
         RecordLogListComponent,
         DownloadManagerComponent,
+        TableSettingsComponent,
+        EditTableSettingComponent,
     ],
     imports: [
         CommonModule,

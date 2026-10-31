@@ -8,6 +8,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Domain.Services.Implementations.Logs;
 using Envirotrax.App.Server.Domain.Services.Implementations.Notifications;
+using Envirotrax.App.Server.Domain.Services.Definitions.TableSettings;
+using Envirotrax.App.Server.Domain.Services.Implementations.TableSettings;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -130,6 +132,8 @@ public static class ServiceRegistration
         services.AddTransient<IBackflowTestNotificationService, BackflowTestNotificationService>();
         services.AddTransient<IBackflowTestNotificationMatcher, BackflowTestNotificationMatcher>();
         services.AddTransient<INotificationDigestService, NotificationDigestService>();
+
+        services.AddTransient<ITableSettingService, TableSettingService>();
 
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
 

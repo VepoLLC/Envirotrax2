@@ -19,7 +19,7 @@ export class FilterPanelComponent {
 
     }
 
-    public onFilterChanged(): void {
+    public getFilter(): QueryProperty[] {
         const filterFields: FilterFieldVm[] = this.fields!.map(f => ({
             fieldName: f.fieldName,
             label: f.label,
@@ -27,8 +27,22 @@ export class FilterPanelComponent {
             value: f.value
         }));
 
-        const queryProperties = this._queryHelper.convertFilterPanelFields(filterFields);
+        return this._queryHelper.convertFilterPanelFields(filterFields);
+    }
 
-        this.filterChange.emit(queryProperties);
+    /**
+     * Puts a filter this panel built earlier, such as one saved in a search template, back into its fields
+     * and emits it. Fields the filter has no value for are cleared.
+     */
+    public setFilter(queryProperties: QueryProperty[]): void {
+        for (const field of this.fields ?? []) {
+            field.value = this._queryHelper.getFilterPanelFieldValue(field, queryProperties);
+        }
+
+        this.onFilterChanged();
+    }
+
+    public onFilterChanged(): void {
+        this.filterChange.emit(this.getFilter());
     }
 }

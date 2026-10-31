@@ -52,7 +52,7 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public int? PropertyStateId { get; set; }
     public State? PropertyState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? PropertyZip { get; set; }
 
     // Mailing / Contact fields
@@ -77,7 +77,7 @@ public class CsiInspection : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public int? MailingStateId { get; set; }
     public State? MailingState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? MailingZip { get; set; }
 
     [StringLength(50)]

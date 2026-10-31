@@ -8,11 +8,14 @@ import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-
 import { SiteGisUpdate, SiteUpdate } from '../../shared/models/sites/site-update';
 import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
 import { SiteService } from '../../shared/services/sites/site.service';
+import { DraggedSite, SiteDragDropService } from '../../shared/services/sites/site-drag-drop.service';
+import { WindowService } from '../../shared/services/window.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
 import { WaterSupplierLookupComponent } from '../../shared/components/lookups/water-supplier-lookup.component';
 import { WindowReference } from '../../window/window-config';
 import { SiteEditSectionsModule } from './sections/site-edit-sections.module';
+import { SiteMergeConfirmationComponent, SiteMergeConfirmationModel } from './merge/site-merge-confirmation.component';
 
 type SiteEditTab = 'details' | 'logs';
 
@@ -67,7 +70,9 @@ export class SiteEditComponent implements OnInit {
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _helperService: HelperService
+        private readonly _helperService: HelperService,
+        private readonly _windowService: WindowService,
+        private readonly _siteDragDropService: SiteDragDropService
     ) {
 
     }
@@ -332,6 +337,161 @@ export class SiteEditComponent implements OnInit {
         } finally {
             this.isSaving = false;
         }
+    }
+
+    public deleteSite(): void {
+        this._modalHelper
+            .showDeleteConfirmation()
+            .result()
+            .subscribe(() => this.processDelete());
+    }
+
+    private async processDelete(): Promise<void> {
+        if (this.siteId == null) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            await this._siteService.delete(this.siteId);
+        } finally {
+            this.isSaving = false;
+        }
+
+        this._toastService.successFullyDeleted('Site');
+
+        this._windowReference.close();
+    }
+
+    public copySite(): void {
+        this._modalHelper
+            .confirm({
+                title: 'Confirm Copy Site',
+                messages: ['Are you sure you want to create a copy of this site?']
+            })
+            .result()
+            .subscribe(() => this.processCopy());
+    }
+
+    private async processCopy(): Promise<void> {
+        if (this.siteId == null || this.waterSupplierId == null) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            const copy = await this._siteService.copy(this.siteId, this.waterSupplierId);
+
+            this.openSite(copy);
+        } finally {
+            this.isSaving = false;
+        }
+    }
+
+    private openSite(site: SiteDetail): void {
+        if (site.id == null) {
+            return;
+        }
+
+        const model: SiteEditWindowModel = {
+            siteId: site.id,
+            waterSupplierId: site.waterSupplier?.id
+        };
+
+        this._windowService.addWindow(SiteEditComponent, {
+            title: this.buildSiteWindowTitle(site),
+            model
+        });
+    }
+
+    private buildSiteWindowTitle(site: SiteDetail): string {
+        const address = [site.streetNumber, site.streetName]
+            .filter(part => !!part && part.trim().length > 0)
+            .join(' ');
+
+        return address ? `${site.id} - ${address}` : `${site.id}`;
+    }
+
+    public startSiteDrag(event: DragEvent): void {
+        if (!event.dataTransfer || !this.originalSite) {
+            return;
+        }
+
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('application/x-envirotrax-site', String(this.siteId));
+
+        this._siteDragDropService.draggedSite = {
+            site: this.originalSite,
+            closeWindow: () => this._windowReference.close()
+        };
+    }
+
+    public endSiteDrag(): void {
+        this._siteDragDropService.draggedSite = undefined;
+    }
+
+    public allowSiteDrop(event: DragEvent): void {
+        if (this._siteDragDropService.draggedSite && !this.isSaving) {
+            event.preventDefault();
+        }
+    }
+
+    public dropSite(event: DragEvent): void {
+        const draggedSite = this._siteDragDropService.draggedSite;
+
+        if (!draggedSite || !this.originalSite || this.isSaving) {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (draggedSite.site.id === this.siteId) {
+            this._modalHelper.showMessage({
+                title: 'Site Merge Error',
+                type: 'error',
+                messages: ['Cannot merge a site onto itself.']
+            });
+
+            return;
+        }
+
+        this._modalHelper
+            .show<SiteMergeConfirmationModel, void>(SiteMergeConfirmationComponent, {
+                title: 'Confirm Record Transfer',
+                model: {
+                    sourceSite: draggedSite.site,
+                    destinationSite: this.originalSite
+                },
+                size: ModalSize.large,
+                mode: 'disableFullScreen'
+            })
+            .result()
+            .subscribe(() => this.mergeSite(draggedSite));
+    }
+
+    private async mergeSite(draggedSite: DraggedSite): Promise<void> {
+        if (this.siteId == null || this.waterSupplierId == null || draggedSite.site.id == null) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            await this._siteService.merge(this.siteId, this.waterSupplierId, draggedSite.site.id);
+        } finally {
+            this.isSaving = false;
+        }
+
+        draggedSite.closeWindow();
+
+        this._toastService.show({
+            text: 'Sites Merged',
+            type: ToastType.Success
+        });
+
+        await this.loadRecordLogs();
     }
 
     /**

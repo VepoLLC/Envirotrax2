@@ -50,7 +50,7 @@ public class BackflowTestAdminUpdateRequest
 
     public ReferencedStateDto? PropertyState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? PropertyZip { get; set; }
 
     [StringLength(100)]

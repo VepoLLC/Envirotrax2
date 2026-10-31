@@ -52,9 +52,9 @@ public class TableSettingController : WaterSupplierProtectedController
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteAsync(int id)
     {
-        var deleted = await _service.DeleteMyAsync(id, cancellationToken);
+        var deleted = await _service.DeleteAsync(id);
 
         if (deleted == null)
         {

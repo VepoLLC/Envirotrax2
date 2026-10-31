@@ -1,12 +1,12 @@
 import { Component } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
-import { TableSetting, TableSettingFilters } from "../../../models/table-setting";
-import { TableSettingService } from "../../../services/table-setting/table-setting.service";
+import { TableSetting, TableSettingDataSource, TableSettingFilters } from "../../../models/table-setting";
 import { HelperService } from "../../../services/helpers/helper.service";
 import { ToastService } from "../../../services/toast/toast.service";
 
 export interface EditTableSettingConfig {
+    dataSource: TableSettingDataSource;
     setting: TableSetting;
     currentFilters: TableSettingFilters;
 }
@@ -22,11 +22,11 @@ export class EditTableSettingComponent {
     public isNew: boolean;
     public saveCurrentFilters: boolean = false;
 
+    private readonly _dataSource: TableSettingDataSource;
     private readonly _currentFilters: TableSettingFilters;
 
     constructor(
         private readonly _modalReference: ModalReference<EditTableSettingConfig, TableSetting>,
-        private readonly _tableSettingService: TableSettingService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
@@ -34,6 +34,7 @@ export class EditTableSettingComponent {
 
         this.setting = config.setting;
         this.isNew = !config.setting.id;
+        this._dataSource = config.dataSource;
         this._currentFilters = config.currentFilters;
     }
 
@@ -49,8 +50,8 @@ export class EditTableSettingComponent {
                 }
 
                 const saved = this.isNew
-                    ? await this._tableSettingService.add(this.setting)
-                    : await this._tableSettingService.update(this.setting);
+                    ? await this._dataSource.add(this.setting)
+                    : await this._dataSource.update(this.setting);
 
                 this._toastService.successfullySaved('Search Template');
                 this._modalReference.closeSuccess(saved);

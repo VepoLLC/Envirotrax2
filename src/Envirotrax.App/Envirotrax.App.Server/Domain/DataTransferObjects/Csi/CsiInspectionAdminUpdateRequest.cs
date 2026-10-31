@@ -26,7 +26,7 @@ public class CsiInspectionAdminUpdateRequest
 
     public ReferencedStateDto? PropertyState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? PropertyZip { get; set; }
 
     [StringLength(100)]
@@ -49,7 +49,7 @@ public class CsiInspectionAdminUpdateRequest
 
     public ReferencedStateDto? MailingState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? MailingZip { get; set; }
 
     public CsiInspectionReason ReasonForInspection { get; set; }

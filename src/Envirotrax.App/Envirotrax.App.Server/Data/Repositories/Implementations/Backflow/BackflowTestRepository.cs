@@ -64,7 +64,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return base.GetDetailsQuery()
             .IgnoreQueryFilters([ProfessionalDbContext.OwnProfessionalFilterFor<ProfessionalUser>()])
             .Include(bt => bt.WaterSupplier)
-                .ThenInclude(ws => ws!.State)
+            .ThenInclude(ws => ws!.State)
             .Include(bt => bt.Site)
             .Include(bt => bt.Professional)
             .Include(bt => bt.Bpat)
@@ -1074,6 +1074,30 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
     public Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
         return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null && t.IsCurrent && !t.OutOfService, cancellationToken);
+    }
+
+    public Task<int> TransferToSiteAsync(int sourceSiteId, Site destinationSite)
+    {
+        return Entity
+            .Where(test => test.SiteId == sourceSiteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(test => test.SiteId, destinationSite.Id)
+                .SetProperty(test => test.PropertyType, (int)destinationSite.PropertyType)
+                .SetProperty(test => test.PropertyBusinessName, destinationSite.BusinessName)
+                .SetProperty(test => test.PropertyStreetNumber, destinationSite.StreetNumber)
+                .SetProperty(test => test.PropertyStreetName, destinationSite.StreetName)
+                .SetProperty(test => test.PropertyNumber, destinationSite.PropertyNumber)
+                .SetProperty(test => test.PropertyCity, destinationSite.City)
+                .SetProperty(test => test.PropertyStateId, destinationSite.StateId)
+                .SetProperty(test => test.PropertyZip, destinationSite.ZipCode)
+                .SetProperty(test => test.MailingCompanyName, destinationSite.MailingCompanyName)
+                .SetProperty(test => test.MailingContactName, destinationSite.MailingContactName)
+                .SetProperty(test => test.MailingStreetNumber, destinationSite.MailingStreetNumber)
+                .SetProperty(test => test.MailingStreetName, destinationSite.MailingStreetName)
+                .SetProperty(test => test.MailingNumber, destinationSite.MailingNumber)
+                .SetProperty(test => test.MailingCity, destinationSite.MailingCity)
+                .SetProperty(test => test.MailingStateId, destinationSite.MailingStateId)
+                .SetProperty(test => test.MailingZip, destinationSite.MailingZipCode));
     }
 
     // V1 checkout: the tests an inspection added ("+ Add Assembly") are paid with that inspection.

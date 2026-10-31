@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Filters;
@@ -22,9 +23,9 @@ namespace Envirotrax.App.Server.Controllers.Fog
 
         [HttpGet("search")]
         [HasPermission(PermissionAction.CanView)]
-        public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] string? registrationNumber, [FromQuery] string? insurancePolicyNumber, CancellationToken cancellationToken)
+        public async Task<IActionResult> SearchAsync([FromQuery] FogTransporterSearchDto criteria, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
         {
-            var result = await _transporterService.SearchAsync(registrationNumber, insurancePolicyNumber, pageInfo, cancellationToken);
+            var result = await _transporterService.SearchAsync(criteria, pageInfo, query, cancellationToken);
             return Ok(result);
         }
 

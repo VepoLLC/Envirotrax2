@@ -1,7 +1,7 @@
 <dp-loading-spinner [hidden]="!isLoading && !isSaving"></dp-loading-spinner>
 
 @if (!isLoading && editableSite) {
-    <form #form="ngForm">
+    <form #form="ngForm" (dragover)="allowSiteDrop($event)" (drop)="dropSite($event)">
         <div class="text-center mb-3">
             <ul class="vp-tabs nav nav-pills d-inline-flex">
                 <li class="nav-item">
@@ -36,22 +36,25 @@
         </div>
 
         <div class="d-flex justify-content-center gap-2 mt-3">
-            <!-- Delete / Copy / Drag-Drop Merge: presentational only for now (Vepo parity); no behavior wired yet. -->
             <button type="button"
                     class="btn btn-primary"
+                    (click)="deleteSite()"
                     [disabled]="isSaving">
                 <i class="fa-solid fa-trash-can me-1"></i>Delete
             </button>
             <button type="button"
                     class="btn btn-primary"
+                    (click)="copySite()"
                     [disabled]="isSaving">
                 <i class="fa-solid fa-copy me-1"></i>Copy
             </button>
-            <button type="button"
-                    class="btn btn-primary"
-                    [disabled]="isSaving">
+            <div class="btn btn-primary"
+                 draggable="true"
+                 [class.disabled]="isSaving"
+                 (dragstart)="startSiteDrag($event)"
+                 (dragend)="endSiteDrag()">
                 <i class="fa-solid fa-code-merge me-1"></i>Drag/Drop Merge
-            </button>
+            </div>
             <button type="button"
                     class="btn btn-primary"
                     (click)="save()"

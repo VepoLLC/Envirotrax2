@@ -1,6 +1,7 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 
@@ -60,6 +61,8 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<BackflowTest?> UpdateReplacementClearedAsync(int id, bool cleared);
 
     Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken);
+
+    Task<int> TransferToSiteAsync(int sourceSiteId, Site destinationSite);
 
     // Checkout
     Task<List<BackflowTest>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? bpatId, CancellationToken cancellationToken);

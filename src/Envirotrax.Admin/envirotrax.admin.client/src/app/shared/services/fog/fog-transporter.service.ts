@@ -9,7 +9,7 @@ import { Professional } from "../../models/professionals/professional";
  * (licences, insurances) or a person inside the company rather than a column on the company row.
  */
 export interface FogTransporterSearchCriteria {
-    licenseNumber?: string | null;
+    registrationNumber?: string | null;
     insurancePolicyNumber?: string | null;
     userEmail?: string | null;
     contactName?: string | null;

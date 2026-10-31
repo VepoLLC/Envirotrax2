@@ -22,4 +22,14 @@ public class FogInspectorService : IFogInspectorService
     {
         return _apiClient.GetAsync<ProfessionalDto>(BaseUrl, pageInfo, query, criteria.ToParameters(), cancellationToken);
     }
+
+    public Task<ProfessionalDto?> GetAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<ProfessionalDto>($"{BaseUrl}/{professionalId}", cancellationToken);
+    }
+
+    public Task<ProfessionalDto?> UpdateAsync(int professionalId, ProfessionalDto professional, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<ProfessionalDto, ProfessionalDto>($"{BaseUrl}/{professionalId}", professional, cancellationToken);
+    }
 }

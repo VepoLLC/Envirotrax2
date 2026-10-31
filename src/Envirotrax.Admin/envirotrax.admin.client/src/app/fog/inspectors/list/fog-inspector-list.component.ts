@@ -5,6 +5,9 @@ import { CellTemplateData, ColumnType, QueryProperty, TableColumn, TableViewMode
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { Professional } from '../../../shared/models/professionals/professional';
 import { FogInspectorSearchCriteria, FogInspectorService } from '../../../shared/services/fog/fog-inspector.service';
+import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
+import { FogInspectorDetailsComponent } from '../details/fog-inspector-details.component';
 
 /**
  * Criteria that match a person inside the company rather than a column on the company row. They are stripped
@@ -43,13 +46,28 @@ export class FogInspectorListComponent implements OnInit {
     };
 
     constructor(
-        private readonly _fogInspectorService: FogInspectorService
+        private readonly _fogInspectorService: FogInspectorService,
+        private readonly _windowService: WindowService
     ) {
 
     }
 
     public ngOnInit(): void {
         this.table.columns = this.getColumns();
+    }
+
+    public openDetails(inspector: Professional): void {
+        this._windowService.addWindow(FogInspectorDetailsComponent, {
+            title: this.buildTitle(inspector),
+            color: MODULE_COLORS.FOG,
+            model: inspector
+        });
+    }
+
+    private buildTitle(inspector: Professional): string {
+        return [inspector.name, inspector.companyEmail]
+            .filter(part => part)
+            .join(' - ');
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {

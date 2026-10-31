@@ -1,13 +1,15 @@
 
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Admin;
 
 /// <summary>
-/// Admin FOG inspector search. A route shell only - it reuses the existing IFogInspectorService.SearchAsync that the
+/// Admin FOG inspector search and account details. A route shell only - it reuses the existing IFogInspectorService.SearchAsync that the
 /// water-supplier window uses. That endpoint (api/fog/inspectors/search) is unreachable by an admin caller
 /// (different scope, role and feature gate), so the admin surface needs its own route, but not its own search.
 /// IDbContextSelector already routes admin requests to AdminDbContext, which disables tenant filtering.
@@ -16,10 +18,12 @@ namespace Envirotrax.App.Server.Controllers.Admin;
 public class FogInspectorController : AdminBaseController
 {
     private readonly IFogInspectorService _inspectorService;
+    private readonly IProfessionalService _professionalService;
 
-    public FogInspectorController(IFogInspectorService inspectorService)
+    public FogInspectorController(IFogInspectorService inspectorService, IProfessionalService professionalService)
     {
         _inspectorService = inspectorService;
+        _professionalService = professionalService;
     }
 
     [HttpGet]
@@ -28,5 +32,28 @@ public class FogInspectorController : AdminBaseController
         var inspectors = await _inspectorService.SearchAsync(criteria, pageInfo, query, cancellationToken);
 
         return Ok(inspectors);
+    }
+
+    [HttpGet("{professionalId}")]
+    public async Task<IActionResult> GetAsync(int professionalId, CancellationToken cancellationToken)
+    {
+        var professional = await _professionalService.GetAsync(professionalId, cancellationToken);
+
+        return professional == null ? NotFound() : Ok(professional);
+    }
+
+    [HttpPut("{professionalId}")]
+    public async Task<IActionResult> UpdateAsync(int professionalId, [FromBody] ProfessionalDto professional, CancellationToken cancellationToken)
+    {
+        if (!await _professionalService.ExistsAsync(professionalId, cancellationToken))
+        {
+            return NotFound();
+        }
+
+        professional.Id = professionalId;
+
+        var updated = await _professionalService.UpdateAsync(professional);
+
+        return Ok(updated);
     }
 }

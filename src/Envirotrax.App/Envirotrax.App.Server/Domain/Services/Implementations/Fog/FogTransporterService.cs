@@ -30,24 +30,17 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog
             _insuranceService = insuranceService;
         }
 
-        public async Task<IPagedData<ProfessionalDto>> SearchAsync(string? registrationNumber, string? insurancePolicyNumber, PageInfo pageInfo, CancellationToken cancellationToken)
+        public async Task<IPagedData<ProfessionalDto>> SearchAsync(FogTransporterSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
         {
-            var items = await _transporterRepository.SearchAsync(registrationNumber, insurancePolicyNumber, pageInfo, cancellationToken);
+            query.Filter = query.ConvertFilterProperties<Professional, ProfessionalDto>(Mapper);
+            query.Sort = query.ConvertSortProperties<Professional, ProfessionalDto>(Mapper);
+
+            var items = await _transporterRepository.SearchAsync(criteria, pageInfo, query, cancellationToken);
             var dtos = items.Select(i => MapToDto(i)!).ToList();
 
             await EnrichWithLicensesAndInsurancesAsync(dtos, cancellationToken);
 
             return dtos.ToPagedData(pageInfo);
-        }
-
-        public async Task<IPagedData<ProfessionalDto>> SearchForAdminAsync(FogTransporterSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-        {
-            query.Filter = query.ConvertFilterProperties<Professional, ProfessionalDto>(Mapper);
-            query.Sort = query.ConvertSortProperties<Professional, ProfessionalDto>(Mapper);
-
-            var items = await _transporterRepository.SearchForAdminAsync(criteria, pageInfo, query, cancellationToken);
-
-            return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
         }
 
         public async Task<IPagedData<ProfessionalDto>> GetAllWithDetailsAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)

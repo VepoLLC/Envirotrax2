@@ -9,6 +9,14 @@ import { PagedData } from "../../models/paged-data";
 import { Professional } from "../../models/professionals/professional";
 import { DownloadEndpoint } from "../../models/download-config";
 
+export interface FogTransporterSearchCriteria {
+    registrationNumber?: string | null;
+    insurancePolicyNumber?: string | null;
+    userEmail?: string | null;
+    contactName?: string | null;
+    cellNumber?: string | null;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -20,36 +28,33 @@ export class FogTransporterService {
     ) {
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<Professional>> {
-        const url = this._urlResolver.resolveUrl('/api/fog/transporters');
-
-        const observable = this._http.get<PagedData<Professional>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
-
-        return await lastValueFrom(observable);
-    }
-
-    public getAllEndpoint(): DownloadEndpoint {
-        const url = this._urlResolver.resolveUrl('/api/fog/transporters');
-
-        return {
-            method: 'GET',
-            url: url
-        };
-    }
-
-    public async search(registrationNumber: string | undefined, insurancePolicyNumber: string | undefined, pageInfo: PageInfo): Promise<PagedData<Professional>> {
+    public async search(criteria: FogTransporterSearchCriteria, pageInfo: PageInfo, query: Query): Promise<PagedData<Professional>> {
         const url = this._urlResolver.resolveUrl('/api/fog/transporters/search');
-        let params = this._queryHelper.pageInfoToQueryString(pageInfo);
 
-        if (registrationNumber) {
-            params = params.append('registrationNumber', registrationNumber);
-        }
-        if (insurancePolicyNumber) {
-            params = params.append('insurancePolicyNumber', insurancePolicyNumber);
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        for (const [name, value] of Object.entries(criteria)) {
+            if (value) {
+                params = params.append(name, value);
+            }
         }
 
         return await lastValueFrom(this._http.get<PagedData<Professional>>(url, { params }));
+    }
+
+    public getSearchEndpoint(criteria: FogTransporterSearchCriteria): DownloadEndpoint {
+        const additionalParams: { [key: string]: string } = {};
+
+        for (const [name, value] of Object.entries(criteria)) {
+            if (value) {
+                additionalParams[name] = value;
+            }
+        }
+
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/fog/transporters/search'),
+            additionalParams
+        };
     }
 }

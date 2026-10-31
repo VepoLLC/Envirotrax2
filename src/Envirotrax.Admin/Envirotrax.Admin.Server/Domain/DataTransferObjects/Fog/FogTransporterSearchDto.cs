@@ -7,7 +7,7 @@ namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Fog;
 /// </summary>
 public class FogTransporterSearchDto
 {
-    public string? LicenseNumber { get; set; }
+    public string? RegistrationNumber { get; set; }
 
     public string? InsurancePolicyNumber { get; set; }
 
@@ -24,7 +24,7 @@ public class FogTransporterSearchDto
     {
         return new Dictionary<string, string>
         {
-            [nameof(LicenseNumber)] = LicenseNumber ?? string.Empty,
+            [nameof(RegistrationNumber)] = RegistrationNumber ?? string.Empty,
             [nameof(InsurancePolicyNumber)] = InsurancePolicyNumber ?? string.Empty,
             [nameof(UserEmail)] = UserEmail ?? string.Empty,
             [nameof(ContactName)] = ContactName ?? string.Empty,

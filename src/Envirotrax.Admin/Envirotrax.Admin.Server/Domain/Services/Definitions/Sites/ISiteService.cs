@@ -17,5 +17,11 @@ public interface ISiteService
 
     Task UpdateWaterSupplierAsync(int siteId, int waterSupplierId, SiteWaterSupplierUpdateDto dto, CancellationToken cancellationToken);
 
+    Task DeleteAsync(int siteId);
+
+    Task<SiteDetailDto?> CopyAsync(int siteId, int waterSupplierId);
+
+    Task MergeAsync(int siteId, int waterSupplierId, SiteMergeDto dto);
+
     Task<List<RecordLogDto>?> GetLogsAsync(int siteId, CancellationToken cancellationToken);
 }

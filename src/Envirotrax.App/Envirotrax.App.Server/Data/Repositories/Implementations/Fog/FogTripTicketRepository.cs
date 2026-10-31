@@ -3,6 +3,7 @@ using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
@@ -155,6 +156,22 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
         return Entity.CountAsync(t => t.SiteId == siteId && t.DeletedTime == null, cancellationToken);
+    }
+
+    public Task<int> TransferToSiteAsync(int sourceSiteId, Site destinationSite)
+    {
+        return Entity
+            .Where(ticket => ticket.SiteId == sourceSiteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(ticket => ticket.SiteId, destinationSite.Id)
+                .SetProperty(ticket => ticket.PropertyType, destinationSite.PropertyType)
+                .SetProperty(ticket => ticket.PropertyBusinessName, destinationSite.BusinessName)
+                .SetProperty(ticket => ticket.PropertyStreetNumber, destinationSite.StreetNumber)
+                .SetProperty(ticket => ticket.PropertyStreetName, destinationSite.StreetName)
+                .SetProperty(ticket => ticket.PropertyNumber, destinationSite.PropertyNumber)
+                .SetProperty(ticket => ticket.PropertyCity, destinationSite.City)
+                .SetProperty(ticket => ticket.PropertyStateId, destinationSite.StateId)
+                .SetProperty(ticket => ticket.PropertyZip, destinationSite.ZipCode));
     }
 
     public async Task<List<FogTripTicket>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? transporterId, CancellationToken cancellationToken)

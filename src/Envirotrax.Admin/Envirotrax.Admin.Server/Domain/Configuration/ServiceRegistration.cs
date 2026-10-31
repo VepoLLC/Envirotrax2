@@ -18,6 +18,8 @@ using Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Backflow;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Fog;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.Letters;
+using Envirotrax.Admin.Server.Domain.Services.Implementations.Letters;
 
 namespace Envirotrax.Admin.Server.Domain.Configuration;
 
@@ -53,6 +55,7 @@ public static class ServiceRegistration
                 services.AddTransient<IFogInspectorService, FogInspectorService>();
                 services.AddTransient<IFogTripTicketService, FogTripTicketService>();
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
+                services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
 
                 return services;
         }

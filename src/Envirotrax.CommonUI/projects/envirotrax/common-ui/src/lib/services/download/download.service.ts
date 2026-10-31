@@ -81,6 +81,19 @@ export class DownloadService {
         }, 5000);
     }
 
+    public downloadFileFromBase64(base64: string, contentType: string, fileName?: string): void {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+
+        for (let index = 0; index < binary.length; index++) {
+            bytes[index] = binary.charCodeAt(index);
+        }
+
+        const blob = new Blob([bytes], { type: contentType });
+
+        this.downloadFileFromBlob(blob, fileName);
+    }
+
     public async openBlobInNewWindow(loadBlob: () => Promise<Blob>): Promise<void> {
         const newWindow = window.open('', '_blank');
 

@@ -33,6 +33,8 @@ using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
 using Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.PublicSearch;
+using Envirotrax.App.Server.Domain.Services.Definitions.Letters;
+using Envirotrax.App.Server.Domain.Services.Implementations.Letters;
 using Envirotrax.App.Server.Domain.Services.Implementations.PublicSearch;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
@@ -132,6 +134,8 @@ public static class ServiceRegistration
         services.AddTransient<INotificationDigestService, NotificationDigestService>();
 
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
+
+        services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();

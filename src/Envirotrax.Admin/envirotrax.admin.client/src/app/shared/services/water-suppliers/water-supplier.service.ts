@@ -4,6 +4,7 @@ import { InputOption, MAX_PAGE_SIZE, PagedData, PageInfo, Query, QueryHelperServ
 import { WaterSupplier } from "../../models/water-suppliers/water-supplier";
 import { WaterSupplierDetails } from "../../models/water-suppliers/water-supplier-details";
 import { WaterSupplierLetterSettings } from "../../models/water-suppliers/water-supplier-letter-settings";
+import { GeneratedLetters } from "../../models/water-suppliers/generated-letters";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({
@@ -41,6 +42,12 @@ export class WaterSupplierService {
         const url = this._urlResolver.resolveUrl('/api/water-suppliers/letter-settings');
 
         return await lastValueFrom(this._http.get<WaterSupplierLetterSettings[]>(url));
+    }
+
+    public async generateLetters(id: number): Promise<GeneratedLetters> {
+        const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}/letters`);
+
+        return await lastValueFrom(this._http.post<GeneratedLetters>(url, null));
     }
 
     public async getDetails(id: number): Promise<WaterSupplierDetails> {

@@ -1,0 +1,196 @@
+@using RazorLight
+@using System.Collections.Generic
+@using Envirotrax.App.Server.Domain.DataTransferObjects.Letters
+@using Envirotrax.App.Server.Templates.Emails.Letters
+@inherits TemplatePage<LetterEmailVm>
+
+@{
+    var content = Model.Content;
+    var letter = Model.Letter;
+    var titleStyle = $"background: {content.HeaderBackgroundColor}; color: {content.HeaderForegroundColor}; border: 2px solid {content.HeaderBorderColor}; padding: 8px 12px; text-align: center; font-size: 15px; font-weight: bold; margin: 12px 0;";
+
+    string RunStyle(LetterMessageRunDto run)
+    {
+        var styles = new List<string>();
+
+        if (run.IsBold)
+        {
+            styles.Add("font-weight: bold;");
+        }
+
+        if (run.IsItalic)
+        {
+            styles.Add("font-style: italic;");
+        }
+
+        if (run.IsUnderline)
+        {
+            styles.Add("text-decoration: underline;");
+        }
+
+        return string.Join(" ", styles);
+    }
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+</head>
+
+<body style="font-family: Arial, sans-serif; font-size: 13px; color: #333; line-height: 1.5; max-width: 750px; margin: 0 auto; padding: 16px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+        <tr>
+            <td valign="top" style="font-size: 12px; color: #555;">
+                <div>@content.ReturnCompanyName</div>
+                <div>@content.ReturnAddress</div>
+                <div>@content.ReturnCityStateZip</div>
+            </td>
+        </tr>
+    </table>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+        <tr>
+            <td valign="top" style="font-size: 13px;">
+                @foreach (var line in letter.MailingLines)
+                {
+                    <div>@line</div>
+                }
+            </td>
+            <td valign="top" align="right">
+                <table cellpadding="4" cellspacing="0" style="border: 1px solid #888; font-size: 12px; min-width: 240px;">
+                    <tr style="background: #e1e1e1;">
+                        <td style="border-right: 1px solid #888; border-bottom: 1px solid #888; font-weight: bold;">Account Number:</td>
+                        <td style="border-bottom: 1px solid #888;">@letter.AccountNumber</td>
+                    </tr>
+                    <tr>
+                        <td style="border-right: 1px solid #888; border-bottom: 1px solid #888; font-weight: bold;">Date:</td>
+                        <td style="border-bottom: 1px solid #888;">@content.LetterDate</td>
+                    </tr>
+                    <tr>
+                        <td style="border-right: 1px solid #888; font-weight: bold; vertical-align: top;">Property Location:</td>
+                        <td>
+                            @foreach (var line in letter.PropertyLines)
+                            {
+                                <div>@line</div>
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <div style="@titleStyle">@content.Title</div>
+
+    <div style="margin: 12px 0;">
+        @foreach (var messageLine in content.MessageLines)
+        {
+            <div style="min-height: 1.5em; white-space: pre-wrap;">@foreach (var run in messageLine.Runs){<span style="@RunStyle(run)">@run.Text</span>}</div>
+        }
+    </div>
+
+    <p style="margin-top: 16px;">Should you have any questions, please contact:</p>
+
+    <table cellpadding="4" cellspacing="0" style="margin-left: 30px; font-size: 13px;">
+        <tr>
+            <td valign="top" style="padding-right: 40px;">
+                @if (!string.IsNullOrWhiteSpace(content.ContactCompanyName))
+                {
+                    <div><strong>@content.ContactCompanyName</strong></div>
+                }
+                @if (!string.IsNullOrWhiteSpace(content.ContactName))
+                {
+                    <div>@content.ContactName</div>
+                }
+                @if (content.ContactAddress != null)
+                {
+                    <div>@content.ContactAddress</div>
+                    <div>@content.ContactCityStateZip</div>
+                }
+            </td>
+            <td valign="top">
+                @if (!string.IsNullOrWhiteSpace(content.ContactPhoneNumber))
+                {
+                    <div><strong>Telephone:</strong> @content.ContactPhoneNumber</div>
+                }
+                @if (!string.IsNullOrWhiteSpace(content.ContactFaxNumber))
+                {
+                    <div><strong>Fax:</strong> @content.ContactFaxNumber</div>
+                }
+                @if (!string.IsNullOrWhiteSpace(content.ContactEmailAddress))
+                {
+                    <div><strong>Email:</strong> @content.ContactEmailAddress</div>
+                }
+            </td>
+        </tr>
+    </table>
+
+    @if (content.ShowAssemblies && letter.Assemblies.Count > 0)
+    {
+        <table width="100%" cellpadding="5" cellspacing="0" style="margin-top: 16px; border-collapse: collapse; font-size: 12px;">
+            <thead>
+                <tr style="background: #f0f0f0;">
+                    <th style="border: 1px solid #aaa; text-align: center;">Assembly Information</th>
+                    <th style="border: 1px solid #aaa; text-align: center;">Location Description</th>
+                    <th style="border: 1px solid #aaa; text-align: center;">Last Tested By</th>
+                    <th style="border: 1px solid #aaa; text-align: center;">Expiration Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var assembly in letter.Assemblies)
+                {
+                    <tr>
+                        <td style="border: 1px solid #ddd; vertical-align: top;">
+                            <div>@assembly.Description</div>
+                            <div>SN: @assembly.SerialNumber</div>
+                        </td>
+                        <td style="border: 1px solid #ddd; vertical-align: top;">
+                            <div>@assembly.LocationDescription</div>
+                            @if (assembly.IsFireSystem)
+                            {
+                                <div><strong>*** Fire System ***</strong></div>
+                            }
+                        </td>
+                        <td style="border: 1px solid #ddd; vertical-align: top;">
+                            @if (!string.IsNullOrWhiteSpace(assembly.TesterCompanyName))
+                            {
+                                <div>@assembly.TesterCompanyName</div>
+                            }
+                            <div>@assembly.TesterPhoneNumber</div>
+                        </td>
+                        <td style="border: 1px solid #ddd; vertical-align: top;">
+                            @if (assembly.TestDate != null)
+                            {
+                                <div><strong>Tested On:</strong> @assembly.TestDate</div>
+                            }
+                            <div><strong>Expiration:</strong> @assembly.ExpirationDate</div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 20px;">
+        <tr>
+            <td valign="bottom">
+                <p>Your prompt attention to this matter would be greatly appreciated.</p>
+                <p>Sincerely,</p>
+                <p>@content.SignatureName</p>
+            </td>
+        </tr>
+    </table>
+
+    <hr style="margin-top: 24px; border: none; border-top: 1px solid #ccc;" />
+
+    <p style="font-size: 11px; color: #666; text-align: center; margin: 8px 0;">
+        Visit our website at <a href="@letter.OptInUrl">@letter.OptInUrl</a>
+        to opt in or out of receiving future renewal notices by email.<br />
+        Your unique code is <strong>@letter.OptInCode</strong>.
+        It will expire on @(letter.OptInExpirationDate).
+    </p>
+</body>
+
+</html>

@@ -38,6 +38,8 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         return base.GetDetailsQuery()
             .Include(supplier => supplier.Parent)
             .Include(supplier => supplier.State)
+            .Include(supplier => supplier.LetterState)
+            .Include(supplier => supplier.LetterContactState)
             .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), supplier => supplier.ParentId == _tenantProvider.WaterSupplierId);
     }
 

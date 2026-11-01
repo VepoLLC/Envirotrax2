@@ -12,9 +12,11 @@ import { TableViewModel } from '../../shared/models/table-view-model';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
-import { CellTemplateData, ColumnType, FilterPanelComponent, InputOption, MapMarker, MapPolygon, TableSettingService, TableSettingType } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, FilterPanelComponent, InputOption, MapMarker, MapPolygon, TableSettingsModalService } from '@envirotrax/common-ui';
 import { BackflowPaymentStatus, BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
 import { BackflowTestSearchFilters } from '../../shared/models/backflow/backflow-test-search-filters';
+import { TableSettingType } from '../../shared/enums/table-setting-type.enum';
+import { TableSettingService } from '../../shared/services/table-settings/table-setting.service';
 import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
@@ -157,7 +159,8 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
         private readonly _containerHelper: AppContainerHelperService,
-        private readonly _tableSettingService: TableSettingService
+        private readonly _tableSettingService: TableSettingService,
+        private readonly _tableSettingsModal: TableSettingsModalService
     ) {
         this.testResultOptions = this._options.testResultOptions;
         this.paymentStatusOptions = this._options.paymentStatusOptions;
@@ -430,7 +433,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             paymentStatus: this.paymentStatus
         };
 
-        this._tableSettingService.showSearchTemplates(TableSettingType.BackflowTests, currentFilters)
+        this._tableSettingsModal.showSearchTemplates(this._tableSettingService, TableSettingType.BackflowTests, currentFilters)
             .subscribe(filters => this.applySearchTemplate(filters));
     }
 

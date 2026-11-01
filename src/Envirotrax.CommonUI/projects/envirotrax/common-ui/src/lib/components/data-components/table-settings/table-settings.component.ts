@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ModalReference, ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { TableSetting, TableSettingFilters, TableSettingType } from "../../../models/table-setting";
-import { TableSettingService } from "../../../services/table-setting/table-setting.service";
+import { TableSetting, TableSettingDataSource, TableSettingFilters } from "../../../models/table-setting";
 import { ModalHelperService } from "../../../services/helpers/modal-helper.service";
 import { ToastService } from "../../../services/toast/toast.service";
 import { TableColumn } from "../table/table-models";
@@ -9,7 +8,8 @@ import { ColumnType } from "../sorting-filtering/query-view-model";
 import { EditTableSettingComponent, EditTableSettingConfig } from "./edit-table-setting.component";
 
 export interface TableSettingsConfig {
-    tableType: TableSettingType;
+    dataSource: TableSettingDataSource;
+    tableType: number;
     currentFilters: TableSettingFilters;
 }
 
@@ -35,7 +35,6 @@ export class TableSettingsComponent implements OnInit {
 
     constructor(
         private readonly _modalReference: ModalReference<TableSettingsConfig, TableSettingFilters>,
-        private readonly _tableSettingService: TableSettingService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService
     ) {
@@ -47,8 +46,8 @@ export class TableSettingsComponent implements OnInit {
             this.isLoading = true;
 
             const [settings, canAdd] = await Promise.all([
-                this._tableSettingService.getAllMy(this._config.tableType),
-                this._tableSettingService.canAddMy()
+                this._config.dataSource.getAll(this._config.tableType),
+                this._config.dataSource.canAdd()
             ]);
 
             this.settings = settings;
@@ -62,7 +61,7 @@ export class TableSettingsComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            this.settings = await this._tableSettingService.getAllMy(this._config.tableType);
+            this.settings = await this._config.dataSource.getAll(this._config.tableType);
         } finally {
             this.isLoading = false;
         }
@@ -91,6 +90,7 @@ export class TableSettingsComponent implements OnInit {
             title: title,
             size: ModalSize.large,
             model: {
+                dataSource: this._config.dataSource,
                 setting: setting,
                 currentFilters: this._config.currentFilters
             }
@@ -104,7 +104,7 @@ export class TableSettingsComponent implements OnInit {
             try {
                 this.isLoading = true;
 
-                await this._tableSettingService.delete(setting.id!);
+                await this._config.dataSource.delete(setting.id!);
                 this._toastService.successFullyDeleted('Search Template');
 
                 await this.getSettings();

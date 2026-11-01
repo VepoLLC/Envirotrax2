@@ -32,7 +32,7 @@ public class TableSettingService : Service<TableSetting, TableSettingDto>, ITabl
 
     public async Task<IEnumerable<TableSettingDto>> GetAllMyAsync(TableSettingType tableType, CancellationToken cancellationToken)
     {
-        var settings = await _repository.GetAllByUserAsync(_authService.UserId, tableType, cancellationToken);
+        var settings = await _repository.GetAllByTableTypeAsync(tableType, cancellationToken);
 
         return settings.Select(setting => MapToDto(setting)!);
     }
@@ -68,6 +68,7 @@ public class TableSettingService : Service<TableSetting, TableSettingDto>, ITabl
     {
         var setting = await _repository.GetTrackedForUpdateAsync(id, cancellationToken);
 
+        // GetTrackedForUpdateAsync doesn't go through the repository's user-scoped queries, so the owner is checked here.
         if (setting == null || setting.UserId != _authService.UserId)
         {
             return null;
@@ -80,15 +81,5 @@ public class TableSettingService : Service<TableSetting, TableSettingDto>, ITabl
         await _repository.SaveChangesAsync();
 
         return MapToDto(setting);
-    }
-
-    public async Task<TableSettingDto?> DeleteMyAsync(int id, CancellationToken cancellationToken)
-    {
-        if (!await _repository.ExistsForUserAsync(id, _authService.UserId, cancellationToken))
-        {
-            return null;
-        }
-
-        return await DeleteAsync(id);
     }
 }

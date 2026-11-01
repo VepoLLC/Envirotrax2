@@ -9,5 +9,4 @@ public interface ITableSettingService : IService<TableSettingDto>
     Task<bool> CanAddMyAsync(CancellationToken cancellationToken);
     Task<TableSettingDto> AddMyAsync(TableSettingDto dto, CancellationToken cancellationToken);
     Task<TableSettingDto?> UpdateMyAsync(int id, TableSettingDto dto, CancellationToken cancellationToken);
-    Task<TableSettingDto?> DeleteMyAsync(int id, CancellationToken cancellationToken);
 }

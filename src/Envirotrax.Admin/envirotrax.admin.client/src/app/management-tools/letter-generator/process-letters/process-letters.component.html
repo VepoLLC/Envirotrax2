@@ -6,6 +6,7 @@
             <input class="form-check-input" type="checkbox"
                    [(ngModel)]="selectAll"
                    (ngModelChange)="onSelectAllChange()"
+                   [disabled]="isGenerating"
                    name="letterGeneratorSelectAll" id="letterGeneratorSelectAll">
             <label class="form-check-label" for="letterGeneratorSelectAll">Select/Unselect Water Suppliers</label>
         </div>
@@ -14,11 +15,12 @@
             <vp-input type="select"
                       [(ngModel)]="showAllWaterSuppliers"
                       (ngModelChange)="applyShowType()"
+                      [disabled]="isGenerating"
                       name="letterGeneratorShowType"
                       [options]="showTypeOptions" />
         </div>
 
-        <button type="button" class="btn btn-primary vp-section-button ms-auto" (click)="loadWaterSuppliers()">
+        <button type="button" class="btn btn-primary vp-section-button ms-auto" [disabled]="isGenerating" (click)="loadWaterSuppliers()">
             <i class="fa-solid fa-rotate me-1"></i>
             Refresh Water Suppliers
         </button>
@@ -64,10 +66,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let waterSupplier of visibleWaterSuppliers">
+                <tr *ngFor="let waterSupplier of visibleWaterSuppliers" [class.table-active]="waterSupplier.id === currentWaterSupplierId">
                     <td>
                         <input class="form-check-input" type="checkbox"
                                [(ngModel)]="waterSupplier.isSelected"
+                               [disabled]="isGenerating"
                                title="Process Water Supplier">
                     </td>
                     <td class="text-center">
@@ -78,53 +81,77 @@
                     <td>{{ waterSupplier.parentId || 0 }}</td>
                     <td>{{ waterSupplier.name }}</td>
                     <td>
-                        <button type="button" class="btn btn-link p-0" title="Letter Settings" (click)="showSettings(waterSupplier)">
+                        <button type="button" class="btn btn-link p-0" title="Letter Settings" [disabled]="isGenerating" (click)="showSettings(waterSupplier)">
                             <i class="fa-solid fa-gear text-primary"></i>
                         </button>
                     </td>
 
-                    <td class="bg-success-subtle">{{ waterSupplier.expiringNotice1 ? 0 : '-' }}</td>
-                    <td class="bg-success-subtle">{{ waterSupplier.expiringNotice2 ? 0 : '-' }}</td>
-                    <td class="bg-success-subtle">{{ waterSupplier.expiredNotice1 ? 0 : '-' }}</td>
-                    <td class="bg-success-subtle">{{ waterSupplier.expiredNotice2 ? 0 : '-' }}</td>
-                    <td class="bg-success-subtle">{{ waterSupplier.backflowNonCompliant1 ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.expiringNotice1 ? waterSupplier.letterCounts.expiringNotice1 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.expiringNotice2 ? waterSupplier.letterCounts.expiringNotice2 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.expiredNotice1 ? waterSupplier.letterCounts.expiredNotice1 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.expiredNotice2 ? waterSupplier.letterCounts.expiredNotice2 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.backflowNonCompliant1 ? waterSupplier.letterCounts.backflowNonCompliant1 : '-' }}</td>
                     <td class="bg-success-subtle">
                         <input class="form-check-input" type="checkbox"
                                [(ngModel)]="waterSupplier.backflowNonCompliantPrint1"
                                (ngModelChange)="savePrintSettings(waterSupplier)"
+                               [disabled]="isGenerating"
                                title="Include in print file">
                     </td>
-                    <td class="bg-success-subtle">{{ waterSupplier.backflowNonCompliant2 ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.backflowNonCompliant2 ? waterSupplier.letterCounts.backflowNonCompliant2 : '-' }}</td>
                     <td class="bg-success-subtle">
                         <input class="form-check-input" type="checkbox"
                                [(ngModel)]="waterSupplier.backflowNonCompliantPrint2"
                                (ngModelChange)="savePrintSettings(waterSupplier)"
+                               [disabled]="isGenerating"
                                title="Include in print file">
                     </td>
-                    <td class="bg-success-subtle">{{ waterSupplier.unknownAssembliesNotice ? 0 : '-' }}</td>
+                    <td class="bg-success-subtle">{{ waterSupplier.unknownAssembliesNotice ? waterSupplier.letterCounts.unknownAssembliesNotice : '-' }}</td>
 
                     <td></td>
 
-                    <td class="bg-primary-subtle">{{ waterSupplier.impendingNotice1 ? 0 : '-' }}</td>
-                    <td class="bg-primary-subtle">{{ waterSupplier.impendingNotice2 ? 0 : '-' }}</td>
-                    <td class="bg-primary-subtle">{{ waterSupplier.pastDueNotice1 ? 0 : '-' }}</td>
-                    <td class="bg-primary-subtle">{{ waterSupplier.pastDueNotice2 ? 0 : '-' }}</td>
-                    <td class="bg-primary-subtle">{{ waterSupplier.csiNonCompliant1 ? 0 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.impendingNotice1 ? waterSupplier.letterCounts.impendingNotice1 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.impendingNotice2 ? waterSupplier.letterCounts.impendingNotice2 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.pastDueNotice1 ? waterSupplier.letterCounts.pastDueNotice1 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.pastDueNotice2 ? waterSupplier.letterCounts.pastDueNotice2 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.csiNonCompliant1 ? waterSupplier.letterCounts.csiNonCompliant1 : '-' }}</td>
                     <td class="bg-primary-subtle">
                         <input class="form-check-input" type="checkbox"
                                [(ngModel)]="waterSupplier.csiNonCompliantPrint1"
                                (ngModelChange)="savePrintSettings(waterSupplier)"
+                               [disabled]="isGenerating"
                                title="Include in print file">
                     </td>
-                    <td class="bg-primary-subtle">{{ waterSupplier.csiNonCompliant2 ? 0 : '-' }}</td>
+                    <td class="bg-primary-subtle">{{ waterSupplier.csiNonCompliant2 ? waterSupplier.letterCounts.csiNonCompliant2 : '-' }}</td>
                     <td class="bg-primary-subtle">
                         <input class="form-check-input" type="checkbox"
                                [(ngModel)]="waterSupplier.csiNonCompliantPrint2"
                                (ngModelChange)="savePrintSettings(waterSupplier)"
+                               [disabled]="isGenerating"
                                title="Include in print file">
                     </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <div class="d-flex flex-wrap align-items-center gap-3 mt-3">
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold">Total Time:</span>
+            <span class="fw-bold" [class.text-success]="isGenerating" [class.text-danger]="!isGenerating">{{ totalTime }}</span>
+        </div>
+
+        <div class="flex-grow-1">
+            <span>{{ status }}</span>
+            <span *ngIf="emailStatus" class="ms-4">{{ emailStatus }}</span>
+        </div>
+
+        <button *ngIf="!isGenerating" type="button" class="btn btn-primary vp-section-button" (click)="generateLetters()">
+            Generate Letters
+        </button>
+
+        <button *ngIf="isGenerating" type="button" class="btn btn-primary vp-section-button" [disabled]="isCancelRequested" (click)="cancelGeneration()">
+            Cancel
+        </button>
     </div>
 </vp-section>

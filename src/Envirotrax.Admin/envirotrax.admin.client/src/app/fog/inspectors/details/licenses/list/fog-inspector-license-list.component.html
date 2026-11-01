@@ -1,0 +1,28 @@
+<vp-section [header]="'Licenses (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [canAdd]="true"
+                  (add)="addLicense()"
+                  [canEdit]="true"
+                  (edit)="editLicense($event)"
+                  [canDelete]="true"
+                  (delete)="deleteLicense($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getLicenses()"
+                  [(query)]="table.query"
+                  (queryChange)="getLicenses()"
+                  (queryReset)="getLicenses()" />
+    </div>
+</vp-section>
+
+<ng-template #expirationCell let-rowData="rowData">
+    <span class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+          [class]="rowData.expirationCssClass">
+        {{ rowData.expirationDate ? (rowData.expirationDate | date) : 'Validating...' }}
+    </span>
+</ng-template>

@@ -33,6 +33,8 @@ using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals.Lice
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.PublicSearch;
 using Envirotrax.App.Server.Data.Repositories.Implementations.PublicSearch;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Letters;
+using Envirotrax.App.Server.Data.Repositories.Implementations.Letters;
 
 namespace Envirotrax.App.Server.Data.Configuration;
 
@@ -132,6 +134,8 @@ public static class ServiceRegistration
         services.AddTransient<ILegacyQueryRepository, LegacyQueryRepository>();
 
         services.AddTransient<IWaterSupplierDashboardRepository, WaterSupplierDashboardRepository>();
+
+        services.AddTransient<ILetterRepository, LetterRepository>();
 
         return services;
     }

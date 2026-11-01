@@ -1,0 +1,426 @@
+@using System.Collections.Generic
+@using Envirotrax.App.Server.Domain.DataTransferObjects.Letters
+@model LetterDocumentDto
+@{
+    Layout = null;
+
+    var content = Model.Content;
+    var bodyStyle = $"font-family: '{content.FontFamily}', Arial, sans-serif; font-size: {content.FontSize}px;";
+    var titleStyle = $"background-color: {content.HeaderBackgroundColor}; color: {content.HeaderForegroundColor}; border-color: {content.HeaderBorderColor};";
+
+    string RunClass(LetterMessageRunDto run)
+    {
+        var classes = new List<string>();
+
+        if (run.IsBold)
+        {
+            classes.Add("letter-bold");
+        }
+
+        if (run.IsItalic)
+        {
+            classes.Add("letter-italic");
+        }
+
+        if (run.IsUnderline)
+        {
+            classes.Add("letter-underline");
+        }
+
+        return string.Join(" ", classes);
+    }
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+        @@page {
+            size: letter;
+            margin: 0;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            color: #000000;
+            line-height: 1.15;
+        }
+
+        .letter-page {
+            position: relative;
+            width: 8.5in;
+            height: 11in;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        .letter-page:last-child {
+            page-break-after: auto;
+        }
+
+        .letter-title {
+            position: absolute;
+            top: 0.25in;
+            left: 0.25in;
+            width: 8in;
+            box-sizing: border-box;
+            padding: 0.05in;
+            border: 1px solid;
+            font-size: 1.25em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .letter-return-address {
+            position: absolute;
+            top: calc(0.75in - 0.92em);
+            left: 0.875in;
+        }
+
+        .letter-return-address div {
+            min-height: 1.15em;
+        }
+
+        .letter-mailing-address {
+            position: absolute;
+            top: calc(2.287in - 0.92em);
+            left: 1.375in;
+        }
+
+        .letter-account {
+            position: absolute;
+            top: 2.175in;
+            left: 4.45in;
+            width: 3.8in;
+            border-collapse: collapse;
+        }
+
+        .letter-account td {
+            padding: 0.05in;
+            border: 1px solid rgb(80, 80, 80);
+            vertical-align: top;
+        }
+
+        .letter-account-label {
+            width: 1.3in;
+            background-color: rgb(225, 225, 225);
+            font-weight: bold;
+        }
+
+        .letter-account-number {
+            font-size: 1.25em;
+            font-weight: bold;
+        }
+
+        .letter-body {
+            position: absolute;
+            top: 3.33in;
+            left: 0.25in;
+            width: 8in;
+        }
+
+        .letter-message-line {
+            min-height: 1.15em;
+            white-space: pre-wrap;
+        }
+
+        .letter-bold {
+            font-weight: bold;
+        }
+
+        .letter-italic {
+            font-style: italic;
+        }
+
+        .letter-underline {
+            text-decoration: underline;
+        }
+
+        .letter-spacer {
+            height: 1.15em;
+        }
+
+        .letter-contact {
+            display: flex;
+            padding-left: 0.375in;
+            font-weight: bold;
+        }
+
+        .letter-contact-main {
+            width: 3in;
+        }
+
+        .letter-contact-label {
+            display: inline-block;
+            width: 0.75in;
+        }
+
+        .letter-assemblies {
+            width: 8in;
+            margin-top: 0.15in;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .letter-assemblies th {
+            padding: 0.05in 0;
+            border: 1px solid #000000;
+            background-color: rgb(240, 240, 240);
+            text-align: center;
+        }
+
+        .letter-assemblies td {
+            padding: 0.035in 0.1in;
+            border-top: 1px solid rgb(80, 80, 80);
+            border-bottom: 1px solid rgb(80, 80, 80);
+            border-left: 1px solid rgb(225, 225, 225);
+            border-right: 1px solid rgb(225, 225, 225);
+            vertical-align: top;
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            font-weight: normal;
+            line-height: 1.44;
+        }
+
+        .letter-assemblies td:first-child {
+            border-left-color: rgb(80, 80, 80);
+        }
+
+        .letter-assemblies td:last-child {
+            border-right-color: rgb(80, 80, 80);
+        }
+
+        .letter-assembly-date-label {
+            display: inline-block;
+            width: 0.58in;
+        }
+
+        .letter-assemblies td.letter-assembly-imported {
+            padding-top: calc(0.035in + 0.72em);
+        }
+
+        .letter-footer {
+            position: absolute;
+            bottom: calc(0.25in + 0.575em);
+            left: 0.25in;
+            width: 8in;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body style="@bodyStyle">
+    <main>
+        @foreach (var letter in Model.Letters)
+        {
+            <div class="letter-page">
+                <div class="letter-title" style="@titleStyle">@content.Title</div>
+
+                <div class="letter-return-address">
+                    <div>@content.ReturnCompanyName</div>
+                    <div>@content.ReturnAddress</div>
+                    <div>@content.ReturnCityStateZip</div>
+                </div>
+
+                <div class="letter-mailing-address">
+                    @foreach (var line in letter.MailingLines)
+                    {
+                        <div>@line</div>
+                    }
+                </div>
+
+                <table class="letter-account">
+                    <tr class="letter-account-number">
+                        <td class="letter-account-label">Account Number:</td>
+                        <td>@letter.AccountNumber</td>
+                    </tr>
+                    <tr>
+                        <td class="letter-account-label">Date:</td>
+                        <td>@content.LetterDate</td>
+                    </tr>
+                    <tr>
+                        <td class="letter-account-label">Property Location:</td>
+                        <td>
+                            @foreach (var line in letter.PropertyLines)
+                            {
+                                <div>@line</div>
+                            }
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="letter-body">
+                    @foreach (var messageLine in content.MessageLines)
+                    {
+                        <div class="letter-message-line">@foreach (var run in messageLine.Runs){<span class="@RunClass(run)">@run.Text</span>}</div>
+                    }
+
+                    <div class="letter-spacer"></div>
+                    <div>Should you have any questions, please contact:</div>
+                    <div class="letter-spacer"></div>
+
+                    <div class="letter-contact">
+                        @if (content.HasMainContact)
+                        {
+                            <div class="letter-contact-main">
+                                @if (!string.IsNullOrWhiteSpace(content.ContactCompanyName))
+                                {
+                                    <div>@content.ContactCompanyName</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(content.ContactName))
+                                {
+                                    <div>@content.ContactName</div>
+                                }
+                                @if (content.ContactAddress != null)
+                                {
+                                    <div>@content.ContactAddress</div>
+                                    <div>@content.ContactCityStateZip</div>
+                                }
+                            </div>
+                        }
+                        <div>
+                            @if (!string.IsNullOrWhiteSpace(content.ContactPhoneNumber))
+                            {
+                                <div><span class="letter-contact-label">Telephone:</span>@content.ContactPhoneNumber</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(content.ContactFaxNumber))
+                            {
+                                <div><span class="letter-contact-label">Fax:</span>@content.ContactFaxNumber</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(content.ContactEmailAddress))
+                            {
+                                <div><span class="letter-contact-label">Email:</span>@content.ContactEmailAddress</div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="letter-spacer"></div>
+                    <div>Your prompt attention to this matter would be greatly appreciated.</div>
+                    <div class="letter-spacer"></div>
+                    <div>Sincerely,</div>
+                    <div class="letter-spacer"></div>
+                    <div>@content.SignatureName</div>
+
+                    @if (content.ShowAssemblies)
+                    {
+                        <table class="letter-assemblies">
+                            <colgroup>
+                                <col style="width: 1.75in;" />
+                                <col style="width: 2.5in;" />
+                                <col style="width: 2.5in;" />
+                                <col style="width: 1.25in;" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Assembly Information</th>
+                                    <th>Location Description</th>
+                                    <th>Last Tested By</th>
+                                    <th>Expiration Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var assembly in letter.Assemblies)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div>@assembly.Description</div>
+                                            <div>SN: @assembly.SerialNumber</div>
+                                        </td>
+                                        <td>
+                                            <div>@assembly.LocationDescription</div>
+                                            @if (assembly.IsFireSystem)
+                                            {
+                                                <div>*** Fire System ***</div>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrWhiteSpace(assembly.TesterCompanyName))
+                                            {
+                                                <div>@assembly.TesterCompanyName</div>
+                                            }
+                                            <div>@assembly.TesterPhoneNumber</div>
+                                        </td>
+                                        @if (assembly.TestDate != null)
+                                        {
+                                            <td>
+                                                <div><span class="letter-assembly-date-label">Tested On:</span>@assembly.TestDate</div>
+                                                <div><span class="letter-assembly-date-label">Expiration:</span>@assembly.ExpirationDate</div>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="letter-assembly-imported">
+                                                <div><span class="letter-assembly-date-label">Expiration:</span>@assembly.ExpirationDate</div>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+
+                <div class="letter-footer">
+                    <div>Visit our website at @letter.OptInUrl to opt in or out of receiving future renewal notices by email.</div>
+                    <div>Your unique code is @(letter.OptInCode). It will expire on @(letter.OptInExpirationDate).</div>
+                </div>
+            </div>
+        }
+    </main>
+
+    <script>
+        function splitAssemblies(page) {
+            var rows = page.querySelectorAll('.letter-assemblies tbody tr');
+
+            if (rows.length < 2) {
+                return;
+            }
+
+            var limit = page.querySelector('.letter-footer').getBoundingClientRect().top;
+            var firstOverflowIndex = -1;
+
+            for (var index = 0; index < rows.length; index++) {
+                if (rows[index].getBoundingClientRect().bottom > limit) {
+                    firstOverflowIndex = index;
+                    break;
+                }
+            }
+
+            if (firstOverflowIndex === -1) {
+                return;
+            }
+
+            if (firstOverflowIndex === 0) {
+                firstOverflowIndex = 1;
+            }
+
+            var nextPage = page.cloneNode(true);
+            var nextRows = nextPage.querySelectorAll('.letter-assemblies tbody tr');
+
+            for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+                if (rowIndex < firstOverflowIndex) {
+                    nextRows[rowIndex].remove();
+                } else {
+                    rows[rowIndex].remove();
+                }
+            }
+
+            page.after(nextPage);
+            splitAssemblies(nextPage);
+        }
+
+        var pages = document.querySelectorAll('.letter-page');
+
+        for (var pageIndex = 0; pageIndex < pages.length; pageIndex++) {
+            splitAssemblies(pages[pageIndex]);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,5 +1,6 @@
 import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType } from './backflow-settings';
 import { CsiImpendingType, CsiNonCompliantType, CsiPastDueType } from './csi-settings';
+import { LetterCounts } from './generated-letters';
 
 export class WaterSupplierLetterSettings {
     id?: number;
@@ -29,4 +30,5 @@ export class WaterSupplierLetterSettings {
 export interface WaterSupplierLetterSettingsRow extends WaterSupplierLetterSettings {
     isSelected: boolean;
     hasLettersForGeneration: boolean;
+    letterCounts: LetterCounts;
 }

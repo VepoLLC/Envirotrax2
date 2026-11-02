@@ -1,3 +1,4 @@
+using System.Dynamic;
 using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.Extensions.Options;
@@ -22,16 +23,46 @@ public class PdfTemplateService : IPdfTemplateService
 
     public async Task<byte[]> GenerateAsync<T>(string pageName, T model)
     {
+        await using var browser = await LaunchBrowserAsync();
+
+        return await GeneratePdfAsync(browser, pageName, model);
+    }
+
+    public async Task<List<byte[]>> GenerateManyAsync<T>(string pageName, List<T> models)
+    {
+        var pdfs = new List<byte[]>();
+
+        await using var browser = await LaunchBrowserAsync();
+
+        foreach (var model in models)
+        {
+            var pdf = await GeneratePdfAsync(browser, pageName, model);
+
+            pdfs.Add(pdf);
+        }
+
+        return pdfs;
+    }
+
+    private async Task<IBrowser> LaunchBrowserAsync()
+    {
         var executablePath = await ResolveChromiumPathAsync();
 
-        var html = await _htmlTemplateService.ParsePdfAsync(pageName, model);
-
-        await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+        return await Puppeteer.LaunchAsync(new LaunchOptions
         {
             Headless = true,
             ExecutablePath = executablePath,
             Args = ["--no-sandbox", "--disable-setuid-sandbox"]
         });
+    }
+
+    private async Task<byte[]> GeneratePdfAsync<T>(IBrowser browser, string pageName, T model)
+    {
+        dynamic viewBag = new ExpandoObject();
+
+        viewBag.BaseUrl = _options.BaseUrl;
+
+        string html = await _htmlTemplateService.ParsePdfAsync(pageName, model, viewBag);
 
         await using var page = await browser.NewPageAsync();
         await page.SetContentAsync(html, new NavigationOptions

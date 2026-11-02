@@ -43,4 +43,16 @@ export class FogTransporterService {
 
         return await lastValueFrom(observable);
     }
+
+    public get(professionalId: number): Promise<Professional> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/transporters/${professionalId}`);
+
+        return lastValueFrom(this._http.get<Professional>(url));
+    }
+
+    public update(professional: Professional): Promise<Professional> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/transporters/${professional.id}`);
+
+        return lastValueFrom(this._http.put<Professional>(url, professional));
+    }
 }

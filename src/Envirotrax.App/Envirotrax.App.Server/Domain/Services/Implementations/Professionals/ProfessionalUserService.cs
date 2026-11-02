@@ -215,6 +215,16 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return MapToDto(saved);
     }
 
+    public async Task<ProfessionalUserDto?> DeleteForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        if (!await _professionalUserRepository.ExistsForProfessionalAsync(professionalId, userId, cancellationToken))
+        {
+            return null;
+        }
+
+        return await DeleteAsync(userId);
+    }
+
     public async Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
     {
         query.Sort = query.ConvertSortProperties<ProfessionalUser, ProfessionalUserDto>(Mapper);

@@ -5,6 +5,7 @@ using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 
@@ -42,6 +43,31 @@ public class FogVehicleService : Service<FogVehicle, FogVehicleDto>, IFogVehicle
         }
 
         return MapToDto(saved)!;
+    }
+
+    public async Task<FogVehicleDto?> UpdateForProfessionalAsync(int professionalId, FogVehicleDto dto, CancellationToken cancellationToken)
+    {
+        if (!await _vehicleRepository.ExistsForProfessionalAsync(professionalId, dto.Id, cancellationToken))
+        {
+            return null;
+        }
+
+        dto.Professional = new ReferencedProfessionalDto
+        {
+            Id = professionalId
+        };
+
+        return await UpdateAsync(dto);
+    }
+
+    public async Task<FogVehicleDto?> DeleteForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken)
+    {
+        if (!await _vehicleRepository.ExistsForProfessionalAsync(professionalId, id, cancellationToken))
+        {
+            return null;
+        }
+
+        return await DeleteAsync(id);
     }
 
     public override async Task<FogVehicleDto?> DeleteAsync(int id)

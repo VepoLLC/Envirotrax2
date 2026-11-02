@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 
@@ -50,6 +51,27 @@ public class ProfessionalSupplierService : Service<ProfessionalWaterSupplier, Pr
         var items = await _proSupplierRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken, filter);
 
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<ProfessionalWaterSupplierDto?> UpdateForProfessionalAsync(int professionalId, int waterSupplierId, ProfessionalWaterSupplierDto dto, CancellationToken cancellationToken)
+    {
+        // The generic update can't add a registration: on a missing row it throws a concurrency error instead.
+        if (!await _proSupplierRepository.ExistsForProfessionalAsync(professionalId, waterSupplierId, cancellationToken))
+        {
+            return null;
+        }
+
+        dto.Professional = new ReferencedProfessionalDto
+        {
+            Id = professionalId
+        };
+
+        dto.WaterSupplier = new ReferencedWaterSupplierDto
+        {
+            Id = waterSupplierId
+        };
+
+        return await UpdateAsync(dto);
     }
 
     public async Task<IPagedData<AvailableWaterSupplierDto>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)

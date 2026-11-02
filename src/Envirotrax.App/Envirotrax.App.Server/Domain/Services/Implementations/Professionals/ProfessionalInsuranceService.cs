@@ -287,4 +287,39 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 
         return null;
     }
+
+    public async Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(int professionalId, ProfessionalInsuranceDto dto, CancellationToken cancellationToken)
+    {
+        if (!await _insuranceRepository.ExistsForProfessionalAsync(professionalId, dto.Id, cancellationToken))
+        {
+            return null;
+        }
+
+        dto.Professional = new ReferencedProfessionalDto
+        {
+            Id = professionalId
+        };
+
+        return await UpdateAsync(dto);
+    }
+
+    public async Task<Uri?> GenerateFileUrlForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken)
+    {
+        if (!await _insuranceRepository.ExistsForProfessionalAsync(professionalId, id, cancellationToken))
+        {
+            return null;
+        }
+
+        return await GenerateFileUrlAsync(id, cancellationToken);
+    }
+
+    public async Task<ProfessionalInsuranceDto?> DeleteForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken)
+    {
+        if (!await _insuranceRepository.ExistsForProfessionalAsync(professionalId, id, cancellationToken))
+        {
+            return null;
+        }
+
+        return await DeleteAsync(id);
+    }
 }

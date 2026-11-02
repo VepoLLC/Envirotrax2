@@ -17,4 +17,7 @@ public interface IProfessionalInsuranceService : IService<ProfessionalInsuranceD
     Task EnsureSatisfiedForWaterSupplierAsync(int professionalId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken);
 
     Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken);
+    Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(int professionalId, ProfessionalInsuranceDto dto, CancellationToken cancellationToken);
+    Task<Uri?> GenerateFileUrlForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken);
+    Task<ProfessionalInsuranceDto?> DeleteForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken);
 }

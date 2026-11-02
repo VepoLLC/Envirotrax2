@@ -37,6 +37,11 @@ public class ProfessionalLicenseRepository : Repository<ProfessionalLicense>, IP
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken)
+    {
+        return Entity.AnyAsync(license => license.Id == id && license.ProfessionalId == professionalId, cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalLicense>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken)
     {
         return await GetListQuery()

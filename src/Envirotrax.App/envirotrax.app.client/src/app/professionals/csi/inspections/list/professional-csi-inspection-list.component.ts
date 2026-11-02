@@ -231,7 +231,7 @@ export class CsiInspectionListComponent implements OnInit {
         this._downloadService.showDownloadManager(this.downloadConfig, this.inspections.query);
     }
 
-    public async viewPrintableTable(): Promise<void> {
-        await this._printService.open(this.inspections, () => this.loadInspections(), () => this._printableSection.nativeElement);
+    public viewPrintableTable(): void {
+        this._printService.open(this._printableSection.nativeElement);
     }
 }

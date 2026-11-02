@@ -149,6 +149,7 @@ export class SubmissionValidationTabComponent implements OnInit, OnChanges {
 
         this._windowService.addWindow(this.source.detailsComponent, {
             title: row.propertyAddress ? `${row.id} - ${row.propertyAddress}` : String(row.id),
+            color: this.source.detailsColor,
             model: { id: row.id }
         });
     }
@@ -190,6 +191,7 @@ export class SubmissionValidationTabComponent implements OnInit, OnChanges {
                 field: 'validationOnHold',
                 caption: 'Hold',
                 type: ColumnType.other,
+                headerCssClass: 'text-center',
                 cellTemplate: this.holdCell,
                 sortColumnExcluded: true,
                 queryColumnExcluded: true

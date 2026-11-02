@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { InputOption, QueryProperty } from '@envirotrax/common-ui';
+import { HelperService, InputOption, QueryProperty } from '@envirotrax/common-ui';
 import { BackflowTestDetailsComponent } from '../../backflow/tests/details/backflow-test-details.component';
 import { CsiInspectionDetailsComponent } from '../../csi/inspections/details/csi-inspection-details.component';
 import { FogInspectionDetailsComponent } from '../../fog/inspections/details/fog-inspection-details.component';
@@ -10,6 +10,7 @@ import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { CsiInspection } from '../../shared/models/csi/csi-inspection';
 import { FogInspection } from '../../shared/models/fog/fog-inspection';
 import { FogTripTicket } from '../../shared/models/fog/fog-trip-ticket';
+import { MODULE_COLORS } from '../../shared/models/module-colors';
 import { PropertyType } from '../../shared/models/sites/site';
 import {
     SubmissionValidationFlag,
@@ -105,7 +106,8 @@ export class SubmissionValidationListComponent implements OnInit {
         private readonly _backflowTestService: BackflowTestService,
         private readonly _fogInspectionService: FogInspectionService,
         private readonly _fogTripTicketService: FogTripTicketService,
-        private readonly _waterSupplierService: WaterSupplierService
+        private readonly _waterSupplierService: WaterSupplierService,
+        private readonly _helperService: HelperService
     ) {
         SubmissionValidationListComponent.windowCount = SubmissionValidationListComponent.windowCount + 1;
 
@@ -182,6 +184,7 @@ export class SubmissionValidationListComponent implements OnInit {
                     infoCaption: 'Inspection Information',
                     reasons: SITE_REASONS,
                     detailsComponent: CsiInspectionDetailsComponent,
+                    detailsColor: MODULE_COLORS.CSI,
                     actions: this._csiInspectionService,
                     load: async (pageInfo, query) => {
                         const inspections = await this._csiInspectionService.getAll(pageInfo, query);
@@ -199,6 +202,7 @@ export class SubmissionValidationListComponent implements OnInit {
                     infoCaption: 'Test Information',
                     reasons: BACKFLOW_REASONS,
                     detailsComponent: BackflowTestDetailsComponent,
+                    detailsColor: MODULE_COLORS.BACKFLOW,
                     actions: this._backflowTestService,
                     load: async (pageInfo, query) => {
                         const tests = await this._backflowTestService.getAll(pageInfo, query);
@@ -216,6 +220,7 @@ export class SubmissionValidationListComponent implements OnInit {
                     infoCaption: 'Inspection Information',
                     reasons: SITE_REASONS,
                     detailsComponent: FogInspectionDetailsComponent,
+                    detailsColor: MODULE_COLORS.FOG,
                     actions: this._fogInspectionService,
                     load: async (pageInfo, query) => {
                         const inspections = await this._fogInspectionService.getAll(pageInfo, query);
@@ -295,25 +300,13 @@ export class SubmissionValidationListComponent implements OnInit {
             waterSupplier: record.waterSupplier,
             propertyType: record.propertyType,
             propertyBusinessName: record.propertyBusinessName,
-            propertyAddress: this.buildPropertyAddress(record),
-            propertyCityStateZip: this.buildCityStateZip(record),
+            propertyAddress: this._helperService.buildStreetAddress(record.propertyStreetNumber, record.propertyStreetName, record.propertyNumber),
+            propertyCityStateZip: this._helperService.buildCityStateZip(record.propertyCity, record.propertyState?.code, record.propertyZip),
             validationOnHold: record.validationOnHold ?? false,
             statusFlag: record.validationOnHold ? ON_HOLD_FLAG : NEEDS_VALIDATION_FLAG,
             reasonFlags: getReasonFlags(reasons).filter(flag => record[flag.reason]),
             infoLines: infoLines.filter(line => line.text || line.date)
         };
-    }
-
-    private buildPropertyAddress(record: SubmissionValidationRecord): string {
-        const address = `${record.propertyStreetNumber ?? ''} ${record.propertyStreetName ?? ''}`.trim();
-
-        return record.propertyNumber ? `${address} #${record.propertyNumber}`.trim() : address;
-    }
-
-    private buildCityStateZip(record: SubmissionValidationRecord): string {
-        const city = record.propertyCity ? `${record.propertyCity},` : '';
-
-        return `${city} ${record.propertyState?.code ?? ''} ${record.propertyZip ?? ''}`.trim();
     }
 
     private async loadWaterSuppliers(): Promise<void> {

@@ -20,12 +20,12 @@
           (queryReset)="load()" />
 
 <ng-template #holdCell let-rowData="rowData">
-    <div class="form-check d-flex justify-content-center mb-0">
-        <input class="form-check-input"
-               type="checkbox"
+    <div class="text-center">
+        <input type="checkbox"
+               class="form-check-input"
                aria-label="Hold"
                [checked]="rowData?.validationOnHold"
-               (change)="toggleHold(rowData, $event)">
+               (change)="toggleHold(rowData, $event)" />
     </div>
 </ng-template>
 
@@ -40,11 +40,11 @@
 </ng-template>
 
 <ng-template #propertyCell let-rowData="rowData">
-    <div class="d-flex gap-2">
-        <i class="fa-solid fa-house text-primary"
+    <div class="d-flex align-items-center gap-2">
+        <i class="fa-solid fa-house fs-5 text-primary"
            title="Residential"
            *ngIf="rowData?.propertyType === propertyType.Residential"></i>
-        <i class="fa-solid fa-building text-danger"
+        <i class="fa-solid fa-building fs-5 text-danger"
            title="Commercial"
            *ngIf="rowData?.propertyType === propertyType.Commercial"></i>
 

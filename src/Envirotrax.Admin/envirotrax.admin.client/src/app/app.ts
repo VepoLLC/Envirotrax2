@@ -156,6 +156,7 @@ export class App implements OnInit {
       {
         title: 'Submission Validations',
         iconCss: 'fa-solid fa-file-circle-check',
+        color: MODULE_COLORS.VALIDATION,
         onClick: this.showSubmissionValidations.bind(this)
       },
       {
@@ -290,7 +291,8 @@ export class App implements OnInit {
 
   public showSubmissionValidations(): void {
     this._windowService.addWindow(SubmissionValidationListComponent, {
-      title: 'Validations'
+      title: 'Validations',
+      color: MODULE_COLORS.VALIDATION
     });
   }
 

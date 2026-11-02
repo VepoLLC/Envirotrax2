@@ -85,6 +85,7 @@ export interface SubmissionValidationSource {
     infoCaption: string;
     reasons: SubmissionValidationReason[];
     detailsComponent?: Type<unknown>;
+    detailsColor?: string;
     actions: SubmissionValidationActions;
     load: (pageInfo: PageInfo, query: Query) => Promise<PagedData<SubmissionValidationRow>>;
 }

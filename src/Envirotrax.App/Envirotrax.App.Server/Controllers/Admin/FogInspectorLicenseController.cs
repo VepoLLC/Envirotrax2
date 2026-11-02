@@ -54,41 +54,18 @@ public class FogInspectorLicenseController : AdminBaseController
     [HttpPut("{professionalId}/licenses/{licenseId}")]
     public async Task<IActionResult> UpdateAsync(int professionalId, int licenseId, [FromBody] ProfessionalUserLicenseDto license, CancellationToken cancellationToken)
     {
-        if (!await BelongsToProfessionalAsync(professionalId, licenseId, cancellationToken))
-        {
-            return NotFound();
-        }
-
         license.Id = licenseId;
-        license.ProfessionalType = ProfessionalType.FogInspector;
 
-        var updated = await _licenseService.UpdateForProfessionalAsync(professionalId, license);
+        var updated = await _licenseService.UpdateForProfessionalAsync(professionalId, license, cancellationToken, ProfessionalType.FogInspector);
 
-        return Ok(updated);
+        return updated == null ? NotFound() : Ok(updated);
     }
 
     [HttpDelete("{professionalId}/licenses/{licenseId}")]
     public async Task<IActionResult> DeleteAsync(int professionalId, int licenseId, CancellationToken cancellationToken)
     {
-        if (!await BelongsToProfessionalAsync(professionalId, licenseId, cancellationToken))
-        {
-            return NotFound();
-        }
-
-        var deleted = await _licenseService.DeleteAsync(licenseId);
+        var deleted = await _licenseService.DeleteForProfessionalAsync(professionalId, licenseId, cancellationToken, ProfessionalType.FogInspector);
 
         return deleted == null ? NotFound() : Ok();
-    }
-
-    private async Task<bool> BelongsToProfessionalAsync(int professionalId, int licenseId, CancellationToken cancellationToken)
-    {
-        var owned = await _licenseService.GetAllByProfessionalAsync(
-            professionalId,
-            new PageInfo(),
-            new Query(),
-            cancellationToken,
-            license => license.Id == licenseId && license.ProfessionalType == ProfessionalType.FogInspector);
-
-        return owned.Data.Any();
     }
 }

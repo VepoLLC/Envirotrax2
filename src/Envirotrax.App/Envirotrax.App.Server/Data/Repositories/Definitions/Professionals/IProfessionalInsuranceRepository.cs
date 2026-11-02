@@ -10,6 +10,8 @@ public interface IProfessionalInsuranceRepository : IRepository<ProfessionalInsu
     Task<IEnumerable<ProfessionalInsurance>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalInsurance>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);
     Task<ProfessionalInsurance?> GetCurrentForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
+    Task<ProfessionalInsurance?> GetForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken);
+    Task<bool> ExistsForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken);
 
     Task<IEnumerable<ProfessionalInsurance>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<Dictionary<int, ProfessionalType?>> GetProfessionalTypesAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);

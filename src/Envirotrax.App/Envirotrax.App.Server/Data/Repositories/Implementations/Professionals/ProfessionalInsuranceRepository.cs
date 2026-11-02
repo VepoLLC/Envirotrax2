@@ -53,6 +53,19 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public Task<ProfessionalInsurance?> GetForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken)
+    {
+        return DbContext.Set<ProfessionalInsurance>()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(i => i.Id == insuranceId && i.ProfessionalId == professionalId, cancellationToken);
+    }
+
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken)
+    {
+        return DbContext.Set<ProfessionalInsurance>()
+            .AnyAsync(i => i.Id == insuranceId && i.ProfessionalId == professionalId, cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalInsurance>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var baseQuery = DbContext.Set<ProfessionalInsurance>()

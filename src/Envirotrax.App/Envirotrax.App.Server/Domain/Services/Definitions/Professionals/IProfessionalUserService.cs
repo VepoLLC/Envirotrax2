@@ -17,4 +17,5 @@ public interface IProfessionalUserService : IService<ProfessionalUser, Professio
     Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null);
     Task<ProfessionalUserDto> AddForProfessionalAsync(int professionalId, ProfessionalUserDto dto, CancellationToken cancellationToken);
     Task<ProfessionalUserDto?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle);
+    Task<ProfessionalUserDto?> DeleteForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken);
 }

@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Fog;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 
 namespace Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
@@ -17,6 +18,8 @@ public interface IFogTripTicketRepository : IRepository<FogTripTicket>
     Task<FogTripTicket?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken);
 
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
+
+    Task<int> TransferToSiteAsync(int sourceSiteId, Site destinationSite);
 
     // Checkout
     Task<List<FogTripTicket>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? transporterId, CancellationToken cancellationToken);

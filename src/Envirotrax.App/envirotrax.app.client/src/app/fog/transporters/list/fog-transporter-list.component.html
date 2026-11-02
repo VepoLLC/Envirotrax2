@@ -7,13 +7,18 @@
                 <div class="row">
                     <div class="col-md-5">
                         <vp-field-grid>
-                            <vp-filter-panel-field fieldName="companyEmail"
-                                                   label="Company Email:"
+                            <vp-filter-panel-field fieldName="userEmail"
+                                                   label="User ID / Email:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="name"
                                                    label="Company Name:"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+
+                            <vp-filter-panel-field fieldName="contactName"
+                                                   label="Contact Name:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
@@ -23,7 +28,12 @@
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field fieldName="phoneNumber"
-                                                   label="Phone #:"
+                                                   label="Work #:"
+                                                   labelStyle="horizontal"
+                                                   [form]="searchForm" />
+
+                            <vp-filter-panel-field fieldName="cellNumber"
+                                                   label="Cell #:"
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
                         </vp-field-grid>

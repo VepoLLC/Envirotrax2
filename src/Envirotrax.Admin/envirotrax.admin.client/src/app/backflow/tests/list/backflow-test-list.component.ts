@@ -16,6 +16,7 @@ import { BackflowTestService } from '../../../shared/services/backflow/backflow-
 import { BackflowTestOptionsService } from '../../../shared/services/backflow/backflow-test-options.service';
 import { WaterSupplierService } from '../../../shared/services/water-suppliers/water-supplier.service';
 import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { BackflowTestDetailsComponent } from '../details/backflow-test-details.component';
 
 @Component({
@@ -162,6 +163,7 @@ export class BackflowTestListComponent implements OnInit {
     public viewDetails(test: BackflowTest): void {
         this._windowService.addWindow(BackflowTestDetailsComponent, {
             title: this.buildWindowTitle(test),
+            color: MODULE_COLORS.BACKFLOW,
             model: { id: test.id }
         });
     }

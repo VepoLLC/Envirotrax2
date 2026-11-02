@@ -72,35 +72,35 @@
         <h3 class="text-bg-light p-2 border h6">Adding Licenses</h3>
         <div class="mx-1">
             <p>
-                Use the form below to add a new license to your account.
+                Use the form below to register a new license with your account.
             </p>
         </div>
 
-        <h3 class="text-bg-light p-2 border h6">The following applies to all Master Accounts and User Accounts:</h3>
+        <h3 class="text-bg-light p-2 border h6">The following applies to all “Master” and User Accounts:</h3>
         <ol>
             <li>
-                A BPAT license must be added for each Master Account or User Account in order for the account to be
-                authorized for use in backflow test submissions. The Company Name and/or Contact Name on the account
-                must match the name of the license holder. If a Master Account is only used for User Account
-                administration and not backflow test submissions, a BPAT license does not need to be registered for the
-                account.
+                Each individual who submits backflow test reports must have a valid Backflow Prevention Assembly Tester
+                (BPAT) license registered with their User Account. The Contact Name on the account must match the name
+                of the license holder. A BPAT license is not required for User Accounts used exclusively for
+                administrative purposes.
             </li>
             <li>
-                Fire company licenses are registered for the company and are not tied to a specific account.
+                A company fire license registered within a "master" account automatically applies to all associated
+                User Accounts. Individual users do not need to register the same fire company license separately. The
+                Company Name associated with the master account must match the company name on the fire license.
             </li>
         </ol>
 
         <h3 class="text-bg-light p-2 border h6">
-            Verify that the information is correct and click the Add New License button to begin the process of
-            registering your license.
+            Verify that the information is correct and click the Register New License button to begin registering your
+            license.
         </h3>
         <ol>
             <li>
-                All BPAT and fire company licenses will be verified by Vepo personnel. Once the license is verified, our
-                staff will validate the license by entering in the expiration date on file with the authority issuing
-                the
+                All BPAT and fire company licenses will be verified by Envirotrax® personnel. Once verified, our staff
+                will validate the license by entering in the expiration date on file with the authority issuing the
                 license.<br />
-                Note: If your company intends to test fireline assemblies in the State of Texas, you certify that BPATs
+                Note: If your company intends to test fire line assemblies in the State of Texas, you certify that BPATs
                 registered in your account are permanent employees per §290.44(h)(4)(A)(ii).
             </li>
         </ol>
@@ -108,21 +108,22 @@
         <h3 class="text-bg-light p-2 border h6">Renewing Your Licenses</h3>
         <ol>
             <li>
-                All BPAT and fire company licenses are monitored by Vepo personnel and updated near the time of their
-                expiration. If a license is not renewed, we will not be able to update the license and your account will
-                become unauthorized for use.
+                All BPAT and fire company licenses are monitored by Envirotrax® personnel and updated near the time of
+                their expiration. If a license is not renewed with the issuing authority, we will not be able to update
+                the license, and your account will become unauthorized for use.
             </li>
         </ol>
 
         <h3 class="text-bg-light p-2 border h6">Reinstating Expired Licenses</h3>
         <ol>
             <li>
-                Vepo personnel will continue to check for renewals of expired BPAT and fire company licenses for a set
-                period of time. If the license is not renewed within that set time period, the license will no longer be
-                checked for renewal and you must reinstate the license manually. To reinstate an expired license you
-                must
-                first renew your license with the authority issuing the license. Then, contact us so that we can verify
-                the license and update it within the system.
+                Envirotrax® periodically checks registered licenses for renewal. However, once a license has expired
+                without renewal, automatic monitoring will eventually stop.
+            </li>
+            <li>
+                To reinstate an expired license, you must first renew your license with the appropriate licensing
+                authority. Then, re-enter the license in your account, and allow time for Envirotrax® personnel to
+                verify the license and update its expiration date.
             </li>
         </ol>
     </div>
@@ -150,7 +151,7 @@
         </ol>
 
         <h3 class="text-bg-light p-2 border h6">
-            Verify that the information is correct and click the Add New License button to begin the process of
+            Verify that the information is correct and click the Register New License button to begin the process of
             registering your license.
         </h3>
         <ol>
@@ -207,7 +208,7 @@
         </ol>
 
         <h3 class="text-bg-light p-2 border h6">
-            Verify that the information is correct and click the Add New License button to begin the process of
+            Verify that the information is correct and click the Register New License button to begin the process of
             registering your license.
         </h3>
         <ol>
@@ -304,6 +305,7 @@
                           (ngModelChange)="licenseTypeChange($event)"
                           [required]="true"
                           [form]="form"
+                          placeholder="Select a license type"
                           [options]="licenseTypes" />
             </div>
 
@@ -335,7 +337,7 @@
                 <vp-validation-summary [form]="form" [validationErrors]="newLicenseValidationErrors" />
 
                 <button type="submit" class="btn btn-primary w-100">
-                    Add New License
+                    Register New License
                 </button>
             </div>
         </form>

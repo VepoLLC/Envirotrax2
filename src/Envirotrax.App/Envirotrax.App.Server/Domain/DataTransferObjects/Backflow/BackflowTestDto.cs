@@ -79,7 +79,7 @@ public class BackflowTestDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRed
 
     public ReferencedStateDto? PropertyState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? PropertyZip { get; set; }
 
     PropertyType IPropertyLocationDto.PropertyType

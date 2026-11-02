@@ -5,6 +5,7 @@ import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplie
 import { WaterSupplierService } from '../../shared/services/water-suppliers/water-supplier.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
 import { WindowService } from '../../shared/services/window.service';
+import { MODULE_COLORS } from '../../shared/models/module-colors';
 import { WaterSupplierDetailsComponent } from '../detail/water-supplier-details.component';
 
 @Component({
@@ -103,6 +104,7 @@ export class WaterSupplierListComponent implements OnInit {
     public viewDetails(supplier: WaterSupplier): void {
         this._windowService.addWindow(WaterSupplierDetailsComponent, {
             title: supplier.name ?? 'Water Supplier',
+            color: MODULE_COLORS.WATER_SUPPLIER,
             model: { id: supplier.id }
         });
     }

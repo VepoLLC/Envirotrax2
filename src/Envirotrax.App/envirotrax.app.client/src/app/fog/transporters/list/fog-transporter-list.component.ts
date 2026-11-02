@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from "@angular/router";
-import { FogTransporterService } from "../../../shared/services/fog/fog-transporter.service";
+import { FogTransporterSearchCriteria, FogTransporterService } from "../../../shared/services/fog/fog-transporter.service";
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
@@ -11,10 +11,13 @@ import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
-interface FogTransporterLicenseSearchVm {
-    registrationNumber?: string;
-    insurancePolicyNumber?: string;
-}
+const CRITERIA_FIELDS: (keyof FogTransporterSearchCriteria)[] = [
+    'registrationNumber',
+    'insurancePolicyNumber',
+    'userEmail',
+    'contactName',
+    'cellNumber'
+];
 
 @Component({
     selector: 'app-fog-transporter-list',
@@ -48,7 +51,7 @@ export class FogTransporterListComponent implements OnInit {
 
     public downloadConfig: DownloadConfig;
 
-    private _licenseSearch: FogTransporterLicenseSearchVm = {};
+    private _criteria: FogTransporterSearchCriteria = {};
 
     constructor(
         private readonly _fogTransporterService: FogTransporterService,
@@ -59,7 +62,7 @@ export class FogTransporterListComponent implements OnInit {
     ) {
         this.downloadConfig = {
             fileName: 'FOG Transporters',
-            endpoint: this._fogTransporterService.getAllEndpoint(),
+            endpoint: this._fogTransporterService.getSearchEndpoint(this._criteria),
             suppoertedFormats: ['CSV', 'Excel'],
             columns: [
                 { field: 'name', caption: 'Company Name' },
@@ -113,29 +116,26 @@ export class FogTransporterListComponent implements OnInit {
     public async getTransporters(): Promise<void> {
         try {
             this.table.isLoading = true;
-            const pageInfo = this.table.items?.pageInfo || {};
-            const { registrationNumber, insurancePolicyNumber } = this._licenseSearch;
-
-            this.table.items = (registrationNumber || insurancePolicyNumber)
-                ? await this._fogTransporterService.search(registrationNumber, insurancePolicyNumber, pageInfo)
-                : await this._fogTransporterService.getAll(pageInfo, this.table.query);
+            this.table.items = await this._fogTransporterService.search(
+                this._criteria,
+                this.table.items?.pageInfo || {},
+                this.table.query
+            );
         } finally {
             this.table.isLoading = false;
         }
     }
 
-    private extractLicenseSearchVm(): FogTransporterLicenseSearchVm {
-        const getValue = (columnName: string) =>
-            this.table.query.filter?.find(f => f.columnName === columnName)?.value as string | undefined;
-
-        return {
-            registrationNumber: getValue('registrationNumber'),
-            insurancePolicyNumber: getValue('insurancePolicyNumber')
-        };
-    }
-
     public onFilterChange(queryProperties: QueryProperty[]): void {
-        this.table.query.filter = queryProperties;
+        this._criteria = {};
+
+        for (const field of CRITERIA_FIELDS) {
+            const property = queryProperties.find(p => p.columnName === field);
+
+            this._criteria[field] = property?.value ? property.value : null;
+        }
+
+        this.table.query.filter = queryProperties.filter(p => !CRITERIA_FIELDS.includes(p.columnName as keyof FogTransporterSearchCriteria));
     }
 
     public openDetails(row: any): void {
@@ -151,14 +151,14 @@ export class FogTransporterListComponent implements OnInit {
 
     public async search(searchForm: NgForm): Promise<void> {
         if (searchForm.valid) {
-            this._licenseSearch = this.extractLicenseSearchVm();
-
             await this.getTransporters();
             this.setShowResults(true);
         }
     }
 
     public showDownloadManager(): void {
+        this.downloadConfig.endpoint = this._fogTransporterService.getSearchEndpoint(this._criteria);
+
         this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 }

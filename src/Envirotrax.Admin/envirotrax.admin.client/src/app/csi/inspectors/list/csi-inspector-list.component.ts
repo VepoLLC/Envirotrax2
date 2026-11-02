@@ -6,6 +6,7 @@ import { SharedComponentsModule } from '../../../shared/components/shared.compon
 import { CsiInspectorAccount } from '../../../shared/models/csi/csi-inspector-account';
 import { CsiInspectorService } from '../../../shared/services/csi/csi-inspector.service';
 import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { CsiInspectorDetailsComponent } from '../details/csi-inspector-details.component';
 
 @Component({
@@ -53,6 +54,7 @@ export class CsiInspectorListComponent implements OnInit {
     public openDetails(account: CsiInspectorAccount): void {
         this._windowService.addWindow(CsiInspectorDetailsComponent, {
             title: this.buildTitle(account),
+            color: MODULE_COLORS.CSI,
             model: account
         });
     }

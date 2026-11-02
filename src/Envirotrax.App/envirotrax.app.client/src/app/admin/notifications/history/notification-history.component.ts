@@ -2,13 +2,15 @@ import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { formatDate } from "@angular/common";
 import { NgForm } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
+import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Query, QueryProperty } from "../../../shared/models/query";
 import { DownloadColumn, DownloadConfig } from "../../../shared/models/download-config";
-import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { Notification, NotificationTest } from "../../../shared/models/notifications/notification";
 import { NotificationSetting } from "../../../shared/models/notifications/notification-setting";
+import { WaterSupplierUser } from "../../../shared/models/users/water-supplier-user";
+import { WaterSupplierUserLookupComponent } from "../../../shared/components/lookups/water-supplier-user-lookup/water-supplier-user-lookup.component";
 import { NotificationInterval } from "../../../shared/enums/notification-interval.enum";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
 import { NotificationService } from "../../../shared/services/notifications/notification.service";
@@ -42,7 +44,6 @@ export class NotificationHistoryComponent implements OnInit {
     public header: string = '';
 
     public filters: NotificationSearchFilters;
-    public accountOptions: InputOption[] = [{ id: '', text: 'Any account' }];
 
     public readonly reasonForTestOptions: InputOption[];
     public readonly intervalOptions: InputOption[];
@@ -109,7 +110,7 @@ export class NotificationHistoryComponent implements OnInit {
         this.canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.Notifications);
         this.table.columns = this.getColumns();
 
-        await this.loadAccounts();
+        await this.loadPresetAccount();
 
         this.applyFilters();
         await this.getNotifications();
@@ -128,7 +129,7 @@ export class NotificationHistoryComponent implements OnInit {
         const period = presetDate ? this.getClosedPeriod(presetDate) : this.getCurrentPeriod();
 
         return {
-            userId: params.get('userId') ?? '',
+            account: null,
             reasonForTest: '',
             interval: String(this.interval),
             fromDate: formatDate(period.from, QueryDateFormat, Locale),
@@ -207,21 +208,32 @@ export class NotificationHistoryComponent implements OnInit {
         return result;
     }
 
-    private async loadAccounts(): Promise<void> {
+    private async loadPresetAccount(): Promise<void> {
+        const userId = Number(this._route.snapshot.queryParamMap.get('userId'));
+
+        if (!userId) {
+            return;
+        }
+
         try {
             this.table.isLoading = true;
 
-            const users = await this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [] });
-
-            const accounts = users.data
-                .filter(user => user.id != null)
-                .map(user => ({ id: String(user.id), text: user.emailAddress ?? user.contactName ?? String(user.id) }))
-                .sort((first, second) => first.text.localeCompare(second.text));
-
-            this.accountOptions = [{ id: '', text: 'Any account' }, ...accounts];
+            this.filters.account = await this._userService.get(userId);
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    public lookupAccount(): void {
+        this._modalHelper.show<WaterSupplierUser>(WaterSupplierUserLookupComponent, {
+            title: 'Accounts',
+            size: ModalSize.large
+        }).result()
+            .subscribe(user => this.filters.account = user);
+    }
+
+    public clearAccount(): void {
+        this.filters.account = null;
     }
 
     private getColumns(): TableColumn<NotificationRow>[] {
@@ -276,7 +288,7 @@ export class NotificationHistoryComponent implements OnInit {
 
     private buildQuery(): Query {
         const filter: QueryProperty[] = [
-            ...this.buildOptionalFilter('userId', this.filters.userId),
+            ...this.buildOptionalFilter('userId', this.filters.account ? String(this.filters.account.id) : ''),
             ...this.buildOptionalFilter('reasonForTest', this.filters.reasonForTest),
             ...this.buildOptionalFilter('interval', this.filters.interval),
             ...this.buildFlagFilters(),
@@ -326,7 +338,7 @@ export class NotificationHistoryComponent implements OnInit {
 
     private buildHeaderPrefix(): string {
         const interval = this.filters.interval ? `${this.findOptionText(this.intervalOptions, this.filters.interval)} ` : '';
-        const account = this.filters.userId ? this.findOptionText(this.accountOptions, this.filters.userId) : 'All Accounts';
+        const account = this.filters.account?.emailAddress ?? 'All Accounts';
 
         const from = formatDate(this.filters.fromDate, DisplayDateFormat, Locale);
         const to = formatDate(this.filters.toDate, DisplayDateFormat, Locale);
@@ -465,7 +477,7 @@ export class NotificationHistoryComponent implements OnInit {
 }
 
 interface NotificationSearchFilters {
-    userId: string;
+    account: WaterSupplierUser | null;
     reasonForTest: string;
     interval: string;
     fromDate: string;

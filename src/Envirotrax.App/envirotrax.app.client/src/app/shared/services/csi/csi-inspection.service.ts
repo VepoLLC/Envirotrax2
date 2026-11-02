@@ -12,6 +12,7 @@ import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
 import { InsuranceCheck } from "../../models/professionals/insurance-check";
 import { CreateCsiInspection, CsiInspectionAssembly } from "../../models/csi/csi-inspection-assembly";
 import { DownloadEndpoint } from "../../models/download-config";
+import { PdfLink } from "../../models/pdf-link";
 import { RecordLog } from "@envirotrax/common-ui";
 
 @Injectable({
@@ -118,11 +119,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.put<CsiInspection>(url, request));
     }
 
-    public getPdf(id: number): Promise<Blob> {
+    public async getPdfUrl(id: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/pdf`);
-        return lastValueFrom(
-            this._http.get(url, { responseType: 'blob' })
-        );
+        const link = await lastValueFrom(this._http.get<PdfLink>(url));
+
+        return link.url;
     }
 
     public getProfessionalInspections(pageInfo: PageInfo, query: Query, latestOnly: boolean): Promise<PagedData<CsiInspection>> {
@@ -151,9 +152,11 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.delete<CsiInspection>(url));
     }
 
-    public getPdfForProfessional(id: number): Promise<Blob> {
+    public async getPdfUrlForProfessional(id: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}/pdf`);
-        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+        const link = await lastValueFrom(this._http.get<PdfLink>(url));
+
+        return link.url;
     }
 
     public checkout(request: ProfessionalCheckoutRequest): Promise<ProfessionalCheckoutReceipt<CsiInspection>> {

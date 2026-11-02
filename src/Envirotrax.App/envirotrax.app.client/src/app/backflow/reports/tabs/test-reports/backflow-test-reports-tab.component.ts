@@ -235,7 +235,7 @@ export class BackflowTestReportsTabComponent implements OnInit, OnDestroy {
     public async downloadPDF(): Promise<void> {
         try {
             this.isLoading = true;
-            await this._downloadService.openBlobInNewWindow(() => this._reportService.getTestReportPdf(this.fromDate, this.toDate), `backflow-test-report_${this.fromDate}_${this.toDate}.pdf`);
+            await this._downloadService.openUrlInNewWindow(() => this._reportService.getTestReportPdfUrl(this.fromDate, this.toDate));
         } finally {
             this.isLoading = false;
         }

@@ -2,6 +2,7 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -17,13 +18,16 @@ public class BackflowTestController : ProfessionalProtectedController
 {
     private readonly IBackflowTestService _backflowTestService;
     private readonly IBackflowCheckoutService _checkoutService;
+    private readonly IPdfLinkService _pdfLinkService;
 
     public BackflowTestController(
         IBackflowTestService backflowTestService,
-        IBackflowCheckoutService checkoutService)
+        IBackflowCheckoutService checkoutService,
+        IPdfLinkService pdfLinkService)
     {
         _backflowTestService = backflowTestService;
         _checkoutService = checkoutService;
+        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet]
@@ -59,7 +63,9 @@ public class BackflowTestController : ProfessionalProtectedController
     {
         var tests = await _backflowTestService.GetAllForProfessionalAsync(pageInfo, query, cancellationToken);
         var pdf = await _backflowTestService.GeneratePdfAsync(tests.Data);
-        return File(pdf, "application/pdf");
+        var link = await _pdfLinkService.CreateAsync(pdf, "backflow-tests.pdf");
+
+        return Ok(link);
     }
 
     [HttpGet("{id}")]
@@ -79,7 +85,9 @@ public class BackflowTestController : ProfessionalProtectedController
         }
 
         var pdf = await _backflowTestService.GeneratePdfForProfessionalAsync(test);
-        return File(pdf, "application/pdf");
+        var link = await _pdfLinkService.CreateAsync(pdf, $"backflow-test-{id}.pdf");
+
+        return Ok(link);
     }
 
     [HttpPost]

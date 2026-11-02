@@ -51,7 +51,7 @@ export class FogInspectionViewComponent implements OnInit {
         try {
             this.isLoading = true;
             const inspectionId = this.inspection.id;
-            await this._downloadService.openBlobInNewWindow(() => this._inspectionService.getPdfForProfessional(inspectionId), `fog-inspection-${inspectionId}.pdf`);
+            await this._downloadService.openUrlInNewWindow(() => this._inspectionService.getPdfUrlForProfessional(inspectionId));
         } catch (e) {
             const validationErrors: string[] = [];
             if (this._helper.parseValidationErrors(e, validationErrors)) {

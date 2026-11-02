@@ -2,6 +2,7 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -17,15 +18,18 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     private readonly ICsiInspectionService _inspectionService;
     private readonly ICsiCheckoutService _checkoutService;
     private readonly ICsiInspectionAssemblyService _assemblyService;
+    private readonly IPdfLinkService _pdfLinkService;
 
     public CsiInspectionProfessionalController(
         ICsiInspectionService inspectionService,
         ICsiCheckoutService checkoutService,
-        ICsiInspectionAssemblyService assemblyService)
+        ICsiInspectionAssemblyService assemblyService,
+        IPdfLinkService pdfLinkService)
     {
         _inspectionService = inspectionService;
         _checkoutService = checkoutService;
         _assemblyService = assemblyService;
+        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet("insurance-check")]
@@ -57,7 +61,9 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
         }
 
         var pdf = await _inspectionService.GeneratePdfForProfessionalAsync(inspection);
-        return File(pdf, "application/pdf");
+        var link = await _pdfLinkService.CreateAsync(pdf, $"csi-inspection-{id}.pdf");
+
+        return Ok(link);
     }
 
     // The inspection's saved "Assemblies at This Location" rows, for the read-only view. The form uses
@@ -81,8 +87,9 @@ public class CsiInspectionProfessionalController : ProfessionalProtectedControll
     {
         var result = await _inspectionService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
         var pdf = await _inspectionService.GeneratePdfAsync(result.Data);
+        var link = await _pdfLinkService.CreateAsync(pdf, "csi-inspections.pdf");
 
-        return File(pdf, "application/pdf");
+        return Ok(link);
     }
 
     [HttpPost("submit")]

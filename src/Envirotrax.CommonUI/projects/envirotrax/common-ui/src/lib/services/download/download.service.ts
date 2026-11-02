@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { QueryHelperService } from "../helpers/query-helper.service";
 import { lastValueFrom } from "rxjs";
@@ -94,17 +94,33 @@ export class DownloadService {
         this.downloadFileFromBlob(blob, fileName);
     }
 
-    public async openBlobInNewWindow(loadBlob: () => Promise<Blob>, fileName?: string): Promise<void> {
-        const newWindow = window.open('', '_blank');
+    public async openUrlInNewWindow(loadUrl: () => Promise<string>): Promise<void> {
+        const newWindow = this.openLoadingWindow();
 
         if (!newWindow) {
-            this.downloadFileFromBlob(await loadBlob(), fileName);
+            this.downloadFileFromUrl(await loadUrl());
             return;
         }
 
-        newWindow.document.title = LOADING_WINDOW_TITLE;
-        newWindow.document.head.innerHTML = LOADING_WINDOW_STYLES;
-        newWindow.document.body.innerHTML = LOADING_WINDOW_BODY;
+        let isOpened = false;
+
+        try {
+            newWindow.location.href = await loadUrl();
+            isOpened = true;
+        } finally {
+            if (!isOpened) {
+                newWindow.close();
+            }
+        }
+    }
+
+    public async openBlobInNewWindow(loadBlob: () => Promise<Blob>): Promise<void> {
+        const newWindow = this.openLoadingWindow();
+
+        if (!newWindow) {
+            this.downloadFileFromBlob(await loadBlob());
+            return;
+        }
 
         let isOpened = false;
 
@@ -115,10 +131,6 @@ export class DownloadService {
             newWindow.location.href = objectUrl;
             isOpened = true;
 
-            if (fileName) {
-                this.downloadFileFromUrl(objectUrl, fileName);
-            }
-
             window.setTimeout(function () {
                 URL.revokeObjectURL(objectUrl);
             }, 5000);
@@ -127,6 +139,18 @@ export class DownloadService {
                 newWindow.close();
             }
         }
+    }
+
+    private openLoadingWindow(): Window | null {
+        const newWindow = window.open('', '_blank');
+
+        if (newWindow) {
+            newWindow.document.title = LOADING_WINDOW_TITLE;
+            newWindow.document.head.innerHTML = LOADING_WINDOW_STYLES;
+            newWindow.document.body.innerHTML = LOADING_WINDOW_BODY;
+        }
+
+        return newWindow;
     }
 
     private getAcceptHeader(format: FileFormat): string {
@@ -157,30 +181,29 @@ export class DownloadService {
         return params;
     }
 
-    private toPdfFileName(fileName?: string): string {
-        const name = fileName ?? 'document';
+    private async requestPdfUrl(config: DownloadConfig): Promise<string> {
+        const observable = this._http.request<{ url: string }>(config.pdfEndpoint!.method || 'GET', config.pdfEndpoint!.url, {
+            params: this.buildEndpointParams(config.pdfEndpoint!)
+        });
 
-        return name.toLowerCase().endsWith('.pdf') ? name : `${name}.pdf`;
+        const link = await lastValueFrom(observable);
+
+        return link.url;
     }
 
-    private requestPdf(config: DownloadConfig): Promise<HttpResponse<Blob>> {
+    private async downloadPdf(config: DownloadConfig): Promise<void> {
+        if (config.openPdfInNewWindow) {
+            await this.openUrlInNewWindow(() => this.requestPdfUrl(config));
+            return;
+        }
+
         const observable = this._http.request(config.pdfEndpoint!.method || 'GET', config.pdfEndpoint!.url, {
             responseType: 'blob',
             observe: 'response',
             params: this.buildEndpointParams(config.pdfEndpoint!)
         });
 
-        return lastValueFrom(observable);
-    }
-
-    private async downloadPdf(config: DownloadConfig): Promise<void> {
-        if (config.openPdfInNewWindow) {
-            await this.openBlobInNewWindow(async () => (await this.requestPdf(config)).body!, this.toPdfFileName(config.fileName));
-
-            return;
-        }
-
-        const response = await this.requestPdf(config);
+        const response = await lastValueFrom(observable);
         const fileName = this.getFileNameFromResponse(response.headers.get('Content-Disposition'), config.fileName ?? 'document.pdf');
 
         this.downloadFileFromBlob(response.body!, fileName);

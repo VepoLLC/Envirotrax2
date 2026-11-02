@@ -2,6 +2,7 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -16,11 +17,13 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
 {
     private readonly IFogTripTicketService _fogService;
     private readonly IFogTripTicketCheckoutService _checkoutService;
+    private readonly IPdfLinkService _pdfLinkService;
 
-    public ProfessionalFogTripTicketController(IFogTripTicketService fogService, IFogTripTicketCheckoutService checkoutService)
+    public ProfessionalFogTripTicketController(IFogTripTicketService fogService, IFogTripTicketCheckoutService checkoutService, IPdfLinkService pdfLinkService)
     {
         _fogService = fogService;
         _checkoutService = checkoutService;
+        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet]
@@ -43,8 +46,9 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
     {
         var result = await _fogService.SearchForProfessionalAsync(pageInfo, query, waterSupplierId, ct);
         var pdf = await _fogService.GeneratePdfAsync(result.Data);
+        var link = await _pdfLinkService.CreateAsync(pdf, "fog-trip-tickets.pdf");
 
-        return File(pdf, "application/pdf");
+        return Ok(link);
     }
 
     [HttpGet("insurance-check")]
@@ -85,7 +89,9 @@ public class ProfessionalFogTripTicketController : ProfessionalProtectedControll
         }
 
         var pdfBytes = await _fogService.GeneratePdfForProfessionalAsync(ticket);
-        return File(pdfBytes, "application/pdf");
+        var link = await _pdfLinkService.CreateAsync(pdfBytes, $"fog-trip-ticket-{id}.pdf");
+
+        return Ok(link);
     }
 
     [HttpPost]

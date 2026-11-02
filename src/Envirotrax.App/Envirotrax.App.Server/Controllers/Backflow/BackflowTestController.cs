@@ -2,6 +2,7 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -16,12 +17,14 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
 {
     private readonly IBackflowTestService _testService;
     private readonly IRecordLogService _recordLogService;
+    private readonly IPdfLinkService _pdfLinkService;
 
-    public BackflowTestController(IBackflowTestService service, IRecordLogService recordLogService)
+    public BackflowTestController(IBackflowTestService service, IRecordLogService recordLogService, IPdfLinkService pdfLinkService)
         : base(service)
     {
         _testService = service;
         _recordLogService = recordLogService;
+        _pdfLinkService = pdfLinkService;
     }
 
     protected override Task<IPagedData<BackflowTestDto>> ProcessGetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -45,7 +48,9 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
     {
         var tests = await _testService.SearchAsync(pageInfo, query, paymentStatus, cancellationToken);
         var pdf = await _testService.GeneratePdfAsync(tests.Data);
-        return File(pdf, "application/pdf");
+        var link = await _pdfLinkService.CreateAsync(pdf, "backflow-tests.pdf");
+
+        return Ok(link);
     }
 
     [HttpGet("{id}/pdf")]
@@ -58,7 +63,9 @@ public class BackflowTestController : WaterSupplierCrudController<BackflowTestDt
         }
 
         var pdf = await _testService.GeneratePdfAsync(test);
-        return File(pdf, "application/pdf");
+        var link = await _pdfLinkService.CreateAsync(pdf, $"backflow-test-{id}.pdf");
+
+        return Ok(link);
     }
 
     [HttpGet("{id}/logs")]

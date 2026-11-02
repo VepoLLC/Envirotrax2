@@ -65,7 +65,7 @@ export class ProfessionalBackflowTestDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
             const testId = this.test.id;
-            await this._downloadService.openBlobInNewWindow(() => this._testService.getPdfForProfessional(testId), `backflow-test-${testId}.pdf`);
+            await this._downloadService.openUrlInNewWindow(() => this._testService.getPdfUrlForProfessional(testId));
         } catch (e) {
             const validationErrors: string[] = [];
             if (this._helper.parseValidationErrors(e, validationErrors)) {

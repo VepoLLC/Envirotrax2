@@ -11,6 +11,7 @@ import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../
 import { FogTripTicketImages } from "../../models/fog/fog-trip-ticket-images";
 import { InsuranceCheck } from "../../models/professionals/insurance-check";
 import { DownloadEndpoint } from "../../models/download-config";
+import { PdfLink } from "../../models/pdf-link";
 
 @Injectable({
     providedIn: 'root'
@@ -87,9 +88,11 @@ export class FogTripTicketService {
         return lastValueFrom(this._http.put<FogTripTicket>(url, disapproved));
     }
 
-    public getPdf(id: number): Promise<Blob> {
+    public async getPdfUrl(id: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}/pdf`);
-        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+        const link = await lastValueFrom(this._http.get<PdfLink>(url));
+
+        return link.url;
     }
 
     public async searchForProfessional(pageInfo: PageInfo, query: Query, waterSupplierId?: number): Promise<PagedData<FogTripTicket>> {
@@ -113,9 +116,11 @@ export class FogTripTicketService {
         return lastValueFrom(this._http.post<ProfessionalCheckoutReceipt<FogTripTicket>>(url, request));
     }
 
-    public getPdfForProfessional(id: number): Promise<Blob> {
+    public async getPdfUrlForProfessional(id: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/fog/trip-tickets/${id}/pdf`);
-        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+        const link = await lastValueFrom(this._http.get<PdfLink>(url));
+
+        return link.url;
     }
 
     public submit(ticket: FogTripTicket, images: FogTripTicketImages = {}): Promise<FogTripTicket> {

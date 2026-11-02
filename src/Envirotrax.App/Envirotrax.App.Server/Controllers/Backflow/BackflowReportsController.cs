@@ -1,4 +1,5 @@
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +13,18 @@ public class BackflowReportsController : WaterSupplierProtectedController
     private readonly IBackflowTestReportService _testReportService;
     private readonly IBackflowComplianceReportService _complianceReportService;
     private readonly IBackflowNewRemovedReportService _newRemovedReportService;
+    private readonly IPdfLinkService _pdfLinkService;
 
     public BackflowReportsController(
         IBackflowTestReportService testReportService,
         IBackflowComplianceReportService complianceReportService,
-        IBackflowNewRemovedReportService newRemovedReportService)
+        IBackflowNewRemovedReportService newRemovedReportService,
+        IPdfLinkService pdfLinkService)
     {
         _testReportService = testReportService;
         _complianceReportService = complianceReportService;
         _newRemovedReportService = newRemovedReportService;
+        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet("tests")]
@@ -42,7 +46,9 @@ public class BackflowReportsController : WaterSupplierProtectedController
         CancellationToken cancellationToken)
     {
         var pdf = await _testReportService.GeneratePdfAsync(fromDate, toDate, cancellationToken);
-        return File(pdf, MimeTypes.Pdf);
+        var link = await _pdfLinkService.CreateAsync(pdf, $"backflow-test-report_{fromDate:yyyy-MM-dd}_{toDate:yyyy-MM-dd}.pdf");
+
+        return Ok(link);
     }
 
     [HttpGet("tests/excel")]
@@ -92,7 +98,9 @@ public class BackflowReportsController : WaterSupplierProtectedController
         CancellationToken cancellationToken)
     {
         var pdf = await _complianceReportService.GeneratePdfAsync(ignoreLast30Days, cancellationToken);
-        return File(pdf, MimeTypes.Pdf);
+        var link = await _pdfLinkService.CreateAsync(pdf, "backflow-compliance-report.pdf");
+
+        return Ok(link);
     }
 
     [HttpGet("compliance/current/excel")]
@@ -128,7 +136,9 @@ public class BackflowReportsController : WaterSupplierProtectedController
     public async Task<IActionResult> GetComplianceHistoryPdfAsync(CancellationToken cancellationToken)
     {
         var pdf = await _complianceReportService.GenerateHistoryPdfAsync(cancellationToken);
-        return File(pdf, MimeTypes.Pdf);
+        var link = await _pdfLinkService.CreateAsync(pdf, "backflow-compliance-history.pdf");
+
+        return Ok(link);
     }
 
     [HttpGet("compliance/history/excel")]
@@ -160,7 +170,9 @@ public class BackflowReportsController : WaterSupplierProtectedController
     public async Task<IActionResult> GetNewRemovedPdfAsync(CancellationToken cancellationToken)
     {
         var pdf = await _newRemovedReportService.GeneratePdfAsync(cancellationToken);
-        return File(pdf, MimeTypes.Pdf);
+        var link = await _pdfLinkService.CreateAsync(pdf, "backflow-new-removed.pdf");
+
+        return Ok(link);
     }
 
     [HttpGet("assemblies/new-removed/excel")]

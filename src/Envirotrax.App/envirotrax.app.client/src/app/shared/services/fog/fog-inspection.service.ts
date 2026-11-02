@@ -8,6 +8,7 @@ import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { FogInspection } from "../../models/fog/fog-inspection";
 import { DownloadEndpoint } from "../../models/download-config";
+import { PdfLink } from "../../models/pdf-link";
 
 @Injectable({
     providedIn: 'root'
@@ -49,8 +50,10 @@ export class FogInspectionService {
         return lastValueFrom(this._http.get<FogInspection>(url));
     }
 
-    public getPdf(id: number): Promise<Blob> {
+    public async getPdfUrl(id: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}/pdf`);
-        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+        const link = await lastValueFrom(this._http.get<PdfLink>(url));
+
+        return link.url;
     }
 }

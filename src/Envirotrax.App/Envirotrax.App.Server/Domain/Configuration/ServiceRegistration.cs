@@ -62,6 +62,7 @@ public static class ServiceRegistration
 
         services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
         services.AddTransient<IFileStorageService, FileStorageService>();
+        services.AddTransient<IPdfLinkService, PdfLinkService>();
 
         services.AddTransient<IWaterSupplierService, WaterSupplierService>();
         services.AddTransient<IGeneralSettingsService, GeneralSettingsService>();

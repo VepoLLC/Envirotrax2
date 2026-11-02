@@ -1,8 +1,10 @@
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
+using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
@@ -28,9 +30,12 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Fog
             _insuranceService = insuranceService;
         }
 
-        public async Task<IPagedData<ProfessionalDto>> SearchAsync(string? registrationNumber, string? insurancePolicyNumber, PageInfo pageInfo, CancellationToken cancellationToken)
+        public async Task<IPagedData<ProfessionalDto>> SearchAsync(FogTransporterSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
         {
-            var items = await _transporterRepository.SearchAsync(registrationNumber, insurancePolicyNumber, pageInfo, cancellationToken);
+            query.Filter = query.ConvertFilterProperties<Professional, ProfessionalDto>(Mapper);
+            query.Sort = query.ConvertSortProperties<Professional, ProfessionalDto>(Mapper);
+
+            var items = await _transporterRepository.SearchAsync(criteria, pageInfo, query, cancellationToken);
             var dtos = items.Select(i => MapToDto(i)!).ToList();
 
             await EnrichWithLicensesAndInsurancesAsync(dtos, cancellationToken);

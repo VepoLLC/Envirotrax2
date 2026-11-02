@@ -1,5 +1,6 @@
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
@@ -22,6 +23,9 @@ public class BackflowSettings : TenantModel<WaterSupplier>
     public BackflowExpiredType ExpiredNotice2 { get; set; }
     public BackflowNonCompliantType BackflowNonCompliant1 { get; set; }
     public BackflowNonCompliantType BackflowNonCompliant2 { get; set; }
+    public bool NonCompliantPrint1 { get; set; }
+    public bool NonCompliantPrint2 { get; set; }
+    public bool UnknownAssembliesNotice { get; set; }
 
     public bool ShowWaterMeterNumber { get; set; }
     public bool ShowRainSensor { get; set; }
@@ -46,11 +50,21 @@ public class BackflowSettings : TenantModel<WaterSupplier>
     public string NonCompliantLettersForegroundColor { get; set; } = "#000000";
     [MaxLength(7)]
     public string NonCompliantLettersBorderColor { get; set; } = "#000000";
+    [MaxLength(7)]
+    public string UnknownAssembliesLettersBackgroundColor { get; set; } = "#d3d3d3";
+    [MaxLength(7)]
+    public string UnknownAssembliesLettersForegroundColor { get; set; } = "#000000";
+    [MaxLength(7)]
+    public string UnknownAssembliesLettersBorderColor { get; set; } = "#000000";
 
     // Backflow Letter Message Settings
     [MaxLength(50)]
     public string? NoticeBodyFont { get; set; }
     public int? NoticeBodyFontSize { get; set; }
+
+    public LetterImageFitType NoticeImageFitType { get; set; }
+    [Precision(12, 2)]
+    public decimal NoticeImageFitSize { get; set; }
 
     [MaxLength(100)]
     public string? ExpiringTitle { get; set; }
@@ -63,4 +77,8 @@ public class BackflowSettings : TenantModel<WaterSupplier>
     [MaxLength(100)]
     public string? NonCompliantTitle { get; set; }
     public string? NonCompliantMessage { get; set; }
+
+    [MaxLength(100)]
+    public string? UnknownAssembliesTitle { get; set; }
+    public string? UnknownAssembliesMessage { get; set; }
 }

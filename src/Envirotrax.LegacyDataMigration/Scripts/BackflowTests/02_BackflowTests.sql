@@ -109,47 +109,47 @@ BEGIN TRY
          BackflowScheduleMonth, ForceRenewal, ForceRenewalYears)
     SELECT
         -- Identity
-        legacyTests.ID, legacyTests.ID, waterSuppliers.Id, sites.Id, LEFT(legacyTests.SubmissionID, 50),
-        LEFT(legacyTests.JobNumber, 50), COALESCE(bpats.ProfessionalId, inspectors.ProfessionalId), bpats.UserId,
-        CASE WHEN bpats.ProfessionalId IS NULL THEN inspectors.UserId END, LEFT(legacyTests.BpatLicenseNumber, 50),
-        legacyTests.BpatLicenseExpiration, LEFT(legacyTests.BpatCompanyName, 100), LEFT(legacyTests.BpatContactName, 100),
-        LEFT(legacyTests.BpatAddress, 200), LEFT(legacyTests.BpatCity, 50), bpatStates.Id, LEFT(legacyTests.BpatZIP, 20),
-        LEFT(legacyTests.BpatWorkNumber, 50), LEFT(legacyTests.BpatCellNumber, 50),
+        legacyTests.ID, legacyTests.ID, waterSuppliers.Id, sites.Id, legacyTests.SubmissionID,
+        legacyTests.JobNumber, COALESCE(bpats.ProfessionalId, inspectors.ProfessionalId), bpats.UserId,
+        CASE WHEN bpats.ProfessionalId IS NULL THEN inspectors.UserId END, legacyTests.BpatLicenseNumber,
+        legacyTests.BpatLicenseExpiration, legacyTests.BpatCompanyName, legacyTests.BpatContactName,
+        legacyTests.BpatAddress, legacyTests.BpatCity, bpatStates.Id, legacyTests.BpatZIP,
+        legacyTests.BpatWorkNumber, legacyTests.BpatCellNumber,
 
         -- Property / Site fields
-        NULL, LEFT(legacyTests.PropertyBusinessName, 100), ISNULL(legacyTests.PropertyType, 0),
-        LEFT(legacyTests.PropertyStreetNumber, 50), LEFT(legacyTests.PropertyStreetName, 100),
-        LEFT(legacyTests.PropertyNumber, 50), LEFT(legacyTests.PropertyCity, 50), propertyStates.Id,
-        LEFT(legacyTests.PropertyZIP, 20),
+        NULL, legacyTests.PropertyBusinessName, ISNULL(legacyTests.PropertyType, 0),
+        legacyTests.PropertyStreetNumber, legacyTests.PropertyStreetName,
+        legacyTests.PropertyNumber, legacyTests.PropertyCity, propertyStates.Id,
+        legacyTests.PropertyZIP,
 
         -- Mailing address
-        LEFT(legacyTests.MailingCompanyName, 100), LEFT(legacyTests.MailingContactName, 100),
-        LEFT(legacyTests.MailingStreetNumber, 50), LEFT(legacyTests.MailingStreetName, 100),
-        LEFT(legacyTests.MailingNumber, 50), LEFT(legacyTests.MailingCity, 50), mailingStates.Id,
-        LEFT(legacyTests.MailingZIP, 20), LEFT(legacyTests.MailingPhoneNumber, 50),
-        LEFT(legacyTests.MailingEmailAddress, 100), NULL,
+        legacyTests.MailingCompanyName, legacyTests.MailingContactName,
+        legacyTests.MailingStreetNumber, legacyTests.MailingStreetName,
+        legacyTests.MailingNumber, legacyTests.MailingCity, mailingStates.Id,
+        legacyTests.MailingZIP, legacyTests.MailingPhoneNumber,
+        legacyTests.MailingEmailAddress, NULL,
 
         -- Device info
-        LEFT(legacyTests.DeviceType, 50), LEFT(legacyTests.Manufacturer, 100), LEFT(legacyTests.Model, 100),
-        LEFT(legacyTests.Size, 50), LEFT(legacyTests.SerialNumber, 100), ISNULL(legacyTests.UnknownSerialNumber, 0),
-        LEFT(legacyTests.Manufacturer2, 100), LEFT(legacyTests.Model2, 100), LEFT(legacyTests.Size2, 50),
-        LEFT(legacyTests.SerialNumber2, 100), LEFT(legacyTests.LocationDescription, 200), LEFT(legacyTests.HazardType, 100),
-        LEFT(legacyTests.HazardTypeOtherDescription, 200),
+        legacyTests.DeviceType, legacyTests.Manufacturer, legacyTests.Model,
+        legacyTests.Size, legacyTests.SerialNumber, ISNULL(legacyTests.UnknownSerialNumber, 0),
+        legacyTests.Manufacturer2, legacyTests.Model2, legacyTests.Size2,
+        legacyTests.SerialNumber2, legacyTests.LocationDescription, legacyTests.HazardType,
+        legacyTests.HazardTypeOtherDescription,
 
         -- Test info
-        ISNULL(legacyTests.ReasonForTest, 0), LEFT(legacyTests.ReplacementAssembly, 100), legacyTests.InstallationDate,
+        ISNULL(legacyTests.ReasonForTest, 0), legacyTests.ReplacementAssembly, legacyTests.InstallationDate,
         legacyTests.TestDate, legacyTests.InitialTestDate, legacyTests.RepairTestDate, NULL, legacyTests.ExpirationDate,
         ISNULL(legacyTests.TestResult, 0), ISNULL(legacyTests.ProperlyInstalled, 0), ISNULL(legacyTests.NonPotable, 0),
 
         -- Gauge
-        LEFT(legacyTests.GaugeManufacturer, 100), LEFT(legacyTests.GaugeModel, 100),
-        LEFT(legacyTests.GaugeSerialNumber, 50), legacyTests.GaugeLastCalibrationDate,
+        legacyTests.GaugeManufacturer, legacyTests.GaugeModel,
+        legacyTests.GaugeSerialNumber, legacyTests.GaugeLastCalibrationDate,
         ISNULL(legacyTests.GaugeNonPotable, 0),
 
         -- Optional fields
-        LEFT(legacyTests.MeterNumber, 50), legacyTests.MeterReadingBefore, ISNULL(legacyTests.MeterRegisters, 0),
-        legacyTests.MeterReadingAfter, LEFT(legacyTests.PermitNumber, 50), legacyTests.OSSF,
-        LEFT(legacyTests.WaterMeterNumber, 50), ISNULL(legacyTests.RainFreezeSensorInstalled, 0),
+        legacyTests.MeterNumber, legacyTests.MeterReadingBefore, ISNULL(legacyTests.MeterRegisters, 0),
+        legacyTests.MeterReadingAfter, legacyTests.PermitNumber, legacyTests.OSSF,
+        legacyTests.WaterMeterNumber, ISNULL(legacyTests.RainFreezeSensorInstalled, 0),
         ISNULL(legacyTests.RainFreezeSensorWorkingProperly, 0),
 
         -- Status
@@ -157,7 +157,7 @@ BEGIN TRY
         ISNULL(legacyTests.OutOfService, 0), NULL,
 
         -- Approval / Payment
-        NULL, NULL, LEFT(legacyTests.TransactionID, 100), legacyTests.TransactionDate, ISNULL(legacyTests.Amount, 0),
+        NULL, NULL, legacyTests.TransactionID, legacyTests.TransactionDate, ISNULL(legacyTests.Amount, 0),
         ISNULL(legacyTests.AmountShare, 0), legacyTests.EmailPDF,
 
         -- Rejection
@@ -180,9 +180,9 @@ BEGIN TRY
         ISNULL(legacyTests.AirGapValid, 0), legacyTests.AirGapTestDate,
 
         -- Repairs
-        LEFT(legacyTests.RepairCV1, 200), LEFT(legacyTests.RepairCV1Details, 100), LEFT(legacyTests.RepairCV2, 200),
-        LEFT(legacyTests.RepairCV2Details, 100), LEFT(legacyTests.RepairRV, 250), LEFT(legacyTests.RepairRVDetails, 100),
-        LEFT(legacyTests.RepairBC, 200), LEFT(legacyTests.RepairBCDetails, 100),
+        legacyTests.RepairCV1, legacyTests.RepairCV1Details, legacyTests.RepairCV2,
+        legacyTests.RepairCV2Details, legacyTests.RepairRV, legacyTests.RepairRVDetails,
+        legacyTests.RepairBC, legacyTests.RepairBCDetails,
 
         -- Final test readings — main assembly
         legacyTests.FinalCV1HeldPSID, ISNULL(legacyTests.FinalCV1ClosedTight, 0), legacyTests.FinalCV2HeldPSID,
@@ -193,11 +193,11 @@ BEGIN TRY
         -- Bypass assembly readings
         legacyTests.InitCV1HeldPSID2, ISNULL(legacyTests.InitCV1ClosedTight2, 0), ISNULL(legacyTests.InitCV1Leaked2, 0),
         legacyTests.InitCV2HeldPSID2, ISNULL(legacyTests.InitCV2ClosedTight2, 0), ISNULL(legacyTests.InitCV2Leaked2, 0),
-        legacyTests.InitRVOpenedPSID2, ISNULL(legacyTests.InitRVDidNotOpen2, 0), LEFT(legacyTests.RepairCV12, 200),
-        LEFT(legacyTests.RepairCV1Details2, 100), LEFT(legacyTests.RepairCV22, 200),
-        LEFT(legacyTests.RepairCV2Details2, 100), LEFT(legacyTests.RepairRV2, 250), LEFT(legacyTests.RepairRVDetails2, 100),
-        LEFT(legacyTests.RepairPvbAirInlet, 200), LEFT(legacyTests.RepairPvbCV, 200),
-        LEFT(legacyTests.RepairPvbAirInletDetails, 100), LEFT(legacyTests.RepairPvbCVDetails, 100),
+        legacyTests.InitRVOpenedPSID2, ISNULL(legacyTests.InitRVDidNotOpen2, 0), legacyTests.RepairCV12,
+        legacyTests.RepairCV1Details2, legacyTests.RepairCV22,
+        legacyTests.RepairCV2Details2, legacyTests.RepairRV2, legacyTests.RepairRVDetails2,
+        legacyTests.RepairPvbAirInlet, legacyTests.RepairPvbCV,
+        legacyTests.RepairPvbAirInletDetails, legacyTests.RepairPvbCVDetails,
         legacyTests.FinalCV1HeldPSID2, ISNULL(legacyTests.FinalCV1ClosedTight2, 0), legacyTests.FinalCV2HeldPSID2,
         ISNULL(legacyTests.FinalCV2ClosedTight2, 0), legacyTests.FinalRVOpenedPSID2,
 

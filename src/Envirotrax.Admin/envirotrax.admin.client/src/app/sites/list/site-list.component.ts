@@ -6,6 +6,7 @@ import { SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteService } from '../../shared/services/sites/site.service';
 import { WaterSupplierService } from '../../shared/services/water-suppliers/water-supplier.service';
 import { WindowService } from '../../shared/services/window.service';
+import { MODULE_COLORS } from '../../shared/models/module-colors';
 import { SiteEditComponent } from '../edit/site-edit.component';
 
 @Component({
@@ -96,6 +97,7 @@ export class SiteListComponent implements OnInit {
 
         this._windowService.addWindow(SiteEditComponent, {
             title: this.buildSiteWindowTitle(site),
+            color: MODULE_COLORS.SITE,
             model
         });
     }

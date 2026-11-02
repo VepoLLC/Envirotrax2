@@ -108,31 +108,31 @@ BEGIN TRY
     SELECT
         -- Identity
         legacyInspections.ID, waterSuppliers.Id, sites.Id, legacyInspections.InspectionDate,
-        LEFT(legacyInspections.SubmissionID, 50),
+        legacyInspections.SubmissionID,
 
         -- Property / Location fields
-        LEFT(legacyInspections.PropertyBusinessName, 100), ISNULL(legacyInspections.PropertyType, 0),
-        LEFT(legacyInspections.PropertyStreetNumber, 50), LEFT(legacyInspections.PropertyStreetName, 100),
-        LEFT(legacyInspections.PropertyNumber, 50), LEFT(legacyInspections.PropertyCity, 50), propertyStates.Id,
-        LEFT(legacyInspections.PropertyZIP, 50),
+        legacyInspections.PropertyBusinessName, ISNULL(legacyInspections.PropertyType, 0),
+        legacyInspections.PropertyStreetNumber, legacyInspections.PropertyStreetName,
+        legacyInspections.PropertyNumber, legacyInspections.PropertyCity, propertyStates.Id,
+        legacyInspections.PropertyZIP,
 
         -- Mailing / Contact fields
-        LEFT(legacyInspections.MailingCompanyName, 100), LEFT(legacyInspections.MailingContactName, 100),
-        LEFT(legacyInspections.MailingStreetNumber, 50), LEFT(legacyInspections.MailingStreetName, 100),
-        LEFT(legacyInspections.MailingNumber, 50), LEFT(legacyInspections.MailingCity, 50), mailingStates.Id,
-        LEFT(legacyInspections.MailingZIP, 50), LEFT(legacyInspections.MailingPhoneNumber, 50),
-        LEFT(legacyInspections.MailingEmailAddress, 1000),
+        legacyInspections.MailingCompanyName, legacyInspections.MailingContactName,
+        legacyInspections.MailingStreetNumber, legacyInspections.MailingStreetName,
+        legacyInspections.MailingNumber, legacyInspections.MailingCity, mailingStates.Id,
+        legacyInspections.MailingZIP, legacyInspections.MailingPhoneNumber,
+        legacyInspections.MailingEmailAddress,
 
         -- Inspector fields. V1 never stores a job title on a FOG inspection (FogInspection.FromReader and
         -- inspection_submit.aspx.vb leave it out), so the V2 snapshot of it stays empty.
-        inspectors.ProfessionalId, inspectors.UserId, LEFT(legacyInspections.InspectorCompanyName, 255), NULL,
-        LEFT(legacyInspections.InspectorContactName, 255), LEFT(legacyInspections.InspectorAddress, 255),
-        LEFT(legacyInspections.InspectorCity, 255), LEFT(legacyInspections.InspectorState, 255),
-        LEFT(legacyInspections.InspectorZIP, 255), LEFT(legacyInspections.InspectorWorkNumber, 50),
-        LEFT(legacyInspections.InspectorCellNumber, 50), LEFT(legacyInspections.InspectorFaxNumber, 50),
+        inspectors.ProfessionalId, inspectors.UserId, legacyInspections.InspectorCompanyName, NULL,
+        legacyInspections.InspectorContactName, legacyInspections.InspectorAddress,
+        legacyInspections.InspectorCity, legacyInspections.InspectorState,
+        legacyInspections.InspectorZIP, legacyInspections.InspectorWorkNumber,
+        legacyInspections.InspectorCellNumber, legacyInspections.InspectorFaxNumber,
 
         -- FOG specific fields
-        LEFT(legacyInspections.FogGeneratorPhoneNumber, 50), LEFT(legacyInspections.FogGeneratorEmailAddress, 100),
+        legacyInspections.FogGeneratorPhoneNumber, legacyInspections.FogGeneratorEmailAddress,
         -- V1 stores the facility type as the text of the inspection form's dropdown, V2 as an enum. Same
         -- table as Scripts/Sites/02_Sites.sql: the inspection form only ever offered the enum's own names,
         -- and the extra spellings below come from sites, so they cost nothing and keep the two in step.
@@ -157,9 +157,9 @@ BEGIN TRY
 
         -- Interceptor fields. V1 keeps the coordinates as text and V2 as numbers; NULLIF stops a blank
         -- one from converting to 0, which would pin the interceptor to latitude/longitude 0,0.
-        LEFT(legacyInspections.InterceptorType, 100), LEFT(legacyInspections.InterceptorOtherDescription, 200),
+        legacyInspections.InterceptorType, legacyInspections.InterceptorOtherDescription,
         ISNULL(legacyInspections.InterceptorCapacity, 0), ISNULL(legacyInspections.InterceptorCapacityType, 0),
-        LEFT(legacyInspections.InterceptorLocationDescription, 200),
+        legacyInspections.InterceptorLocationDescription,
         TRY_CAST(NULLIF(legacyInspections.InterceptorLatitude, '') AS FLOAT),
         TRY_CAST(NULLIF(legacyInspections.InterceptorLongitude, '') AS FLOAT),
         legacyInspections.InterceptorComments,
@@ -169,14 +169,14 @@ BEGIN TRY
         ISNULL(legacyInspections.PastOverflow, 0),
 
         -- Chamber fields
-        LEFT(legacyInspections.InletChamberWettingHeight, 50), LEFT(legacyInspections.InletChamberGreaseBlanket, 50),
-        LEFT(legacyInspections.InletChamberSediments, 50), LEFT(legacyInspections.OutletChamberWettingHeight, 50),
-        LEFT(legacyInspections.OutletChamberGreaseBlanket, 50), LEFT(legacyInspections.OutletChamberSediments, 50),
+        legacyInspections.InletChamberWettingHeight, legacyInspections.InletChamberGreaseBlanket,
+        legacyInspections.InletChamberSediments, legacyInspections.OutletChamberWettingHeight,
+        legacyInspections.OutletChamberGreaseBlanket, legacyInspections.OutletChamberSediments,
         ISNULL(legacyInspections.InletTeeIntact, 0), ISNULL(legacyInspections.OutletTeeIntact, 0),
         legacyInspections.InletTeeVisible, legacyInspections.OutletTeeVisible,
 
         -- Sampling fields
-        LEFT(legacyInspections.SampledFrom, 100), ISNULL(legacyInspections.SamplingPointAccessible, 0),
+        legacyInspections.SampledFrom, ISNULL(legacyInspections.SamplingPointAccessible, 0),
         ISNULL(legacyInspections.SamplingPointClean, 0),
 
         -- Capacity / Result
@@ -184,7 +184,7 @@ BEGIN TRY
         ISNULL(legacyInspections.TotalCapacityPercent, 0), ISNULL(legacyInspections.InspectionResult, 0),
 
         -- Signature / Comments
-        LEFT(legacyInspections.SignatureContactName, 255), legacyInspections.SignatureDate, legacyInspections.Comments,
+        legacyInspections.SignatureContactName, legacyInspections.SignatureDate, legacyInspections.Comments,
 
         -- Images. The three V2 paths are left NULL on purpose: FogInspectionService fills each one in only
         -- once its upload to Azure has returned, so they double as the "still pending" flag.
@@ -218,7 +218,7 @@ BEGIN TRY
         -- Payment / Transaction. V1 marks an unpaid inspection with an empty TransactionID, V2 with NULL,
         -- and some V2 checks only test for NULL - the report download among them - so '' must not survive.
         -- V1 has no "email PDF" flag on a FOG inspection.
-        LEFT(NULLIF(LTRIM(RTRIM(legacyInspections.TransactionID)), ''), 100), legacyInspections.TransactionDate,
+        NULLIF(LTRIM(RTRIM(legacyInspections.TransactionID)), ''), legacyInspections.TransactionDate,
         ISNULL(legacyInspections.Amount, 0), ISNULL(legacyInspections.AmountShare, 0), 0,
 
         -- Audit. CreatedTime is deliberately not defaulted: there is no honest stand-in for when an

@@ -8,6 +8,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Domain.Services.Implementations.Logs;
 using Envirotrax.App.Server.Domain.Services.Implementations.Notifications;
+using Envirotrax.App.Server.Domain.Services.Definitions.TableSettings;
+using Envirotrax.App.Server.Domain.Services.Implementations.TableSettings;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -33,6 +35,8 @@ using Envirotrax.App.Server.Domain.Services.Implementations.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Payments;
 using Envirotrax.App.Server.Domain.Services.Implementations.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.PublicSearch;
+using Envirotrax.App.Server.Domain.Services.Definitions.Letters;
+using Envirotrax.App.Server.Domain.Services.Implementations.Letters;
 using Envirotrax.App.Server.Domain.Services.Implementations.PublicSearch;
 
 namespace Envirotrax.App.Server.Domain.Configuration;
@@ -131,7 +135,11 @@ public static class ServiceRegistration
         services.AddTransient<IBackflowTestNotificationMatcher, BackflowTestNotificationMatcher>();
         services.AddTransient<INotificationDigestService, NotificationDigestService>();
 
+        services.AddTransient<ITableSettingService, TableSettingService>();
+
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
+
+        services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();

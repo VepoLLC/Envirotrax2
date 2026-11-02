@@ -1,0 +1,29 @@
+<vp-section [header]="'Insurance Policies (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [customActions]="customActions"
+                  [canAdd]="true"
+                  (add)="addInsurance()"
+                  [canEdit]="true"
+                  (edit)="editInsurance($event)"
+                  [canDelete]="true"
+                  (delete)="deleteInsurance($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getInsurances()"
+                  [(query)]="table.query"
+                  (queryChange)="getInsurances()"
+                  (queryReset)="getInsurances()" />
+    </div>
+</vp-section>
+
+<ng-template #expirationCell let-rowData="rowData">
+    <span class="border border-secondary d-inline-block px-2 py-1 rounded-3"
+          [class]="rowData.expirationCssClass">
+        {{ rowData.expirationDate ? (rowData.expirationDate | date) : 'Validating...' }}
+    </span>
+</ng-template>

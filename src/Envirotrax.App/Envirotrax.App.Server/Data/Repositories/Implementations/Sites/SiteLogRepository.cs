@@ -94,6 +94,14 @@ public class SiteLogRepository : Repository<SiteLog>, ISiteLogRepository
         return Entity.CountAsync(sl => sl.SiteId == siteId, cancellationToken);
     }
 
+    public Task<int> TransferToSiteAsync(int sourceSiteId, int destinationSiteId)
+    {
+        return Entity
+            .Where(siteLog => siteLog.SiteId == sourceSiteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(siteLog => siteLog.SiteId, destinationSiteId));
+    }
+
     public async Task<IEnumerable<SiteLog>> GetBySiteIdsAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken)
     {
         var cutoff = DateTime.UtcNow.AddDays(-365);

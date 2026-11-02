@@ -21,6 +21,9 @@ public class BackflowSettingsDto
     public int ExpiredNotice2 { get; set; }
     public int BackflowNonCompliant1 { get; set; }
     public int BackflowNonCompliant2 { get; set; }
+    public bool NonCompliantPrint1 { get; set; }
+    public bool NonCompliantPrint2 { get; set; }
+    public bool UnknownAssembliesNotice { get; set; }
 
     public bool ShowWaterMeterNumber { get; set; }
     public bool ShowRainSensor { get; set; }
@@ -36,15 +39,22 @@ public class BackflowSettingsDto
     public string NonCompliantLettersBackgroundColor { get; set; } = "#d3d3d3";
     public string NonCompliantLettersForegroundColor { get; set; } = "#000000";
     public string NonCompliantLettersBorderColor { get; set; } = "#000000";
+    public string UnknownAssembliesLettersBackgroundColor { get; set; } = "#d3d3d3";
+    public string UnknownAssembliesLettersForegroundColor { get; set; } = "#000000";
+    public string UnknownAssembliesLettersBorderColor { get; set; } = "#000000";
 
     public string? NoticeBodyFont { get; set; }
     public int? NoticeBodyFontSize { get; set; }
+    public int NoticeImageFitType { get; set; }
+    public decimal NoticeImageFitSize { get; set; }
     public string? ExpiringTitle { get; set; }
     public string? ExpiringMessage { get; set; }
     public string? ExpiredTitle { get; set; }
     public string? ExpiredMessage { get; set; }
     public string? NonCompliantTitle { get; set; }
     public string? NonCompliantMessage { get; set; }
+    public string? UnknownAssembliesTitle { get; set; }
+    public string? UnknownAssembliesMessage { get; set; }
 }
 
 

@@ -8,6 +8,8 @@ public interface IWaterSupplierService
 {
     Task<IPagedData<WaterSupplierDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
+    Task<List<WaterSupplierLetterSettingsDto>?> GetAllLetterSettingsAsync(CancellationToken cancellationToken);
+
     Task<WaterSupplierDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken);
 
     Task<WaterSupplierDetailsDto?> UpdateDetailsAsync(int id, WaterSupplierDetailsDto details);

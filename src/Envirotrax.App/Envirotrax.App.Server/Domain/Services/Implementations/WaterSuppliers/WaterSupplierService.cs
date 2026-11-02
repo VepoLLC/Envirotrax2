@@ -17,19 +17,22 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
     private readonly ITenantProvidersService _tenantProvider;
     private readonly IGeneralSettingsService _generalSettingsService;
     private readonly IBackflowSettingsService _backflowSettingsService;
+    private readonly ICsiSettingsService _csiSettingsService;
 
     public WaterSupplierService(
         IMapper mapper,
         IWaterSupplierRepository repository,
         ITenantProvidersService tenantProvider,
         IGeneralSettingsService generalSettingsService,
-        IBackflowSettingsService backflowSettingsService)
+        IBackflowSettingsService backflowSettingsService,
+        ICsiSettingsService csiSettingsService)
         : base(mapper, repository)
     {
         _repository = repository;
         _tenantProvider = tenantProvider;
         _generalSettingsService = generalSettingsService;
         _backflowSettingsService = backflowSettingsService;
+        _csiSettingsService = csiSettingsService;
     }
 
     public Task<WaterSupplierDto> GetLoggedInSupplierAsync()
@@ -104,6 +107,11 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
         return BuildHierarchy(waterSuppliers);
     }
 
+    public Task<IEnumerable<WaterSupplierLetterSettingsDto>> GetAllLetterSettingsAsync(CancellationToken cancellationToken)
+    {
+        return _repository.GetAllLetterSettingsAsync(cancellationToken);
+    }
+
     public async Task<WaterSupplierDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken)
     {
         var supplier = await GetAsync(id, cancellationToken);
@@ -115,12 +123,14 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
 
         var generalSettings = await _generalSettingsService.GetAsync(id, cancellationToken);
         var backflowSettings = await _backflowSettingsService.GetAsync(id, cancellationToken);
+        var csiSettings = await _csiSettingsService.GetAsync(id, cancellationToken);
 
         return new WaterSupplierDetailsDto
         {
             WaterSupplier = supplier,
             GeneralSettings = generalSettings ?? new GeneralSettingsDto { Id = id },
-            BackflowSettings = backflowSettings ?? new BackflowSettingsDto { Id = id }
+            BackflowSettings = backflowSettings ?? new BackflowSettingsDto { Id = id },
+            CsiSettings = csiSettings ?? new CsiSettingsDto { Id = id }
         };
     }
 
@@ -182,6 +192,7 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
 
         var generalSettings = await _generalSettingsService.AddOrUpdateAsync(id, details.GeneralSettings);
         var backflowSettings = await _backflowSettingsService.AddOrUpdateAsync(id, details.BackflowSettings);
+        var csiSettings = await _csiSettingsService.AddOrUpdateAsync(id, details.CsiSettings);
 
         scope.Complete();
 
@@ -189,7 +200,8 @@ public class WaterSupplierService : Service<WaterSupplier, WaterSupplierDto>, IW
         {
             WaterSupplier = MapToDto(supplier)!,
             GeneralSettings = generalSettings,
-            BackflowSettings = backflowSettings
+            BackflowSettings = backflowSettings,
+            CsiSettings = csiSettings
         };
     }
 }

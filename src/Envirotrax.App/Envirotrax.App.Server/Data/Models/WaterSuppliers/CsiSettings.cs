@@ -1,5 +1,6 @@
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.Common.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Envirotrax.App.Server.Data.Models.WaterSuppliers;
@@ -17,6 +18,8 @@ public class CsiSettings : TenantModel<WaterSupplier>
     public CsiPastDueType PastDueNotice2 { get; set; }
     public CsiNonCompliantType NonCompliant1 { get; set; }
     public CsiNonCompliantType NonCompliant2 { get; set; }
+    public bool NonCompliantPrint1 { get; set; }
+    public bool NonCompliantPrint2 { get; set; }
 
 
     [MaxLength(7)]
@@ -42,6 +45,10 @@ public class CsiSettings : TenantModel<WaterSupplier>
     [MaxLength(50)]
     public string? NoticeBodyFont { get; set; }
     public int? NoticeBodyFontSize { get; set; }
+
+    public LetterImageFitType NoticeImageFitType { get; set; }
+    [Precision(12, 2)]
+    public decimal NoticeImageFitSize { get; set; }
 
     [MaxLength(100)]
     public string? ImpendingTitle { get; set; }

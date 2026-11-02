@@ -1,6 +1,7 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Sites;
 
@@ -9,6 +10,8 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 public interface IBackflowTestRepository : IRepository<BackflowTest>
 {
     Task<List<BackflowTest>> GetByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
+
+    Task<List<BackflowTest>> GetForNotificationListAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
 
     // Resolved for the whole batch in one query, keyed by test id. Tests without an earlier
     // match are simply absent from the result.
@@ -58,6 +61,8 @@ public interface IBackflowTestRepository : IRepository<BackflowTest>
     Task<BackflowTest?> UpdateReplacementClearedAsync(int id, bool cleared);
 
     Task<int> CountCurrentInServiceBySiteAsync(int siteId, CancellationToken cancellationToken);
+
+    Task<int> TransferToSiteAsync(int sourceSiteId, Site destinationSite);
 
     // Checkout
     Task<List<BackflowTest>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? bpatId, CancellationToken cancellationToken);

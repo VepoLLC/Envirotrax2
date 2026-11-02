@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { FogCompliancyStatus, Site } from "../../models/sites/site";
 import { SiteDetail } from "../../models/sites/site-detail";
-import { SiteGisUpdate, SiteUpdate, SiteWaterSupplierUpdate } from "../../models/sites/site-update";
+import { SiteGisUpdate, SiteMerge, SiteUpdate, SiteWaterSupplierUpdate } from "../../models/sites/site-update";
 import { lastValueFrom } from "rxjs";
 
 @Injectable({
@@ -62,6 +62,32 @@ export class SiteService {
         const payload: SiteWaterSupplierUpdate = { waterSupplierId };
 
         const observable = this._http.put<void>(url, payload);
+
+        await lastValueFrom(observable);
+    }
+
+    public async delete(siteId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}`);
+
+        const observable = this._http.delete<void>(url);
+
+        await lastValueFrom(observable);
+    }
+
+    public async copy(siteId: number, waterSupplierId: number): Promise<SiteDetail> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/copies?waterSupplierId=${waterSupplierId}`);
+
+        const observable = this._http.post<SiteDetail>(url, null);
+
+        return await lastValueFrom(observable);
+    }
+
+    public async merge(siteId: number, waterSupplierId: number, sourceSiteId: number): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/merges?waterSupplierId=${waterSupplierId}`);
+
+        const payload: SiteMerge = { sourceSiteId };
+
+        const observable = this._http.post<void>(url, payload);
 
         await lastValueFrom(observable);
     }

@@ -13,4 +13,7 @@ public class WaterSupplierDetailsDto
 
     [Required]
     public BackflowSettingsDto BackflowSettings { get; set; } = null!;
+
+    [Required]
+    public CsiSettingsDto CsiSettings { get; set; } = null!;
 }

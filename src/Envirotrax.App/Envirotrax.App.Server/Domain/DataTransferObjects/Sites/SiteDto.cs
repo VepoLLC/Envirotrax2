@@ -196,6 +196,11 @@ public class UpdateSiteWaterSupplierDto
     public int WaterSupplierId { get; set; }
 }
 
+public class MergeSiteDto
+{
+    public int SourceSiteId { get; set; }
+}
+
 public abstract class ComplianceSiteDtoBase : SiteDto
 {
     public List<SiteLogDto> Logs { get; set; } = [];

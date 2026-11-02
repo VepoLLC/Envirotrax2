@@ -3,6 +3,7 @@ using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
@@ -292,6 +293,30 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
         return Entity.CountAsync(f => f.SiteId == siteId && f.DeletedTime == null, cancellationToken);
+    }
+
+    public Task<int> TransferToSiteAsync(int sourceSiteId, Site destinationSite)
+    {
+        return Entity
+            .Where(inspection => inspection.SiteId == sourceSiteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(inspection => inspection.SiteId, destinationSite.Id)
+                .SetProperty(inspection => inspection.PropertyType, destinationSite.PropertyType)
+                .SetProperty(inspection => inspection.PropertyBusinessName, destinationSite.BusinessName)
+                .SetProperty(inspection => inspection.PropertyStreetNumber, destinationSite.StreetNumber)
+                .SetProperty(inspection => inspection.PropertyStreetName, destinationSite.StreetName)
+                .SetProperty(inspection => inspection.PropertyNumber, destinationSite.PropertyNumber)
+                .SetProperty(inspection => inspection.PropertyCity, destinationSite.City)
+                .SetProperty(inspection => inspection.PropertyStateId, destinationSite.StateId)
+                .SetProperty(inspection => inspection.PropertyZip, destinationSite.ZipCode)
+                .SetProperty(inspection => inspection.MailingCompanyName, destinationSite.MailingCompanyName)
+                .SetProperty(inspection => inspection.MailingContactName, destinationSite.MailingContactName)
+                .SetProperty(inspection => inspection.MailingStreetNumber, destinationSite.MailingStreetNumber)
+                .SetProperty(inspection => inspection.MailingStreetName, destinationSite.MailingStreetName)
+                .SetProperty(inspection => inspection.MailingNumber, destinationSite.MailingNumber)
+                .SetProperty(inspection => inspection.MailingCity, destinationSite.MailingCity)
+                .SetProperty(inspection => inspection.MailingStateId, destinationSite.MailingStateId)
+                .SetProperty(inspection => inspection.MailingZip, destinationSite.MailingZipCode));
     }
 
     public async Task<List<FogInspection>> GetUnpaidForCheckoutAsync(IReadOnlyCollection<int> ids, int professionalId, int? inspectorId, CancellationToken cancellationToken)

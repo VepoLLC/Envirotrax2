@@ -11,6 +11,19 @@ public class CsiSettingsRepository : TenantSettingsRepository<CsiSettings>, ICsi
     {
     }
 
+    protected override void UpdateEntity(CsiSettings model)
+    {
+        base.UpdateEntity(model);
+
+        var entry = DbContext.Entry(model);
+
+        entry.Property(settings => settings.NonCompliantPrint1).IsModified = false;
+        entry.Property(settings => settings.NonCompliantPrint2).IsModified = false;
+
+        entry.Property(settings => settings.NoticeImageFitType).IsModified = false;
+        entry.Property(settings => settings.NoticeImageFitSize).IsModified = false;
+    }
+
     protected override void CopyValues(CsiSettings source, CsiSettings target, SettingsSection section)
     {
         switch (section)

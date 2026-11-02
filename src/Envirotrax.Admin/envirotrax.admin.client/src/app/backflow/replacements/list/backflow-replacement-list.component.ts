@@ -15,6 +15,7 @@ import { BackflowReplacement } from '../../../shared/models/backflow/backflow-re
 import { PropertyType } from '../../../shared/models/sites/site';
 import { BackflowReplacementService } from '../../../shared/services/backflow/backflow-replacement.service';
 import { WindowService } from '../../../shared/services/window.service';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { BackflowTestDetailsComponent } from '../../tests/details/backflow-test-details.component';
 import { SiteEditComponent } from '../../../sites/edit/site-edit.component';
 
@@ -143,6 +144,7 @@ export class BackflowReplacementListComponent implements OnInit {
 
         this._windowService.addWindow(SiteEditComponent, {
             title: this.buildSiteWindowTitle(siteId, replacement),
+            color: MODULE_COLORS.SITE,
             model: {
                 siteId: siteId,
                 waterSupplierId: replacement.waterSupplier?.id
@@ -153,6 +155,7 @@ export class BackflowReplacementListComponent implements OnInit {
     public openTest(replacement: BackflowReplacement): void {
         this._windowService.addWindow(BackflowTestDetailsComponent, {
             title: this.buildTestWindowTitle(replacement),
+            color: MODULE_COLORS.BACKFLOW,
             model: { id: replacement.id }
         });
     }

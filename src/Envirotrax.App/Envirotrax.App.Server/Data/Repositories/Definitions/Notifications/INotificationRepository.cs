@@ -11,4 +11,6 @@ public interface INotificationRepository : IRepository<Notification>
     Task MarkSentAsync(IEnumerable<int> ids, CancellationToken cancellationToken);
 
     Task<List<Notification>> GetForDigestAsync(int userId, NotificationInterval interval, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken);
+
+    Task<Notification?> SetHiddenAsync(int id, bool hidden, CancellationToken cancellationToken);
 }

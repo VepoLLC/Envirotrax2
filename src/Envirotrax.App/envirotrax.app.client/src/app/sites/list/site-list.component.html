@@ -356,37 +356,44 @@
 </ng-template>
 
 <div *ngIf="showResults">
-    <div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
+    <div class="row mb-3 gy-2">
+        <div class="col-sm-6 col-md-4 col-lg-3 d-flex">
+            <button type="button"
+                    class="btn btn-primary flex-fill"
+                    title="Create New Property Record"
+                    aria-label="Create New Property Record"
+                    (click)="add()">
+                <i class="fa-solid fa-circle-plus me-1"></i>
+                Create New Property Record
+            </button>
+        </div>
 
-        <button type="button"
-                class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                title="Create New Property Record"
-                aria-label="Create New Property Record"
-                (click)="add()">
-            <i class="fa-solid fa-circle-plus me-1"></i>
-            Create New Property Record
-        </button>
+        <div class="col-sm-6 col-md-4 col-lg-3 d-flex">
+            <button type="button"
+                    class="btn btn-primary flex-fill"
+                    (click)="showDownloadManager()">
+                <i class="fa-regular fa-file-export me-1"></i>
+                Export Results
+            </button>
+        </div>
 
-        <button type="button"
-                class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                (click)="showDownloadManager()">
-            <i class="fa-regular fa-file-export me-1"></i>
-            Export Results
-        </button>
+        <div class="col-sm-6 col-md-4 col-lg-3 d-flex">
+            <button type="button"
+                    class="btn btn-primary flex-fill"
+                    (click)="viewPrintableTable()">
+                <i class="fa-regular fa-table me-1"></i>
+                View Printable Table
+            </button>
+        </div>
 
-        <button type="button"
-                class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                (click)="viewPrintableTable()">
-            <i class="fa-regular fa-table me-1"></i>
-            View Printable Table
-        </button>
-
-        <button type="button"
-                class="btn btn-primary vp-section-button flex-grow-1 flex-lg-grow-0"
-                (click)="setShowResults(false)">
-            <i class="fa-solid fa-magnifying-glass me-1"></i>
-            Search Again
-        </button>
+        <div class="col-sm-6 col-md-4 col-lg-3 d-flex">
+            <button type="button"
+                    class="btn btn-primary flex-fill"
+                    (click)="setShowResults(false)">
+                <i class="fa-solid fa-magnifying-glass me-1"></i>
+                Search Again
+            </button>
+        </div>
 
     </div>
 
@@ -421,8 +428,8 @@
                       [(query)]="table.query"
                       (queryChange)="getSites()"
                       (queryReset)="getSites()"
-                      [canEdit]="true"
-                      (edit)="edit($event)"
+                      [canViewDetails]="true"
+                      (viewDetails)="viewDetails($event)"
                       [freeTextSearch]="table.freeTextSearch" />
         </div>
     </vp-section>

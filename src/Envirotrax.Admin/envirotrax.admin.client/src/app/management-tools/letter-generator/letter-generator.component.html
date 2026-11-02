@@ -1,0 +1,19 @@
+<ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center mb-3">
+    <li class="nav-item">
+        <a class="nav-link" role="button"
+           [class.active]="activeTab === 'processLetters'"
+           (click)="setActiveTab('processLetters')">Process Letters</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" role="button"
+           [class.active]="activeTab === 'letterHistory'"
+           (click)="setActiveTab('letterHistory')">Letter History</a>
+    </li>
+</ul>
+
+<div [hidden]="activeTab !== 'processLetters'">
+    <vp-process-letters />
+</div>
+
+<div [hidden]="activeTab !== 'letterHistory'">
+</div>

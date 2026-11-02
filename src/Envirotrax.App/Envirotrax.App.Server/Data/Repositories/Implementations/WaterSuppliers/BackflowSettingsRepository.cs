@@ -54,6 +54,27 @@ public class BackflowSettingsRepository : TenantSettingsRepository<BackflowSetti
         return await query.SingleOrDefaultAsync(cancellationToken);
     }
 
+    protected override void UpdateEntity(BackflowSettings model)
+    {
+        base.UpdateEntity(model);
+
+        var entry = DbContext.Entry(model);
+
+        entry.Property(settings => settings.NonCompliantPrint1).IsModified = false;
+        entry.Property(settings => settings.NonCompliantPrint2).IsModified = false;
+        entry.Property(settings => settings.UnknownAssembliesNotice).IsModified = false;
+
+        entry.Property(settings => settings.UnknownAssembliesLettersBackgroundColor).IsModified = false;
+        entry.Property(settings => settings.UnknownAssembliesLettersForegroundColor).IsModified = false;
+        entry.Property(settings => settings.UnknownAssembliesLettersBorderColor).IsModified = false;
+
+        entry.Property(settings => settings.NoticeImageFitType).IsModified = false;
+        entry.Property(settings => settings.NoticeImageFitSize).IsModified = false;
+
+        entry.Property(settings => settings.UnknownAssembliesTitle).IsModified = false;
+        entry.Property(settings => settings.UnknownAssembliesMessage).IsModified = false;
+    }
+
     protected override void CopyValues(BackflowSettings source, BackflowSettings target, SettingsSection section)
     {
         switch (section)

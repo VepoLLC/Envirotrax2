@@ -9,6 +9,7 @@ public interface IProfessionalUserLicenseRepository : IRepository<ProfessionalUs
 {
     Task<IEnumerable<ProfessionalUserLicense>> GetAllAsync(int userId, PageInfo pageInfo, Query query);
     Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUserLicense, bool>>? filter = null);
+    Task<bool> ExistsForProfessionalAsync(int professionalId, int licenseId, CancellationToken cancellationToken, ProfessionalType? professionalType = null);
     Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUserLicense>> GetBpatLicensesForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUserLicense>> GetUserLicensesForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken);

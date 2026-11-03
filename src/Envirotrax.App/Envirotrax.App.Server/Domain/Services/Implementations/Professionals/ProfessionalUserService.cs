@@ -189,6 +189,18 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return deleted;
     }
 
+    public async Task<ProfessionalUserDto?> DeleteForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        var belongsToProfessional = await _professionalUserRepository.ExistsForProfessionalAsync(professionalId, userId, cancellationToken);
+
+        if (!belongsToProfessional)
+        {
+            return null;
+        }
+
+        return await DeleteAsync(userId);
+    }
+
     public async Task<ProfessionalUserDto> AddForProfessionalAsync(int professionalId, ProfessionalUserDto dto, CancellationToken cancellationToken)
     {
         var professional = await _professionalService.GetAsync(professionalId, cancellationToken)

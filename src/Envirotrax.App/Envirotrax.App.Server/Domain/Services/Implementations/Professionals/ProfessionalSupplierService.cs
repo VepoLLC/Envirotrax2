@@ -8,6 +8,7 @@ using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 
@@ -50,6 +51,28 @@ public class ProfessionalSupplierService : Service<ProfessionalWaterSupplier, Pr
         var items = await _proSupplierRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken, filter);
 
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<ProfessionalWaterSupplierDto?> UpdateForProfessionalAsync(int professionalId, int waterSupplierId, ProfessionalWaterSupplierDto registration, CancellationToken cancellationToken)
+    {
+        var isRegistered = await _proSupplierRepository.ExistsForProfessionalAsync(professionalId, waterSupplierId, cancellationToken);
+
+        if (!isRegistered)
+        {
+            return null;
+        }
+
+        registration.Professional = new ReferencedProfessionalDto
+        {
+            Id = professionalId
+        };
+
+        registration.WaterSupplier = new ReferencedWaterSupplierDto
+        {
+            Id = waterSupplierId
+        };
+
+        return await UpdateAsync(registration);
     }
 
     public async Task<IPagedData<AvailableWaterSupplierDto>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)

@@ -107,6 +107,12 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return existing;
     }
 
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        return DbContext.ProfessionalUsers
+            .AnyAsync(u => u.ProfessionalId == professionalId && u.UserId == userId, cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
     {
         var q = DbContext.ProfessionalUsers

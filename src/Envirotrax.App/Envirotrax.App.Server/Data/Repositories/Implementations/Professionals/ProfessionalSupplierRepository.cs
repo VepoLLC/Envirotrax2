@@ -108,6 +108,14 @@ public class ProfessionalSupplierRepository : Repository<ProfessionalWaterSuppli
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int waterSupplierId, CancellationToken cancellationToken)
+    {
+        return DbContext.ProfessionalWaterSuppliers
+            .AnyAsync(pws => pws.ProfessionalId == professionalId
+                && pws.WaterSupplierId == waterSupplierId
+                && pws.WaterSupplier!.DeletedTime == null, cancellationToken);
+    }
+
     public Task<ProfessionalWaterSupplier?> GetRegistrationAsync(int waterSupplierId, CancellationToken cancellationToken)
     {
         return DbContext.ProfessionalWaterSuppliers

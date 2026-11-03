@@ -58,6 +58,19 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int licenseId, CancellationToken cancellationToken, ProfessionalType? professionalType = null)
+    {
+        var q = DbContext.ProfessionalUserLicenses
+            .Where(l => l.Id == licenseId && l.ProfessionalId == professionalId);
+
+        if (professionalType != null)
+        {
+            q = q.Where(l => l.ProfessionalType == professionalType);
+        }
+
+        return q.AnyAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken)
     {
         return await DbContext.ProfessionalUserLicenses

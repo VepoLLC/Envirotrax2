@@ -10,7 +10,6 @@ import { FogInspection } from "../../models/fog/fog-inspection";
 import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { FogInspectionImages } from "../../models/fog/fog-inspection-images";
 import { DownloadEndpoint } from "../../models/download-config";
-import { PdfLink } from "../../models/pdf-link";
 
 @Injectable({
     providedIn: 'root'
@@ -50,11 +49,9 @@ export class ProfessionalFogInspectionService {
         return lastValueFrom(this._http.get<FogInspection>(url));
     }
 
-    public async getPdfUrlForProfessional(id: number): Promise<string> {
+    public async getPdfForProfessional(id: number): Promise<Blob> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/fog/inspections/${id}/pdf`);
-        const link = await lastValueFrom(this._http.get<PdfLink>(url));
-
-        return link.url;
+        return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     public deleteForProfessional(id: number): Promise<FogInspection> {

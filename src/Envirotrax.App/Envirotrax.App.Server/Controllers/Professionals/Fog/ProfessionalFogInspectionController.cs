@@ -2,7 +2,6 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Payments;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
-using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -17,13 +16,11 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
 {
     private readonly IFogInspectionService _fogInspectionService;
     private readonly IFogInspectionCheckoutService _checkoutService;
-    private readonly IPdfLinkService _pdfLinkService;
 
-    public ProfessionalFogInspectionController(IFogInspectionService fogInspectionService, IFogInspectionCheckoutService checkoutService, IPdfLinkService pdfLinkService)
+    public ProfessionalFogInspectionController(IFogInspectionService fogInspectionService, IFogInspectionCheckoutService checkoutService)
     {
         _fogInspectionService = fogInspectionService;
         _checkoutService = checkoutService;
-        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet]
@@ -42,9 +39,7 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
     {
         var inspections = await _fogInspectionService.SearchForProfessionalAsync(pageInfo, query, latestOnly, cancellationToken);
         var pdf = await _fogInspectionService.GeneratePdfAsync(inspections.Data);
-        var link = await _pdfLinkService.CreateAsync(pdf, "fog-inspections.pdf");
-
-        return Ok(link);
+        return File(pdf, "application/pdf");
     }
 
     [HttpGet("{id}")]
@@ -69,9 +64,7 @@ public class ProfessionalFogInspectionController : ProfessionalProtectedControll
         }
 
         var pdf = await _fogInspectionService.GeneratePdfForProfessionalAsync(inspection);
-        var link = await _pdfLinkService.CreateAsync(pdf, $"fog-inspection-{id}.pdf");
-
-        return Ok(link);
+        return File(pdf, "application/pdf");
     }
 
     [HttpPost]

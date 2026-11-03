@@ -1,7 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
-using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +12,11 @@ namespace Envirotrax.App.Server.Controllers.Fog;
 public class FogTripTicketController : WaterSupplierCrudController<FogTripTicketDto>
 {
     private readonly IFogTripTicketService _tripTicketService;
-    private readonly IPdfLinkService _pdfLinkService;
 
-    public FogTripTicketController(IFogTripTicketService service, IPdfLinkService pdfLinkService)
+    public FogTripTicketController(IFogTripTicketService service)
         : base(service)
     {
         _tripTicketService = service;
-        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet("pdf")]
@@ -28,9 +25,8 @@ public class FogTripTicketController : WaterSupplierCrudController<FogTripTicket
     {
         var tickets = await _tripTicketService.GetAllAsync(pageInfo, query, cancellationToken);
         var pdfBytes = await _tripTicketService.GeneratePdfAsync(tickets.Data);
-        var link = await _pdfLinkService.CreateAsync(pdfBytes, "fog-trip-tickets.pdf");
 
-        return Ok(link);
+        return File(pdfBytes, "application/pdf");
     }
 
     [HttpPut("{id}/approval")]
@@ -53,8 +49,6 @@ public class FogTripTicketController : WaterSupplierCrudController<FogTripTicket
         }
 
         var pdfBytes = await _tripTicketService.GeneratePdfAsync(ticket);
-        var link = await _pdfLinkService.CreateAsync(pdfBytes, $"fog-trip-ticket-{id}.pdf");
-
-        return Ok(link);
+        return File(pdfBytes, "application/pdf");
     }
 }

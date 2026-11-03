@@ -1,7 +1,6 @@
 
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.PublicSearch;
-using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.PublicSearch;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +12,10 @@ namespace Envirotrax.App.Server.Controllers.PublicSearch;
 public class PublicSearchController : EnvirotraxBaseController
 {
     private readonly IPublicSearchService _publicSearchService;
-    private readonly IPdfLinkService _pdfLinkService;
 
-    public PublicSearchController(IPublicSearchService publicSearchService, IPdfLinkService pdfLinkService)
+    public PublicSearchController(IPublicSearchService publicSearchService)
     {
         _publicSearchService = publicSearchService;
-        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet("water-suppliers")]
@@ -71,9 +68,7 @@ public class PublicSearchController : EnvirotraxBaseController
             return NoContent();
         }
 
-        var link = await _pdfLinkService.CreateAsync(pdf, $"backflow-test-{id}.pdf");
-
-        return Ok(link);
+        return File(pdf, "application/pdf");
     }
 
     [HttpGet("csi-inspections/{id}")]
@@ -110,8 +105,6 @@ public class PublicSearchController : EnvirotraxBaseController
             return NoContent();
         }
 
-        var link = await _pdfLinkService.CreateAsync(pdf, $"csi-inspection-{id}.pdf");
-
-        return Ok(link);
+        return File(pdf, "application/pdf");
     }
 }

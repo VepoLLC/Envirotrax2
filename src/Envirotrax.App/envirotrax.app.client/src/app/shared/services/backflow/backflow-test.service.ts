@@ -14,7 +14,6 @@ import { InsuranceCheck } from "../../models/professionals/insurance-check";
 import { BpatLicenseCheck } from "../../models/professionals/license-check";
 import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { DownloadEndpoint } from "../../models/download-config";
-import { PdfLink } from "../../models/pdf-link";
 import { RecordLog } from "@envirotrax/common-ui";
 
 export type BackflowExpiryRangeKey = 'expired' | 'thismonth' | 'nextmonth' | 'twomonths';
@@ -166,11 +165,9 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<RecordLog[]>(url));
     }
 
-    public async getPdfUrl(id: number): Promise<string> {
+    public async getPdf(id: number): Promise<Blob> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/tests/${id}/pdf`);
-        const link = await lastValueFrom(this._http.get<PdfLink>(url));
-
-        return link.url;
+        return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     public async update(test: BackflowTest): Promise<BackflowTest> {
@@ -190,11 +187,9 @@ export class BackflowTestService {
         return await lastValueFrom(this._http.get<BackflowTest>(url));
     }
 
-    public async getPdfUrlForProfessional(id: number): Promise<string> {
+    public async getPdfForProfessional(id: number): Promise<Blob> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/tests/${id}/pdf`);
-        const link = await lastValueFrom(this._http.get<PdfLink>(url));
-
-        return link.url;
+        return await lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     public async deleteForProfessional(id: number): Promise<BackflowTest> {

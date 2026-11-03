@@ -144,7 +144,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
             this.isLoading = true;
 
             const inspectionId = this.inspection.id;
-            await this._downloadService.openUrlInNewWindow(() => this._inspectionService.getPdfUrl(inspectionId));
+            await this._downloadService.openBlobInNewWindow(() => this._inspectionService.getPdf(inspectionId));
         } finally {
             this.isLoading = false;
         }

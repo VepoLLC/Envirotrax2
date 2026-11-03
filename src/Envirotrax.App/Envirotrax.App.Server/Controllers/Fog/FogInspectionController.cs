@@ -1,7 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
-using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +13,11 @@ namespace Envirotrax.App.Server.Controllers.Fog;
 public class FogInspectionController : WaterSupplierCrudController<FogInspectionDto>
 {
     private readonly IFogInspectionService _inspectionService;
-    private readonly IPdfLinkService _pdfLinkService;
 
-    public FogInspectionController(IFogInspectionService service, IPdfLinkService pdfLinkService)
+    public FogInspectionController(IFogInspectionService service)
         : base(service)
     {
         _inspectionService = service;
-        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet("pdf")]
@@ -29,9 +26,8 @@ public class FogInspectionController : WaterSupplierCrudController<FogInspection
     {
         var inspections = await _inspectionService.GetAllAsync(pageInfo, query, cancellationToken);
         var pdfBytes = await _inspectionService.GeneratePdfAsync(inspections.Data);
-        var link = await _pdfLinkService.CreateAsync(pdfBytes, "fog-inspections.pdf");
 
-        return Ok(link);
+        return File(pdfBytes, "application/pdf");
     }
 
     [HttpGet("{id}/pdf")]
@@ -46,8 +42,7 @@ public class FogInspectionController : WaterSupplierCrudController<FogInspection
         }
 
         var pdfBytes = await _inspectionService.GeneratePdfAsync(inspection);
-        var link = await _pdfLinkService.CreateAsync(pdfBytes, $"fog-inspection-{id}.pdf");
 
-        return Ok(link);
+        return File(pdfBytes, "application/pdf");
     }
 }

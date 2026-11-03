@@ -13,7 +13,6 @@ import { PublicBackflowTestDetails } from "../../models/public-search/public-bac
 import { CsiInspection } from "../../models/csi/csi-inspection";
 import { CsiInspectionAssembly } from "../../models/csi/csi-inspection-assembly";
 import { CsiInspectionImage } from "../../models/csi/csi-inspection-image";
-import { PdfLink } from "../../models/pdf-link";
 
 @Injectable({
     providedIn: 'root'
@@ -60,11 +59,10 @@ export class PublicSearchService {
         return lastValueFrom(this._http.get<PublicBackflowTestDetails | null>(url));
     }
 
-    public async getBackflowTestPdfUrl(id: number): Promise<string> {
+    public getBackflowTestPdf(id: number): Promise<Blob> {
         const url = this._urlResolver.resolveUrl(`/api/public-search/backflow-tests/${id}/pdf`);
-        const link = await lastValueFrom(this._http.get<PdfLink>(url));
 
-        return link.url;
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     public getCsiInspection(id: number): Promise<CsiInspection | null> {
@@ -85,11 +83,10 @@ export class PublicSearchService {
         return lastValueFrom(this._http.get<CsiInspectionImage[]>(url));
     }
 
-    public async getCsiInspectionPdfUrl(id: number): Promise<string> {
+    public getCsiInspectionPdf(id: number): Promise<Blob> {
         const url = this._urlResolver.resolveUrl(`/api/public-search/csi-inspections/${id}/pdf`);
-        const link = await lastValueFrom(this._http.get<PdfLink>(url));
 
-        return link.url;
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
     }
 
     private buildSearchParams(criteria: PublicSearchCriteria, pageInfo: PageInfo): HttpParams {

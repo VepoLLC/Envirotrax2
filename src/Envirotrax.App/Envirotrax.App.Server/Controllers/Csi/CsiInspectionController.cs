@@ -2,7 +2,6 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
-using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -19,21 +18,18 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
     private readonly ICsiInspectionImageService _imageService;
     private readonly IRecordLogService _recordLogService;
     private readonly ICsiInspectionAssemblyService _assemblyService;
-    private readonly IPdfLinkService _pdfLinkService;
 
     public CsiInspectionController(
         ICsiInspectionService service,
         ICsiInspectionImageService imageService,
         IRecordLogService recordLogService,
-        ICsiInspectionAssemblyService assemblyService,
-        IPdfLinkService pdfLinkService)
+        ICsiInspectionAssemblyService assemblyService)
         : base(service)
     {
         _inspectionService = service;
         _imageService = imageService;
         _recordLogService = recordLogService;
         _assemblyService = assemblyService;
-        _pdfLinkService = pdfLinkService;
     }
 
     [HttpGet("pdf")]
@@ -42,9 +38,8 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
     {
         var inspections = await _inspectionService.GetAllAsync(pageInfo, query, cancellationToken);
         var pdfBytes = await _inspectionService.GeneratePdfAsync(inspections.Data);
-        var link = await _pdfLinkService.CreateAsync(pdfBytes, "csi-inspections.pdf");
 
-        return Ok(link);
+        return File(pdfBytes, "application/pdf");
     }
 
     [HttpPut("{id}/approval")]
@@ -63,9 +58,7 @@ public class CsiInspectionController : WaterSupplierCrudController<CsiInspection
         if (inspection == null) return NotFound();
 
         var pdfBytes = await _inspectionService.GeneratePdfAsync(inspection);
-        var link = await _pdfLinkService.CreateAsync(pdfBytes, $"csi-inspection-{id}.pdf");
-
-        return Ok(link);
+        return File(pdfBytes, "application/pdf");
     }
 
     [HttpGet("{id}/logs")]

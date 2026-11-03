@@ -6,7 +6,6 @@ import { BackflowTestReport } from "../../models/backflow/backflow-test-report";
 import { BackflowComplianceReport } from "../../models/backflow/backflow-compliance-report";
 import { BackflowComplianceHistory } from "../../models/backflow/backflow-compliance-history";
 import { BackflowNewRemovedReport } from "../../models/backflow/backflow-new-removed-report";
-import { PdfLink } from "../../models/pdf-link";
 
 @Injectable({
     providedIn: 'root'
@@ -34,7 +33,7 @@ export class BackflowReportService {
         );
     }
 
-    public async getTestReportPdfUrl(fromDate: string, toDate: string): Promise<string> {
+    public getTestReportPdf(fromDate: string, toDate: string): Promise<Blob> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/tests/pdf');
 
         let params = new HttpParams();
@@ -45,9 +44,9 @@ export class BackflowReportService {
             params = params.set('toDate', toDate);
         }
 
-        const link = await lastValueFrom(this._http.get<PdfLink>(url, { params }));
-
-        return link.url;
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
     }
 
     public getTestReportExcel(fromDate: string, toDate: string): Promise<Blob> {
@@ -102,13 +101,13 @@ export class BackflowReportService {
         );
     }
 
-    public async getComplianceReportPdfUrl(ignoreLast30Days: boolean): Promise<string> {
+    public getComplianceReportPdf(ignoreLast30Days: boolean): Promise<Blob> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/current/pdf');
         const params = new HttpParams().set('ignoreLast30Days', ignoreLast30Days);
 
-        const link = await lastValueFrom(this._http.get<PdfLink>(url, { params }));
-
-        return link.url;
+        return lastValueFrom(
+            this._http.get(url, { params, responseType: 'blob' })
+        );
     }
 
     public getComplianceReportExcel(ignoreLast30Days: boolean): Promise<Blob> {
@@ -137,11 +136,12 @@ export class BackflowReportService {
         );
     }
 
-    public async getComplianceHistoryPdfUrl(): Promise<string> {
+    public getComplianceHistoryPdf(): Promise<Blob> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/compliance/history/pdf');
-        const link = await lastValueFrom(this._http.get<PdfLink>(url));
 
-        return link.url;
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
     }
 
     public getComplianceHistoryExcel(): Promise<Blob> {
@@ -168,11 +168,12 @@ export class BackflowReportService {
         );
     }
 
-    public async getNewRemovedPdfUrl(): Promise<string> {
+    public getNewRemovedPdf(): Promise<Blob> {
         const url = this._urlResolver.resolveUrl('/api/backflow/reports/assemblies/new-removed/pdf');
-        const link = await lastValueFrom(this._http.get<PdfLink>(url));
 
-        return link.url;
+        return lastValueFrom(
+            this._http.get(url, { responseType: 'blob' })
+        );
     }
 
     public getNewRemovedExcel(): Promise<Blob> {

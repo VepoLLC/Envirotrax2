@@ -189,18 +189,6 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return deleted;
     }
 
-    public async Task<ProfessionalUserDto?> DeleteForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
-    {
-        var belongsToProfessional = await _professionalUserRepository.ExistsForProfessionalAsync(professionalId, userId, cancellationToken);
-
-        if (!belongsToProfessional)
-        {
-            return null;
-        }
-
-        return await DeleteAsync(userId);
-    }
-
     public async Task<ProfessionalUserDto> AddForProfessionalAsync(int professionalId, ProfessionalUserDto dto, CancellationToken cancellationToken)
     {
         var professional = await _professionalService.GetAsync(professionalId, cancellationToken)
@@ -225,6 +213,16 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         }
 
         return MapToDto(saved);
+    }
+
+    public async Task<ProfessionalUserDto?> DeleteForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        if (!await _professionalUserRepository.ExistsForProfessionalAsync(professionalId, userId, cancellationToken))
+        {
+            return null;
+        }
+
+        return await DeleteAsync(userId);
     }
 
     public async Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)

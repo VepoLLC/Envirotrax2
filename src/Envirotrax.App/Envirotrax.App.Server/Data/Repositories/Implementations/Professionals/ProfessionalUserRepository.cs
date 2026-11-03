@@ -107,12 +107,6 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return existing;
     }
 
-    public Task<bool> ExistsForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
-    {
-        return DbContext.ProfessionalUsers
-            .AnyAsync(u => u.ProfessionalId == professionalId && u.UserId == userId, cancellationToken);
-    }
-
     public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
     {
         var q = DbContext.ProfessionalUsers
@@ -129,6 +123,11 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId, cancellationToken);
     }
 
     public async Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken)

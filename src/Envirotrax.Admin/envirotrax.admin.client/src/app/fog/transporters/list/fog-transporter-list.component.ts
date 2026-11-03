@@ -3,8 +3,11 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CellTemplateData, ColumnType, QueryProperty, TableColumn, TableViewModel } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { Professional } from '../../../shared/models/professionals/professional';
 import { FogTransporterSearchCriteria, FogTransporterService } from '../../../shared/services/fog/fog-transporter.service';
+import { WindowService } from '../../../shared/services/window.service';
+import { FogTransporterDetailsComponent } from '../details/fog-transporter-details.component';
 
 /**
  * Criteria that match a child collection or a person inside the company rather than a column on the company row.
@@ -46,7 +49,8 @@ export class FogTransporterListComponent implements OnInit {
     };
 
     constructor(
-        private readonly _fogTransporterService: FogTransporterService
+        private readonly _fogTransporterService: FogTransporterService,
+        private readonly _windowService: WindowService
     ) {
 
     }
@@ -88,6 +92,20 @@ export class FogTransporterListComponent implements OnInit {
         } finally {
             this.table.isLoading = false;
         }
+    }
+
+    public openDetails(transporter: Professional): void {
+        this._windowService.addWindow(FogTransporterDetailsComponent, {
+            title: this.buildTitle(transporter),
+            color: MODULE_COLORS.FOG,
+            model: transporter
+        });
+    }
+
+    private buildTitle(transporter: Professional): string {
+        return [transporter.name, transporter.companyEmail]
+            .filter(part => part)
+            .join(' - ');
     }
 
     private getColumns(): TableColumn<Professional>[] {

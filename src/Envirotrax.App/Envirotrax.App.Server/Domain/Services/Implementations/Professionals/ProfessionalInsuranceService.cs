@@ -329,4 +329,19 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 
         return null;
     }
+
+    public async Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(int professionalId, ProfessionalInsuranceDto dto, CancellationToken cancellationToken)
+    {
+        if (!await _insuranceRepository.ExistsForProfessionalAsync(professionalId, dto.Id, cancellationToken))
+        {
+            return null;
+        }
+
+        dto.Professional = new ReferencedProfessionalDto
+        {
+            Id = professionalId
+        };
+
+        return await UpdateAsync(dto);
+    }
 }

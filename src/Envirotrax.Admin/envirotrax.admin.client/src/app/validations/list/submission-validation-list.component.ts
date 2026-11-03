@@ -87,7 +87,7 @@ export class SubmissionValidationListComponent implements OnInit {
 
     public showResults: boolean = false;
 
-    public activeTab: SubmissionValidationTab = SubmissionValidationTab.CsiInspections;
+    public activeTab: SubmissionValidationTab = SubmissionValidationTab.BackflowTests;
 
     public tabs: ValidationTabView[] = [];
 
@@ -176,24 +176,6 @@ export class SubmissionValidationListComponent implements OnInit {
     private createTabs(): ValidationTabView[] {
         return [
             {
-                key: SubmissionValidationTab.CsiInspections,
-                title: 'CSI Inspections',
-                count: 0,
-                filter: null,
-                source: {
-                    infoCaption: 'Inspection Information',
-                    reasons: SITE_REASONS,
-                    detailsComponent: CsiInspectionDetailsComponent,
-                    detailsColor: MODULE_COLORS.CSI,
-                    actions: this._csiInspectionService,
-                    load: async (pageInfo, query) => {
-                        const inspections = await this._csiInspectionService.getAll(pageInfo, query);
-
-                        return { ...inspections, data: inspections.data.map(inspection => this.toCsiRow(inspection)) };
-                    }
-                }
-            },
-            {
                 key: SubmissionValidationTab.BackflowTests,
                 title: 'Backflow Tests',
                 count: 0,
@@ -208,6 +190,24 @@ export class SubmissionValidationListComponent implements OnInit {
                         const tests = await this._backflowTestService.getAll(pageInfo, query);
 
                         return { ...tests, data: tests.data.map(test => this.toBackflowRow(test)) };
+                    }
+                }
+            },
+            {
+                key: SubmissionValidationTab.CsiInspections,
+                title: 'CSI Inspections',
+                count: 0,
+                filter: null,
+                source: {
+                    infoCaption: 'Inspection Information',
+                    reasons: SITE_REASONS,
+                    detailsComponent: CsiInspectionDetailsComponent,
+                    detailsColor: MODULE_COLORS.CSI,
+                    actions: this._csiInspectionService,
+                    load: async (pageInfo, query) => {
+                        const inspections = await this._csiInspectionService.getAll(pageInfo, query);
+
+                        return { ...inspections, data: inspections.data.map(inspection => this.toCsiRow(inspection)) };
                     }
                 }
             },

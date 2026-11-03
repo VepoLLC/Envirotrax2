@@ -60,8 +60,8 @@ export class ProfessionalFogTripTicketViewComponent implements OnInit {
 
         try {
             this.isLoading = true;
-            const blob = await this._tripTicketService.getPdfForProfessional(this.ticket.id);
-            this._downloadService.downloadFileFromBlob(blob);
+            const ticketId = this.ticket.id;
+            await this._downloadService.openBlobInNewWindow(() => this._tripTicketService.getPdfForProfessional(ticketId));
         } catch (e) {
             const validationErrors: string[] = [];
             if (this._helper.parseValidationErrors(e, validationErrors)) {

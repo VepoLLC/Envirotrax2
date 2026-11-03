@@ -170,7 +170,8 @@ export class LicenseListComponent implements OnInit {
     public lookupUser(): void {
         this._modalHelper.show<ProfessionalUser>(ProfessionalUserLookupComponent, {
             title: 'Accounts',
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result()
             .subscribe(selectedUser => {
                 this.newLicense.user = selectedUser;
@@ -179,12 +180,8 @@ export class LicenseListComponent implements OnInit {
 
     public selectProfession(professionalType: ProfessionalType): void {
         this.newLicense.professionalType = professionalType;
-        this.professionChange();
-    }
-
-    public professionChange(): void {
-        this.activeProfession = this.newLicense.professionalType;
-        this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.newLicense.professionalType);
+        this.activeProfession = professionalType;
+        this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == professionalType);
         this.newLicense.licenseType = undefined;
 
         this.updateLicenseScope();
@@ -239,7 +236,7 @@ export class LicenseListComponent implements OnInit {
                 this.newLicense = {};
                 this.hasReadHelp = false;
 
-                form.resetForm({ professionalType: professionalType });
+                form.resetForm();
                 this.selectProfession(professionalType);
 
                 this.getLicenses();

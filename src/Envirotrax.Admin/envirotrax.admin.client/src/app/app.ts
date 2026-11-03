@@ -15,6 +15,7 @@ import { FogTransporterListComponent } from './fog/transporters/list/fog-transpo
 import { FogDisposalSiteListComponent } from './fog/disposal-sites/list/fog-disposal-site-list.component';
 import { FogTripTicketListComponent } from './fog/trip-tickets/list/fog-trip-ticket-list.component';
 import { LetterGeneratorComponent } from './management-tools/letter-generator/letter-generator.component';
+import { SubmissionValidationListComponent } from './validations/list/submission-validation-list.component';
 import { NavigationEnd, Router } from '@angular/router';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 import { filter } from 'rxjs';
@@ -153,6 +154,12 @@ export class App implements OnInit {
         ]
       },
       {
+        title: 'Submission Validations',
+        iconCss: 'fa-solid fa-file-circle-check',
+        color: MODULE_COLORS.VALIDATION,
+        onClick: this.showSubmissionValidations.bind(this)
+      },
+      {
         title: 'Management Tools',
         iconCss: 'fa-solid fa-screwdriver-wrench',
         children: [
@@ -279,6 +286,13 @@ export class App implements OnInit {
     this._windowService.addWindow(FogDisposalSiteListComponent, {
       title: 'FOG Disposal Sites',
       color: MODULE_COLORS.FOG
+    });
+  }
+
+  public showSubmissionValidations(): void {
+    this._windowService.addWindow(SubmissionValidationListComponent, {
+      title: 'Validations',
+      color: MODULE_COLORS.VALIDATION
     });
   }
 

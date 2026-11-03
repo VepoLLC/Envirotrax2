@@ -248,6 +248,20 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         return Mapper.Map<BackflowReplacementDto>(test);
     }
 
+    public async Task<BackflowTestDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default)
+    {
+        var test = await _testRepository.UpdateValidationHoldAsync(id, onHold, cancellationToken);
+
+        return MapToDto(test);
+    }
+
+    public async Task<BackflowTestDto?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken = default)
+    {
+        var test = await _testRepository.UpdateNeedsValidationAsync(id, needsValidation, cancellationToken);
+
+        return MapToDto(test);
+    }
+
     private async Task PopulateBpatSnapshotAsync(BackflowTestDto dto)
     {
         if (dto.Professional?.Id is int professionalId)
@@ -529,6 +543,8 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         dto.ValidationUnknownSerialNumber = unknownSerialNumber;
         dto.ValidationDeviceInformationChanged = deviceInformationChanged;
+        dto.ValidationDeviceMoved = deviceMoved;
+        dto.ValidationHazardTypeChanged = hazardTypeChanged;
 
         if (unknownSerialNumber || deviceMoved || deviceInformationChanged || hazardTypeChanged)
         {

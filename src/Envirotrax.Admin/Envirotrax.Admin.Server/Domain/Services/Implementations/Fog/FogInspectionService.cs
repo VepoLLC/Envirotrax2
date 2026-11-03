@@ -32,6 +32,16 @@ public class FogInspectionService : IFogInspectionService
         return _apiClient.PutAsync<FogInspectionUpdateRequest, FogInspectionDto>(waterSupplierId, $"{BaseUrl}/{id}", request, cancellationToken);
     }
 
+    public Task<FogInspectionDto?> UpdateValidationHoldAsync(int id, int waterSupplierId, bool onHold, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<bool, FogInspectionDto>(waterSupplierId, $"{BaseUrl}/{id}/validation-hold", onHold, cancellationToken);
+    }
+
+    public Task<FogInspectionDto?> UpdateNeedsValidationAsync(int id, int waterSupplierId, bool needsValidation, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<bool, FogInspectionDto>(waterSupplierId, $"{BaseUrl}/{id}/needs-validation", needsValidation, cancellationToken);
+    }
+
     public Task<FogInspectionDto?> UploadImageAsync(int id, int waterSupplierId, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken)
     {
         var formFields = new Dictionary<string, string>();

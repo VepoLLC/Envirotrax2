@@ -316,6 +316,20 @@ public class CsiInspectionService : Service<CsiInspection, CsiInspectionDto>, IC
         return Mapper.Map<CsiInspectionDto>(updated);
     }
 
+    public async Task<CsiInspectionDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default)
+    {
+        var inspection = await _repository.UpdateValidationHoldAsync(id, onHold, cancellationToken);
+
+        return MapToDto(inspection);
+    }
+
+    public async Task<CsiInspectionDto?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken = default)
+    {
+        var inspection = await _repository.UpdateNeedsValidationAsync(id, needsValidation, cancellationToken);
+
+        return MapToDto(inspection);
+    }
+
     public async Task<IPagedData<CsiInspectionDto>> SearchForProfessionalAsync(PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken)
     {
         query.Filter = query.ConvertFilterProperties<CsiInspection, CsiInspectionDto>(Mapper);

@@ -71,6 +71,12 @@ export class FogTripTicket {
     completed?: boolean;
     transactionId?: string;
 
+    needsValidation?: boolean;
+    validationOnHold?: boolean;
+    validationNewSite?: boolean;
+    validationSiteInformationChanged?: boolean;
+    validationReceiverInformationChanged?: boolean;
+
     createdTime?: string;
 }
 

@@ -154,6 +154,20 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return dto;
     }
 
+    public async Task<FogTripTicketDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default)
+    {
+        var ticket = await _repository.UpdateValidationHoldAsync(id, onHold, cancellationToken);
+
+        return MapToDto(ticket);
+    }
+
+    public async Task<FogTripTicketDto?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken = default)
+    {
+        var ticket = await _repository.UpdateNeedsValidationAsync(id, needsValidation, cancellationToken);
+
+        return MapToDto(ticket);
+    }
+
     public Task<byte[]> GeneratePdfForProfessionalAsync(FogTripTicketDto ticket)
     {
         if (ticket.TransactionId == null)

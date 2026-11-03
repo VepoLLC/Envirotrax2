@@ -12,6 +12,10 @@ public interface IFogInspectionService
 
     Task<FogInspectionDto?> UpdateAsync(int id, int waterSupplierId, FogInspectionUpdateRequest request, CancellationToken cancellationToken);
 
+    Task<FogInspectionDto?> UpdateValidationHoldAsync(int id, int waterSupplierId, bool onHold, CancellationToken cancellationToken);
+
+    Task<FogInspectionDto?> UpdateNeedsValidationAsync(int id, int waterSupplierId, bool needsValidation, CancellationToken cancellationToken);
+
     Task<FogInspectionDto?> UploadImageAsync(int id, int waterSupplierId, string imageType, Stream fileStream, string fileName, CancellationToken cancellationToken);
 
     Task<List<RecordLogDto>?> GetLogsAsync(int id, CancellationToken cancellationToken);

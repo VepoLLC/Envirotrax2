@@ -79,6 +79,7 @@ BEGIN TRY
         -- Validation flags
          NeedsValidation, ValidationNewSite, ValidationSiteInformationChanged, ValidationUnknownSerialNumber,
          ValidationDeviceInformationChanged, ValidationNotes, ValidationReplacementOnHold, ValidationReplacementCleared,
+         ValidationDeviceMoved, ValidationHazardTypeChanged, ValidationCreatedFromCsi, ValidationOnHold,
 
         -- Initial test readings — main assembly
          InitCV1HeldPSID, InitCV1ClosedTight, InitCV1Leaked, InitCV2HeldPSID, InitCV2ClosedTight, InitCV2Leaked,
@@ -167,6 +168,8 @@ BEGIN TRY
         ISNULL(legacyTests.NeedsValidation, 0), ISNULL(legacyTests.ValidationNewSite, 0),
         ISNULL(legacyTests.ValidationSiteInformationChanged, 0), ISNULL(legacyTests.ValidationUnknownSerialNumber, 0),
         ISNULL(legacyTests.ValidationDeviceInformationChanged, 0), NULL, 0, 0,
+        ISNULL(legacyTests.ValidationDeviceMoved, 0), ISNULL(legacyTests.ValidationHazardTypeChanged, 0),
+        ISNULL(legacyTests.ValidationCreatedFromCsi, 0), ISNULL(legacyTests.ValidationOnHold, 0),
 
         -- Initial test readings — main assembly
         legacyTests.InitCV1HeldPSID, ISNULL(legacyTests.InitCV1ClosedTight, 0), ISNULL(legacyTests.InitCV1Leaked, 0),

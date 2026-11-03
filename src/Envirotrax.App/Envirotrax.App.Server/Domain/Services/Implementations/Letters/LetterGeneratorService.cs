@@ -12,8 +12,10 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Letters;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Templates.Emails.Letters;
+using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
+using Microsoft.Extensions.Options;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Letters;
 
@@ -30,12 +32,12 @@ public class LetterGeneratorService : ILetterGeneratorService
     private const string PdfTemplateName = "Letters.Letters";
     private const string EmailTemplateName = "Letters.Letter";
     private const string EmailSubject = "Important Notice from Your Water Supplier – Action May Be Required";
-    private const string OptInUrl = "https://www.envirotrax.com/renewal_opt_in.aspx?id=";
 
     private const string DefaultFontFamily = "Arial";
     private const int DefaultFontSize = 12;
     private const string DateFormat = "M/d/yyyy";
 
+    private const string AllValue = "All";
     private const string FireSystemHazardType = "Fire System";
     private const string ImportTransactionId = "import";
     private const string ManualTransactionId = "manual";
@@ -53,19 +55,22 @@ public class LetterGeneratorService : ILetterGeneratorService
     private readonly IBackflowRenewalRequirementService _renewalRequirementService;
     private readonly IPdfTemplateService _pdfTemplateService;
     private readonly IEmailService _emailService;
+    private readonly PdfTemplateOptions _pdfTemplateOptions;
 
     public LetterGeneratorService(
         ILetterRepository letterRepository,
         IWaterSupplierService waterSupplierService,
         IBackflowRenewalRequirementService renewalRequirementService,
         IPdfTemplateService pdfTemplateService,
-        IEmailService emailService)
+        IEmailService emailService,
+        IOptions<PdfTemplateOptions> pdfTemplateOptions)
     {
         _letterRepository = letterRepository;
         _waterSupplierService = waterSupplierService;
         _renewalRequirementService = renewalRequirementService;
         _pdfTemplateService = pdfTemplateService;
         _emailService = emailService;
+        _pdfTemplateOptions = pdfTemplateOptions.Value;
     }
 
     public async Task<GeneratedLettersDto?> GenerateAsync(int waterSupplierId)
@@ -83,16 +88,23 @@ public class LetterGeneratorService : ILetterGeneratorService
         {
             Details = details,
             RenewalRequirements = renewalRequirements.ToList(),
-            Now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, CentralTimeZone)
+            Now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, CentralTimeZone),
+            OptInCodeExpirationDate = DateTime.UtcNow.AddDays(OptInCodeValidDays)
         };
 
         await GenerateBackflowLettersAsync(context);
         await GenerateCsiLettersAsync(context);
 
+        await SaveOptInCodesAsync(context);
+        await SaveUnknownAssemblyLettersSentAsync(context);
+
+        await SendLetterEmailsAsync(context);
+        await AddPdfFilesAsync(context);
+
         var result = new GeneratedLettersDto
         {
             Counts = context.Counts,
-            EmailCount = context.EmailCount
+            EmailCount = context.Emails.Count
         };
 
         if (context.Files.Count > 0)
@@ -212,7 +224,7 @@ public class LetterGeneratorService : ILetterGeneratorService
         var sites = await GetBackflowLetterSitesAsync(context, period);
         var fileTypeName = $"{BackflowFilePrefix} - Expiring{noticeNumber} {period.Name}";
 
-        return await GenerateLettersAsync(context, content, sites, fileTypeName, true);
+        return AddLetters(context, content, sites, fileTypeName, true);
     }
 
     private async Task<int> GenerateExpiredLettersAsync(GenerationContext context, int noticeNumber, BackflowExpiredType expiredType)
@@ -243,7 +255,7 @@ public class LetterGeneratorService : ILetterGeneratorService
         var sites = await GetBackflowLetterSitesAsync(context, period);
         var fileTypeName = $"{BackflowFilePrefix} - Expired{noticeNumber} {period.Name}";
 
-        return await GenerateLettersAsync(context, content, sites, fileTypeName, true);
+        return AddLetters(context, content, sites, fileTypeName, true);
     }
 
     private async Task<int> GenerateBackflowNonCompliantLettersAsync(GenerationContext context, int noticeNumber, BackflowNonCompliantType nonCompliantType, bool isPrinted)
@@ -265,7 +277,7 @@ public class LetterGeneratorService : ILetterGeneratorService
         var sites = await GetBackflowLetterSitesAsync(context, period);
         var fileTypeName = $"{BackflowFilePrefix} - Non-Compliant{noticeNumber} {period.Name}";
 
-        return await GenerateLettersAsync(context, content, sites, fileTypeName, isPrinted);
+        return AddLetters(context, content, sites, fileTypeName, isPrinted);
     }
 
     private async Task<int> GenerateUnknownAssembliesLettersAsync(GenerationContext context)
@@ -286,21 +298,12 @@ public class LetterGeneratorService : ILetterGeneratorService
         var sites = await _letterRepository.GetUnknownAssembliesSitesAsync(context.Details.WaterSupplier.Id, lastModifiedBefore, CancellationToken.None);
         var fileTypeName = $"{BackflowFilePrefix} - Unknown Assemblies";
 
-        var letterCount = await GenerateLettersAsync(context, content, sites, fileTypeName, true);
-
-        if (sites.Count > 0)
+        foreach (var site in sites)
         {
-            var siteIds = new List<int>();
-
-            foreach (var site in sites)
-            {
-                siteIds.Add(site.Id);
-            }
-
-            await _letterRepository.IncrementUnknownAssemblyLettersSentAsync(siteIds);
+            context.UnknownAssemblySiteIds.Add(site.Id);
         }
 
-        return letterCount;
+        return AddLetters(context, content, sites, fileTypeName, true);
     }
 
     private async Task<int> GenerateImpendingLettersAsync(GenerationContext context, int noticeNumber, CsiImpendingType impendingType)
@@ -318,7 +321,7 @@ public class LetterGeneratorService : ILetterGeneratorService
         var sites = await _letterRepository.GetCsiSitesAsync(context.Details.WaterSupplier.Id, period.Start, period.End, CancellationToken.None);
         var fileTypeName = $"{CsiFilePrefix} - Impending{noticeNumber} {period.Name}";
 
-        return await GenerateLettersAsync(context, content, sites, fileTypeName, true);
+        return AddLetters(context, content, sites, fileTypeName, true);
     }
 
     private async Task<int> GeneratePastDueLettersAsync(GenerationContext context, int noticeNumber, CsiPastDueType pastDueType)
@@ -336,7 +339,7 @@ public class LetterGeneratorService : ILetterGeneratorService
         var sites = await _letterRepository.GetCsiSitesAsync(context.Details.WaterSupplier.Id, period.Start, period.End, CancellationToken.None);
         var fileTypeName = $"{CsiFilePrefix} - Past Due{noticeNumber} {period.Name}";
 
-        return await GenerateLettersAsync(context, content, sites, fileTypeName, true);
+        return AddLetters(context, content, sites, fileTypeName, true);
     }
 
     private async Task<int> GenerateCsiNonCompliantLettersAsync(GenerationContext context, int noticeNumber, CsiNonCompliantType nonCompliantType, bool isPrinted)
@@ -354,87 +357,118 @@ public class LetterGeneratorService : ILetterGeneratorService
         var sites = await _letterRepository.GetCsiSitesAsync(context.Details.WaterSupplier.Id, period.Start, period.End, CancellationToken.None);
         var fileTypeName = $"{CsiFilePrefix} - Non-Compliant{noticeNumber} {period.Name}";
 
-        return await GenerateLettersAsync(context, content, sites, fileTypeName, isPrinted);
+        return AddLetters(context, content, sites, fileTypeName, isPrinted);
     }
 
     private async Task<List<LetterSiteDto>> GetBackflowLetterSitesAsync(GenerationContext context, LetterPeriod period)
     {
         var waterSupplierId = context.Details.WaterSupplier.Id;
+        var periodTests = await _letterRepository.GetBackflowTestsAsync(waterSupplierId, period.Start, period.End, CancellationToken.None);
 
         var tests = new List<LetterBackflowTestDto>();
         var testIds = new HashSet<int>();
 
         foreach (var requirement in context.RenewalRequirements)
         {
-            var requirementTests = await _letterRepository.GetRenewalRequirementTestsAsync(waterSupplierId, requirement, period.Start, period.End, CancellationToken.None);
-
-            AddNewTests(tests, testIds, requirementTests);
-        }
-
-        var forcedRenewalTests = await _letterRepository.GetForcedRenewalTestsAsync(waterSupplierId, period.Start, period.End, CancellationToken.None);
-
-        AddNewTests(tests, testIds, forcedRenewalTests);
-
-        var siteIds = new List<int>();
-        var addedSiteIds = new HashSet<int>();
-
-        foreach (var test in tests)
-        {
-            if (addedSiteIds.Add(test.SiteId))
+            foreach (var test in periodTests)
             {
-                siteIds.Add(test.SiteId);
+                if (DoesTestMatchRequirement(test, requirement) && testIds.Add(test.Id))
+                {
+                    tests.Add(test);
+                }
             }
         }
 
-        if (siteIds.Count == 0)
+        foreach (var test in periodTests)
+        {
+            if (test.ForceRenewal && testIds.Add(test.Id))
+            {
+                tests.Add(test);
+            }
+        }
+
+        if (tests.Count == 0)
         {
             return [];
         }
 
-        var sites = await _letterRepository.GetSitesAsync(siteIds, CancellationToken.None);
+        var sites = await _letterRepository.GetBackflowSitesAsync(waterSupplierId, period.Start, period.End, CancellationToken.None);
         var sitesById = sites.ToDictionary(site => site.Id);
-
-        foreach (var test in tests)
-        {
-            sitesById[test.SiteId].BackflowTests.Add(test);
-        }
 
         var orderedSites = new List<LetterSiteDto>();
 
-        foreach (var siteId in siteIds)
+        foreach (var test in tests)
         {
-            orderedSites.Add(sitesById[siteId]);
+            if (!sitesById.TryGetValue(test.SiteId, out var site))
+            {
+                continue;
+            }
+
+            if (site.BackflowTests.Count == 0)
+            {
+                orderedSites.Add(site);
+            }
+
+            site.BackflowTests.Add(test);
         }
 
         return orderedSites;
     }
 
-    private static void AddNewTests(List<LetterBackflowTestDto> tests, HashSet<int> testIds, List<LetterBackflowTestDto> newTests)
+    private static bool DoesTestMatchRequirement(LetterBackflowTestDto test, BackflowRenewalRequirementDto requirement)
     {
-        foreach (var test in newTests)
+        if (test.SitePropertyType != requirement.PropertyType)
         {
-            if (testIds.Add(test.Id))
-            {
-                tests.Add(test);
-            }
+            return false;
         }
+
+        if (!IsAllValue(requirement.DeviceType) && !string.Equals(test.DeviceType, requirement.DeviceType, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!IsAllValue(requirement.HazardType) && !string.Equals(test.HazardType, requirement.HazardType, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (requirement.HasSiteOssf && !test.SiteHasOnSiteSewageFacility)
+        {
+            return false;
+        }
+
+        if (requirement.AuxWaterSupply && !test.SiteHasAuxWaterSupply)
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    private async Task<int> GenerateLettersAsync(GenerationContext context, LetterContentDto content, List<LetterSiteDto> sites, string fileTypeName, bool includeInDownload)
+    private static bool IsAllValue(string? value)
+    {
+        return string.IsNullOrEmpty(value) || string.Equals(value, AllValue, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static int AddLetters(GenerationContext context, LetterContentDto content, List<LetterSiteDto> sites, string fileTypeName, bool includeInDownload)
     {
         var printedLetters = new List<LetterDto>();
 
         foreach (var site in sites)
         {
-            var optInCode = await GetOptInCodeAsync(context, site.Id);
-            var letter = BuildLetter(context, site, optInCode);
             var emailAddresses = GetEmailAddresses(site);
+
+            if (emailAddresses.Count == 0 && !includeInDownload)
+            {
+                continue;
+            }
+
+            var optInCode = GetOptInCode(context, site.Id);
+            var letter = BuildLetter(context, site, optInCode);
 
             if (emailAddresses.Count > 0)
             {
-                await SendLetterEmailAsync(content, letter, emailAddresses);
-
-                context.EmailCount++;
+                context.Emails.Add(new LetterEmail(emailAddresses, content, letter));
             }
             else
             {
@@ -442,15 +476,12 @@ public class LetterGeneratorService : ILetterGeneratorService
             }
         }
 
-        if (includeInDownload)
-        {
-            await AddPdfFilesAsync(context, content, printedLetters, fileTypeName);
-        }
+        AddPdfDocuments(context, content, printedLetters, fileTypeName);
 
         return sites.Count;
     }
 
-    private async Task<OptInCode> GetOptInCodeAsync(GenerationContext context, int siteId)
+    private static OptInCode GetOptInCode(GenerationContext context, int siteId)
     {
         if (context.OptInCodes.TryGetValue(siteId, out var existingCode))
         {
@@ -459,19 +490,16 @@ public class LetterGeneratorService : ILetterGeneratorService
 
         var maxValue = (int)Math.Pow(10, OptInCodeLength);
         var code = RandomNumberGenerator.GetInt32(maxValue).ToString($"D{OptInCodeLength}");
-        var expirationDate = DateTime.UtcNow.AddDays(OptInCodeValidDays);
         var codeHash = BCrypt.Net.BCrypt.HashPassword(code);
 
-        await _letterRepository.UpdateOptInCodeAsync(siteId, codeHash, expirationDate);
-
-        var optInCode = new OptInCode(code, expirationDate);
+        var optInCode = new OptInCode(code, codeHash);
 
         context.OptInCodes.Add(siteId, optInCode);
 
         return optInCode;
     }
 
-    private async Task AddPdfFilesAsync(GenerationContext context, LetterContentDto content, List<LetterDto> letters, string fileTypeName)
+    private static void AddPdfDocuments(GenerationContext context, LetterContentDto content, List<LetterDto> letters, string fileTypeName)
     {
         var fileNumber = 0;
 
@@ -487,26 +515,82 @@ public class LetterGeneratorService : ILetterGeneratorService
                 Letters = letters.GetRange(index, letterCount)
             };
 
-            var pdf = await _pdfTemplateService.GenerateAsync(PdfTemplateName, document);
             var fileName = $"{context.Details.WaterSupplier.Id} - {fileTypeName} ({fileNumber}).pdf";
 
-            context.Files.Add(new LetterFile(fileName, pdf));
+            context.PdfDocuments.Add(new LetterPdfDocument(fileName, document));
         }
     }
 
-    private async Task SendLetterEmailAsync(LetterContentDto content, LetterDto letter, List<string> emailAddresses)
+    private async Task SaveOptInCodesAsync(GenerationContext context)
     {
-        await _emailService.SendAsync(new EmailDto<LetterEmailVm>
+        if (context.OptInCodes.Count == 0)
         {
-            Recipients = emailAddresses,
-            Subject = EmailSubject,
-            TemplateId = EmailTemplateName,
-            TemplateData = new LetterEmailVm
+            return;
+        }
+
+        var optInCodes = new List<LetterOptInCodeDto>();
+
+        foreach (var siteCode in context.OptInCodes)
+        {
+            optInCodes.Add(new LetterOptInCodeDto
             {
-                Content = content,
-                Letter = letter
-            }
-        });
+                SiteId = siteCode.Key,
+                CodeHash = siteCode.Value.CodeHash
+            });
+        }
+
+        await _letterRepository.UpdateOptInCodesAsync(optInCodes, context.OptInCodeExpirationDate);
+    }
+
+    private async Task SaveUnknownAssemblyLettersSentAsync(GenerationContext context)
+    {
+        if (context.UnknownAssemblySiteIds.Count == 0)
+        {
+            return;
+        }
+
+        await _letterRepository.IncrementUnknownAssemblyLettersSentAsync(context.UnknownAssemblySiteIds);
+    }
+
+    private async Task SendLetterEmailsAsync(GenerationContext context)
+    {
+        foreach (var email in context.Emails)
+        {
+            await _emailService.SendAsync(new EmailDto<LetterEmailVm>
+            {
+                Recipients = email.Recipients,
+                Subject = EmailSubject,
+                TemplateId = EmailTemplateName,
+                TemplateData = new LetterEmailVm
+                {
+                    BaseUrl = _pdfTemplateOptions.BaseUrl,
+                    Content = email.Content,
+                    Letter = email.Letter
+                }
+            });
+        }
+    }
+
+    private async Task AddPdfFilesAsync(GenerationContext context)
+    {
+        if (context.PdfDocuments.Count == 0)
+        {
+            return;
+        }
+
+        var documents = new List<LetterDocumentDto>();
+
+        foreach (var pdfDocument in context.PdfDocuments)
+        {
+            documents.Add(pdfDocument.Document);
+        }
+
+        var pdfs = await _pdfTemplateService.GenerateManyAsync(PdfTemplateName, documents);
+
+        for (var index = 0; index < pdfs.Count; index++)
+        {
+            context.Files.Add(new LetterFile(context.PdfDocuments[index].FileName, pdfs[index]));
+        }
     }
 
     private static List<string> GetEmailAddresses(LetterSiteDto site)
@@ -688,9 +772,8 @@ public class LetterGeneratorService : ILetterGeneratorService
         {
             SiteId = site.Id,
             AccountNumber = GetDisplayAccountNumber(context, site),
-            OptInUrl = OptInUrl + site.Id,
             OptInCode = optInCode.Code,
-            OptInExpirationDate = FormatDate(optInCode.ExpirationDate)
+            OptInExpirationDate = FormatDate(context.OptInCodeExpirationDate)
         };
 
         letter.MailingLines.AddRange(GetMailingNameLines(site));
@@ -874,15 +957,23 @@ public class LetterGeneratorService : ILetterGeneratorService
         public WaterSupplierDetailsDto Details { get; set; } = null!;
         public List<BackflowRenewalRequirementDto> RenewalRequirements { get; set; } = [];
         public DateTime Now { get; set; }
+        public DateTime OptInCodeExpirationDate { get; set; }
 
         public LetterCountsDto Counts { get; } = new();
-        public int EmailCount { get; set; }
 
         public Dictionary<int, OptInCode> OptInCodes { get; } = new();
+        public List<int> UnknownAssemblySiteIds { get; } = [];
+
+        public List<LetterEmail> Emails { get; } = [];
+        public List<LetterPdfDocument> PdfDocuments { get; } = [];
         public List<LetterFile> Files { get; } = [];
     }
 
-    private record OptInCode(string Code, DateTime ExpirationDate);
+    private record OptInCode(string Code, string CodeHash);
+
+    private record LetterEmail(List<string> Recipients, LetterContentDto Content, LetterDto Letter);
+
+    private record LetterPdfDocument(string FileName, LetterDocumentDto Document);
 
     private record LetterFile(string Name, byte[] Content);
 }

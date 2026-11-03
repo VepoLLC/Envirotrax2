@@ -48,7 +48,7 @@ public class BackflowTesterCompanyLicensesController : WaterSupplierProtectedCon
 
         var result = await _licenseService.UpdateForProfessionalAsync(id, dto);
 
-        return Ok(result);
+        return result == null ? NotFound() : Ok(result);
     }
 
     [HttpDelete("{id}/company-licenses/{licenseId}")]

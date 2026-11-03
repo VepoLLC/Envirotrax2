@@ -187,6 +187,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         entry.Property(m => m.AirGapImagePath).IsModified = false;
         entry.Property(m => m.ValidationReplacementOnHold).IsModified = false;
         entry.Property(m => m.ValidationReplacementCleared).IsModified = false;
+        entry.Property(m => m.ValidationCreatedFromCsi).IsModified = false;
+        entry.Property(m => m.ValidationOnHold).IsModified = false;
         entry.Property(m => m.InspectorId).IsModified = false;
         entry.Property(m => m.MailingAddress).IsModified = false;
     }
@@ -910,6 +912,40 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         return test;
     }
 
+    // Submission Validations window: the Hold checkbox and the Clear action. The record log keeps who changed
+    // the flag and when, which V1 stored in ValidatedBy and ValidationClearedDate.
+    public async Task<BackflowTest?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken)
+    {
+        var test = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        test.ValidationOnHold = onHold;
+
+        await SaveChangesAsync(logData: true, cancellationToken);
+
+        return test;
+    }
+
+    public async Task<BackflowTest?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken)
+    {
+        var test = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (test == null)
+        {
+            return null;
+        }
+
+        test.NeedsValidation = needsValidation;
+
+        await SaveChangesAsync(logData: true, cancellationToken);
+
+        return test;
+    }
+
     private async Task ReassignIsCurrentForDeviceAsync(BackflowTest fromTest, CancellationToken cancellationToken)
     {
         if (fromTest.SiteId == null || string.IsNullOrWhiteSpace(fromTest.SerialNumber))
@@ -1032,6 +1068,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         var airGapImagePath = test.AirGapImagePath;
         var inspectorId = test.InspectorId;
         var mailingAddress = test.MailingAddress;
+        var validationCreatedFromCsi = test.ValidationCreatedFromCsi;
+        var validationOnHold = test.ValidationOnHold;
 
         DbContext.Entry(test).CurrentValues.SetValues(model);
 
@@ -1065,6 +1103,8 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         test.AirGapImagePath = newAirGapImagePath ?? airGapImagePath;
         test.InspectorId = inspectorId;
         test.MailingAddress = mailingAddress;
+        test.ValidationCreatedFromCsi = validationCreatedFromCsi;
+        test.ValidationOnHold = validationOnHold;
 
         await SaveChangesAsync(logData: true);
 

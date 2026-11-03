@@ -1,0 +1,70 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="mb-3">
+            <vp-input [(ngModel)]="vehicle.licensePlateNumber"
+                      name="licensePlateNumber"
+                      label="License Plate #"
+                      [required]="true"
+                      [maxLength]="20"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input [(ngModel)]="vehicle.manufacturer"
+                      name="manufacturer"
+                      label="Manufacturer"
+                      [required]="true"
+                      [maxLength]="255"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input [(ngModel)]="vehicle.manufacturedYear"
+                      name="manufacturedYear"
+                      type="number"
+                      label="Year"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input [(ngModel)]="vehicle.capacity"
+                      name="capacity"
+                      type="number"
+                      [min]="0"
+                      label="Holding Capacity"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input [(ngModel)]="vehicle.capacityType"
+                      name="capacityType"
+                      type="select"
+                      label="Capacity Type"
+                      [required]="true"
+                      [options]="capacityTypeOptions"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-3">
+            <vp-input [(ngModel)]="vehicle.stickerNumber"
+                      name="stickerNumber"
+                      label="Sticker #"
+                      [required]="true"
+                      [maxLength]="50"
+                      [form]="form" />
+        </div>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary w-100" (click)="cancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary w-100" [disabled]="isLoading">Save</button>
+            </div>
+        </div>
+    </form>
+</div>

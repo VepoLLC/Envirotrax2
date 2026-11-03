@@ -35,6 +35,11 @@ namespace Envirotrax.Common.Domain.Services.Implementations
             return await ParseStringAsync($"Pdf.{pageName}", model, null);
         }
 
+        public async Task<string> ParsePdfAsync<T>(string pageName, T model, ExpandoObject viewBag)
+        {
+            return await ParseStringAsync($"Pdf.{pageName}", model, viewBag);
+        }
+
         private async Task<string> ParseStringAsync<T>(string pageName, T model, ExpandoObject? viewBag)
         {
             return await _engine.CompileRenderAsync($"Templates.{pageName}", model, viewBag: viewBag);

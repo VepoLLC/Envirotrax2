@@ -35,6 +35,11 @@ public class FogVehicleRepository : Repository<FogVehicle>, IFogVehicleRepositor
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken)
+    {
+        return Entity.AnyAsync(v => v.Id == id && v.ProfessionalId == professionalId, cancellationToken);
+    }
+
     public async Task<FogVehicle?> UpdateVehicleAsync(FogVehicle model)
     {
         var vehicle = await GetTrackedForUpdateAsync(model.Id, default);

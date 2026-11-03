@@ -15,6 +15,8 @@ public interface ICsiInspectionService : IService<CsiInspection, CsiInspectionDt
     Task<IPagedData<CsiInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, CsiPaymentStatus? paymentStatus, CancellationToken cancellationToken);
     Task<CsiInspectionDto?> UpdateApprovalAsync(int id, CsiInspectionApprovalRequest request, CancellationToken cancellationToken);
     Task<CsiInspectionDto?> UpdateForAdminAsync(int id, CsiInspectionAdminUpdateRequest request);
+    Task<CsiInspectionDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default);
+    Task<CsiInspectionDto?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken = default);
     Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection);
     Task<byte[]> GeneratePdfAsync(IEnumerable<CsiInspectionDto> inspections);
     Task<byte[]> GeneratePdfAsync(CsiInspectionDto inspection, IReadOnlyList<CsiInspectionAssemblyDto> assemblies);

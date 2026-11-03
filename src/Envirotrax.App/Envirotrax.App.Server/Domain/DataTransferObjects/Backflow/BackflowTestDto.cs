@@ -379,6 +379,10 @@ public class BackflowTestDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRed
     public bool ValidationSiteInformationChanged { get; set; }
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
+    public bool ValidationDeviceMoved { get; set; }
+    public bool ValidationHazardTypeChanged { get; set; }
+    public bool ValidationCreatedFromCsi { get; set; }
+    public bool ValidationOnHold { get; set; }
 
     // Images
     public string? AssemblyImagePath { get; set; }

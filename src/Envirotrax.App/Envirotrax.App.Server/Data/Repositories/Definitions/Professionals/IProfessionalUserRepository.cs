@@ -11,6 +11,7 @@ public interface IProfessionalUserRepository : IRepository<ProfessionalUser>
     Task<ProfessionalUser?> UpdateNonSensitiveDataAsync(ProfessionalUser user);
     Task<ProfessionalUser?> UpdateSignaturePathAsync(int userId, string signaturePath);
     Task<ProfessionalUser?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle);
+    Task<bool> ExistsForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null);
     Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken);
 }

@@ -23,6 +23,10 @@ public interface IFogTripTicketService : IService<FogTripTicket, FogTripTicketDt
 
     Task<FogTripTicketDto?> UpdateApprovalAsync(int id, bool disapproved, CancellationToken cancellationToken);
 
+    Task<FogTripTicketDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default);
+
+    Task<FogTripTicketDto?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken = default);
+
     Task<byte[]> GeneratePdfAsync(FogTripTicketDto ticket);
 
     Task<byte[]> GeneratePdfAsync(IEnumerable<FogTripTicketDto> tickets);

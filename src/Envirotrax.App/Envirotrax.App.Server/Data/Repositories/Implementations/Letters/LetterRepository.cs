@@ -1,17 +1,16 @@
+using System.Text.Json;
 using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Letters;
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Letters;
-using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Letters;
 
 public class LetterRepository : ILetterRepository
 {
-    private const string AllValue = "All";
     private const int MaxUnknownAssemblyLetters = 2;
 
     private readonly TenantDbContext _dbContext;
@@ -21,50 +20,19 @@ public class LetterRepository : ILetterRepository
         _dbContext = dbContextSelector.Current;
     }
 
-    public async Task<List<LetterBackflowTestDto>> GetRenewalRequirementTestsAsync(int waterSupplierId, BackflowRenewalRequirementDto requirement, DateTime rangeStart, DateTime rangeEnd, CancellationToken cancellationToken)
+    public async Task<List<LetterBackflowTestDto>> GetBackflowTestsAsync(int waterSupplierId, DateTime rangeStart, DateTime rangeEnd, CancellationToken cancellationToken)
     {
-        var propertyType = requirement.PropertyType;
-        var deviceType = requirement.DeviceType;
-        var hazardType = requirement.HazardType;
-
-        var query = GetBackflowLetterTestsQuery(waterSupplierId, rangeStart, rangeEnd)
-            .Where(test => test.Site!.PropertyType == propertyType);
-
-        if (!IsAllValue(deviceType))
-        {
-            query = query.Where(test => test.DeviceType == deviceType);
-        }
-
-        if (!IsAllValue(hazardType))
-        {
-            query = query.Where(test => test.HazardType == hazardType);
-        }
-
-        if (requirement.HasSiteOssf)
-        {
-            query = query.Where(test => test.Site!.HasOnSiteSewageFacility);
-        }
-
-        if (requirement.AuxWaterSupply)
-        {
-            query = query.Where(test => test.Site!.HasAuxWaterSupply);
-        }
+        var query = GetBackflowLetterTestsQuery(waterSupplierId, rangeStart, rangeEnd);
 
         return await SelectLetterTests(query).ToListAsync(cancellationToken);
     }
 
-    public async Task<List<LetterBackflowTestDto>> GetForcedRenewalTestsAsync(int waterSupplierId, DateTime rangeStart, DateTime rangeEnd, CancellationToken cancellationToken)
+    public async Task<List<LetterSiteDto>> GetBackflowSitesAsync(int waterSupplierId, DateTime rangeStart, DateTime rangeEnd, CancellationToken cancellationToken)
     {
-        var query = GetBackflowLetterTestsQuery(waterSupplierId, rangeStart, rangeEnd)
-            .Where(test => test.ForceRenewal);
+        var testsQuery = GetBackflowLetterTestsQuery(waterSupplierId, rangeStart, rangeEnd);
 
-        return await SelectLetterTests(query).ToListAsync(cancellationToken);
-    }
-
-    public async Task<List<LetterSiteDto>> GetSitesAsync(List<int> siteIds, CancellationToken cancellationToken)
-    {
         var query = _dbContext.Sites
-            .Where(site => siteIds.Contains(site.Id));
+            .Where(site => testsQuery.Any(test => test.SiteId == site.Id));
 
         return await SelectLetterSites(query).ToListAsync(cancellationToken);
     }
@@ -98,13 +66,17 @@ public class LetterRepository : ILetterRepository
         return await SelectLetterSites(query).ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateOptInCodeAsync(int siteId, string optInCodeHash, DateTime optInCodeExpirationDate)
+    public async Task UpdateOptInCodesAsync(List<LetterOptInCodeDto> optInCodes, DateTime optInCodeExpirationDate)
     {
-        await _dbContext.Sites
-            .Where(site => site.Id == siteId)
-            .ExecuteUpdateAsync(setter => setter
-                .SetProperty(site => site.OptInCodeHash, optInCodeHash)
-                .SetProperty(site => site.OptInCodeExpirationDate, optInCodeExpirationDate));
+        var optInCodesJson = JsonSerializer.Serialize(optInCodes);
+
+        await _dbContext.Database.ExecuteSqlAsync($"""
+            UPDATE site
+            SET site.OptInCodeHash = code.CodeHash,
+                site.OptInCodeExpirationDate = {optInCodeExpirationDate}
+            FROM Sites AS site
+            INNER JOIN OPENJSON({optInCodesJson}) WITH (SiteId int, CodeHash nvarchar(100)) AS code ON code.SiteId = site.Id
+            """);
     }
 
     public async Task IncrementUnknownAssemblyLettersSentAsync(List<int> siteIds)
@@ -156,7 +128,11 @@ public class LetterRepository : ILetterRepository
                 BpatWorkNumber = test.BpatWorkNumber,
                 TransactionId = test.TransactionId,
                 TestDate = test.TestDate,
-                ExpirationDate = test.ExpirationDate
+                ExpirationDate = test.ExpirationDate,
+                ForceRenewal = test.ForceRenewal,
+                SitePropertyType = test.Site!.PropertyType,
+                SiteHasOnSiteSewageFacility = test.Site!.HasOnSiteSewageFacility,
+                SiteHasAuxWaterSupply = test.Site!.HasAuxWaterSupply
             });
     }
 
@@ -186,10 +162,5 @@ public class LetterRepository : ILetterRepository
             MailingEmailAddress = site.MailingEmailAddress,
             RenewalOptInType = site.RenewalOptInType
         });
-    }
-
-    private static bool IsAllValue(string? value)
-    {
-        return string.IsNullOrEmpty(value) || string.Equals(value, AllValue, StringComparison.OrdinalIgnoreCase);
     }
 }

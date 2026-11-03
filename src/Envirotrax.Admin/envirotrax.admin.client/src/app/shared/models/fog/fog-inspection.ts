@@ -87,6 +87,11 @@ export class FogInspection {
     inspectorCompanyName?: string;
     inspectorContactName?: string;
 
+    needsValidation?: boolean;
+    validationNewSite?: boolean;
+    validationSiteInformationChanged?: boolean;
+    validationOnHold?: boolean;
+
     createdTime?: string;
 
     // Detail members - populated by GET api/fog/inspections/{id}, absent on search rows.

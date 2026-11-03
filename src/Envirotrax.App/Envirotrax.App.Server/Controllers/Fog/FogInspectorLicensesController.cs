@@ -54,7 +54,7 @@ namespace Envirotrax.App.Server.Controllers.Fog
         {
             dto.Id = licenseId;
             var result = await _licenseService.UpdateForProfessionalAsync(id, dto);
-            return Ok(result);
+            return result == null ? NotFound() : Ok(result);
         }
     }
 }

@@ -41,31 +41,15 @@ public class FogInspectorInsuranceController : AdminBaseController
     [HttpPut("{insuranceId}")]
     public async Task<IActionResult> UpdateAsync(int professionalId, int insuranceId, [FromBody] ProfessionalInsuranceDto insurance, CancellationToken cancellationToken)
     {
-        if (!await BelongsToProfessionalAsync(professionalId, insuranceId, cancellationToken))
-        {
-            return NotFound();
-        }
+        var updated = await _insuranceService.UpdateForProfessionalAsync(professionalId, insuranceId, insurance, cancellationToken);
 
-        insurance.Id = insuranceId;
-        insurance.Professional = new ReferencedProfessionalDto
-        {
-            Id = professionalId
-        };
-
-        var updated = await _insuranceService.UpdateAsync(insurance);
-
-        return Ok(updated);
+        return updated == null ? NotFound() : Ok(updated);
     }
 
     [HttpGet("{insuranceId}/file-url")]
     public async Task<IActionResult> GetFileUrlAsync(int professionalId, int insuranceId, CancellationToken cancellationToken)
     {
-        if (!await BelongsToProfessionalAsync(professionalId, insuranceId, cancellationToken))
-        {
-            return NotFound();
-        }
-
-        var url = await _insuranceService.GenerateFileUrlAsync(insuranceId, cancellationToken);
+        var url = await _insuranceService.GenerateFileUrlForProfessionalAsync(professionalId, insuranceId, cancellationToken);
 
         return url == null ? NotFound() : Ok(url);
     }
@@ -73,23 +57,8 @@ public class FogInspectorInsuranceController : AdminBaseController
     [HttpDelete("{insuranceId}")]
     public async Task<IActionResult> DeleteAsync(int professionalId, int insuranceId, CancellationToken cancellationToken)
     {
-        if (!await BelongsToProfessionalAsync(professionalId, insuranceId, cancellationToken))
-        {
-            return NotFound();
-        }
-
-        var deleted = await _insuranceService.DeleteAsync(insuranceId);
+        var deleted = await _insuranceService.DeleteForProfessionalAsync(professionalId, insuranceId, cancellationToken);
 
         return deleted == null ? NotFound() : Ok();
-    }
-
-    private async Task<bool> BelongsToProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken)
-    {
-        var query = new Query();
-        query.Filter.Add(new() { ColumnName = nameof(ProfessionalInsuranceDto.Id), Value = insuranceId.ToString() });
-
-        var owned = await _insuranceService.GetAllByProfessionalAsync(professionalId, new PageInfo(), query, cancellationToken);
-
-        return owned.Data.Any();
     }
 }

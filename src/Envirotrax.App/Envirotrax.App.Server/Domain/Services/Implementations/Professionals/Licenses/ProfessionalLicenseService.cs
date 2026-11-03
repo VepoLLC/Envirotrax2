@@ -120,8 +120,14 @@ public class ProfessionalLicenseService : Service<ProfessionalLicense, Professio
         return MapToDto(added)!;
     }
 
-    public async Task<ProfessionalLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalLicenseDto dto)
+    public async Task<ProfessionalLicenseDto?> UpdateForProfessionalAsync(int professionalId, ProfessionalLicenseDto dto)
     {
+        // Without this, another professional's license id would be updated and moved to this professional.
+        if (!await _licenseRepository.ExistsForProfessionalAsync(professionalId, dto.Id, default))
+        {
+            return null;
+        }
+
         var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.Company);
 
         dto.ProfessionalType = licenseType.ProfessionalType;
@@ -132,6 +138,16 @@ public class ProfessionalLicenseService : Service<ProfessionalLicense, Professio
         var updated = await Repository.UpdateAsync(model);
 
         return MapToDto(updated)!;
+    }
+
+    public async Task<ProfessionalLicenseDto?> DeleteForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken)
+    {
+        if (!await _licenseRepository.ExistsForProfessionalAsync(professionalId, id, cancellationToken))
+        {
+            return null;
+        }
+
+        return await DeleteAsync(id);
     }
 
     public async Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto)

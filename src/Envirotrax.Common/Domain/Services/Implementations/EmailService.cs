@@ -1,10 +1,8 @@
 
-using System.Dynamic;
 using System.Text.Json;
 using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,7 +18,6 @@ public class EmailService : IEmailService
     private readonly EmailOptions _emailOptions;
     private readonly ILogger<EmailService> _logger;
     private readonly IHtmlTemplateService _templateService;
-    private readonly IHttpContextAccessor _contextAccessor;
     private readonly IHostEnvironment _environment;
 
     private readonly ISendGridClient _emailClient;
@@ -29,13 +26,11 @@ public class EmailService : IEmailService
         IOptions<EmailOptions> emailOptions,
         ILogger<EmailService> logger,
         IHtmlTemplateService templateService,
-        IHttpContextAccessor contextAccessor,
         IHostEnvironment environment)
     {
         _emailOptions = emailOptions.Value;
         _logger = logger;
         _templateService = templateService;
-        _contextAccessor = contextAccessor;
         _environment = environment;
 
         _emailClient = new SendGridClient(_emailOptions.ApiKey);
@@ -121,12 +116,7 @@ public class EmailService : IEmailService
 
         if (!string.IsNullOrWhiteSpace(email.TemplateId))
         {
-            dynamic viewBag = new ExpandoObject();
-            var request = _contextAccessor.HttpContext!.Request;
-
-            viewBag.BaseUrl = $"https://{request.Host}";
-
-            body = await _templateService.ParseEmailAsync(email.TemplateId, email.TemplateData, viewBag);
+            body = await _templateService.ParseEmailAsync(email.TemplateId, email.TemplateData);
         }
 
         var fromAddress = GetFromAddress(email.FromAddress);

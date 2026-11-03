@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Envirotrax.Auth.Domain.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
 {
@@ -21,15 +23,18 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly SiteOptions _siteOptions;
 
         public EmailModel(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IOptions<SiteOptions> siteOptions)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _siteOptions = siteOptions.Value;
         }
 
         /// <summary>
@@ -123,7 +128,8 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
                     "/Account/ConfirmEmailChange",
                     pageHandler: null,
                     values: new { area = "Identity", userId = userId, email = Input.NewEmail, code = code },
-                    protocol: Request.Scheme);
+                    protocol: _siteOptions.Url.Scheme,
+                    host: _siteOptions.Url.Authority);
                 await _emailSender.SendEmailAsync(
                     Input.NewEmail,
                     "Confirm your email",
@@ -159,7 +165,8 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account.Manage
                 "/Account/ConfirmEmail",
                 pageHandler: null,
                 values: new { area = "Identity", userId = userId, code = code },
-                protocol: Request.Scheme);
+                protocol: _siteOptions.Url.Scheme,
+                host: _siteOptions.Url.Authority);
             await _emailSender.SendEmailAsync(
                 email,
                 "Confirm your email",

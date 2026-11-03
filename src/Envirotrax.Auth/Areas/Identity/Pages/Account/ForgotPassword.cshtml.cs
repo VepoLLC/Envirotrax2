@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.Auth.Templates.Emails;
+using Envirotrax.Auth.Domain.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
@@ -24,15 +26,18 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly IEmailService _emailService;
+        private readonly SiteOptions _siteOptions;
 
         public ForgotPasswordModel(
             UserManager<AppUser> userManager,
             IEmailSender emailSender,
-            IEmailService emailService)
+            IEmailService emailService,
+            IOptions<SiteOptions> siteOptions)
         {
             _userManager = userManager;
             _emailSender = emailSender;
             _emailService = emailService;
+            _siteOptions = siteOptions.Value;
         }
 
         /// <summary>
@@ -76,7 +81,8 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
                     "/Account/ResetPassword",
                     pageHandler: null,
                     values: new { area = "Identity", code },
-                    protocol: Request.Scheme);
+                    protocol: _siteOptions.Url.Scheme,
+                    host: _siteOptions.Url.Authority);
 
                 await _emailService.SendAsync<ForgotPasswordVm>(new()
                 {

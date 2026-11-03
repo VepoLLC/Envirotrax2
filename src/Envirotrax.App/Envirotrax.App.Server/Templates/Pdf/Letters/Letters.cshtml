@@ -219,6 +219,8 @@
     <main>
         @foreach (var letter in Model.Letters)
         {
+            var optInUrl = $"{ViewBag.BaseUrl}/renewal-opt-in/{letter.SiteId}";
+
             <div class="letter-page">
                 <div class="letter-title" style="@titleStyle">@content.Title</div>
 
@@ -367,7 +369,7 @@
                 </div>
 
                 <div class="letter-footer">
-                    <div>Visit our website at @letter.OptInUrl to opt in or out of receiving future renewal notices by email.</div>
+                    <div>Visit our website at @optInUrl to opt in or out of receiving future renewal notices by email.</div>
                     <div>Your unique code is @(letter.OptInCode). It will expire on @(letter.OptInExpirationDate).</div>
                 </div>
             </div>

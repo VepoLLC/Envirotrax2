@@ -7,6 +7,7 @@
 @{
     var content = Model.Content;
     var letter = Model.Letter;
+    var optInUrl = $"{Model.BaseUrl}/renewal-opt-in/{letter.SiteId}";
     var titleStyle = $"background: {content.HeaderBackgroundColor}; color: {content.HeaderForegroundColor}; border: 2px solid {content.HeaderBorderColor}; padding: 8px 12px; text-align: center; font-size: 15px; font-weight: bold; margin: 12px 0;";
 
     string RunStyle(LetterMessageRunDto run)
@@ -186,7 +187,7 @@
     <hr style="margin-top: 24px; border: none; border-top: 1px solid #ccc;" />
 
     <p style="font-size: 11px; color: #666; text-align: center; margin: 8px 0;">
-        Visit our website at <a href="@letter.OptInUrl">@letter.OptInUrl</a>
+        Visit our website at <a href="@optInUrl">@optInUrl</a>
         to opt in or out of receiving future renewal notices by email.<br />
         Your unique code is <strong>@letter.OptInCode</strong>.
         It will expire on @(letter.OptInExpirationDate).

@@ -25,7 +25,7 @@ public class AppServicesComposer : IComposer
 
         builder.Services.Configure<LegacyUrlRedirectOptions>(builder.Config.GetSection("LegacyUrlRedirects"));
 
-        builder.Services.AddEmailService(builder.Config.GetSection("Email"), options =>
+        builder.Services.AddEmailService(builder.Config.GetSection("Email"), builder.Config["Sites:EnvirotraxWebsite:Url"], options =>
         {
             options.Assembly = Assembly.GetExecutingAssembly();
             options.Namespace = "Envirotrax.Website";

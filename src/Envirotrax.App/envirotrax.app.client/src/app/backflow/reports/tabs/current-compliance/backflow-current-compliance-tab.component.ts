@@ -131,8 +131,7 @@ export class BackflowCurrentComplianceTabComponent implements OnInit, OnDestroy 
     public async downloadPDF(): Promise<void> {
         try {
             this.isLoading = true;
-            const blob = await this._reportService.getComplianceReportPdf(this.ignoreLast30Days);
-            this._downloadService.downloadFileFromBlob(blob, 'backflow-compliance-report.pdf');
+            await this._downloadService.openBlobInNewWindow(() => this._reportService.getComplianceReportPdf(this.ignoreLast30Days));
         } finally {
             this.isLoading = false;
         }

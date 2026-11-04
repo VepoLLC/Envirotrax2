@@ -3,11 +3,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Transactions;
 using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Data.Repositories.Defintions;
+using Envirotrax.Auth.Domain.Configuration;
 using Envirotrax.Auth.Domain.DataTransferObjects;
 using Envirotrax.Auth.Domain.Services.Definitions;
 using Envirotrax.Auth.Templates.Emails;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace Envirotrax.Auth.Domain.Services.Implementations;
 
@@ -20,6 +22,7 @@ public class UserInvitationService : IUserInvitationService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IEmailService _emailService;
     private readonly Definitions.IAuthService _authService;
+    private readonly SiteOptions _siteOptions;
 
     public UserInvitationService(
         UserManager<AppUser> userManager,
@@ -28,7 +31,8 @@ public class UserInvitationService : IUserInvitationService
         LinkGenerator linkGenerator,
         IHttpContextAccessor contextAccessor,
         IEmailService emailService,
-        Definitions.IAuthService authService)
+        Definitions.IAuthService authService,
+        IOptions<SiteOptions> siteOptions)
     {
         _userManager = userManager;
         _passwordHasher = passwordHasher;
@@ -37,6 +41,7 @@ public class UserInvitationService : IUserInvitationService
         _contextAccessor = contextAccessor;
         _emailService = emailService;
         _authService = authService;
+        _siteOptions = siteOptions.Value;
     }
 
     private async Task<AppUser> GetOrCreateUserIdAsync(AppUser? user, UserInvitationDto invitation)
@@ -87,7 +92,8 @@ public class UserInvitationService : IUserInvitationService
                 page: "/Account/AcceptInvitation",
                 handler: null,
                 values: new { area = "Identity", tokenId = addedInvitation.Id, token },
-                scheme: "https"
+                scheme: _siteOptions.Url.Scheme,
+                host: new HostString(_siteOptions.Url.Authority)
             );
 
             await _emailService.SendAsync<RegistrationInvitationVm>(new()

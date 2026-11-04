@@ -19,7 +19,7 @@ import { SubmissionValidationListComponent } from './validations/list/submission
 import { NavigationEnd, Router } from '@angular/router';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 import { filter } from 'rxjs';
-import { MODULE_COLORS } from './shared/models/module-colors';
+import { MODULE_COLORS, NAVBAR_COLOR } from './shared/models/module-colors';
 
 @Component({
   selector: 'app-root',
@@ -32,6 +32,7 @@ export class App implements OnInit {
   public isNavbarVisible: boolean = false;
   public menuItems: MenuItem[] = [];
   public showWindowContainer: boolean = true;
+  public readonly navbarColor: string = NAVBAR_COLOR;
 
   constructor(
     private readonly _authService: AuthService,

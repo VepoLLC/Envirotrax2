@@ -1,14 +1,15 @@
 export const MODULE_COLORS = {
-    WATER_SUPPLIER: '#ff00ff',
-    SITE: '#ffa500',
-    CSI: '#0000ff',
-    BACKFLOW: '#60e0c0',
-    FOG: '#a52a2a',
-    VALIDATION: '#ff0000',
-    LICENSES: '#800080'
+    WATER_SUPPLIER: '#ff4fff',
+    SITE: '#ffb836',
+    CSI: '#3030ff',
+    BACKFLOW: '#91ead4',
+    FOG: '#af4141',
+    VALIDATION: '#ff4040',
+    LICENSES: '#9b369b'
 } as const;
 
-export const DEFAULT_WINDOW_COLOR = '#e9ecef';
+export const DEFAULT_WINDOW_COLOR = '#d3d3d3';
+export const NAVBAR_COLOR = '#f0f0f0';
 
 export interface ContrastClasses {
     text: string;

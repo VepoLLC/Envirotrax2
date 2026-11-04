@@ -127,6 +127,7 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
             fileName: 'FOG Trip Tickets',
             endpoint: this._fogTripTicketService.getAllForProfessionalEndpoint(),
             pdfEndpoint: this._fogTripTicketService.getAllPdfForProfessionalEndpoint(),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             columns: [
                 { field: 'propertyBusinessName', caption: 'PropertyBusinessName' },

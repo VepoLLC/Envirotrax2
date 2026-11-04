@@ -44,6 +44,10 @@ namespace Envirotrax.Auth.Domain.Configuration
                 // Register the OpenIddict server components.
                 .AddServer(options =>
                 {
+                    var issuer = configuration["Sites:EnvirotraxAuth:Url"] ?? throw new InvalidOperationException("Auth site URL is required (Sites:EnvirotraxAuth:Url)");
+
+                    options.SetIssuer(new Uri(issuer, UriKind.Absolute));
+
                     options
                         .AllowAuthorizationCodeFlow()
                         .AllowRefreshTokenFlow()
@@ -131,7 +135,7 @@ namespace Envirotrax.Auth.Domain.Configuration
 
             services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, AppUserClaimsPrincipalFactory>();
 
-            services.AddEmailService(configuration.GetSection("Email"), options =>
+            services.AddEmailService(configuration.GetSection("Email"), configuration["Sites:EnvirotraxAuth:Url"], options =>
             {
                 options.Assembly = Assembly.GetExecutingAssembly();
                 options.Namespace = "Envirotrax.Auth";
@@ -140,6 +144,7 @@ namespace Envirotrax.Auth.Domain.Configuration
             services.AddSmsService(configuration.GetSection("Sms"));
 
             services.Configure<AdminUserOptions>(configuration.GetSection("AdminUser"));
+            services.Configure<SiteOptions>(configuration.GetSection("Sites:EnvirotraxAuth"));
             services.AddHostedService<SeedDataService>();
 
             services.AddTransient<IAuthService, AuthService>();

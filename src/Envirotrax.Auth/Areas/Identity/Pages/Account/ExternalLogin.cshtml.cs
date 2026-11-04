@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Envirotrax.Auth.Domain.Configuration;
 
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
@@ -30,13 +31,15 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<AppUser> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly SiteOptions _siteOptions;
 
         public ExternalLoginModel(
             SignInManager<AppUser> signInManager,
             UserManager<AppUser> userManager,
             IUserStore<AppUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IOptions<SiteOptions> siteOptions)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -44,6 +47,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
+            _siteOptions = siteOptions.Value;
         }
 
         /// <summary>
@@ -172,7 +176,8 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
                             "/Account/ConfirmEmail",
                             pageHandler: null,
                             values: new { area = "Identity", userId = userId, code = code },
-                            protocol: Request.Scheme);
+                            protocol: _siteOptions.Url.Scheme,
+                            host: _siteOptions.Url.Authority);
 
                         await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                             $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");

@@ -124,6 +124,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierLicenseService, WaterSupplierLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
         services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
+        services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();
         services.AddTransient<IProfessionalDashboardService, ProfessionalDashboardService>();
 
         services.AddTransient<IGisAreaService, GisAreaService>();

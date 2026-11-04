@@ -1,0 +1,37 @@
+<ng-template #createdTemplate let-note="rowData">
+    <div class="text-nowrap">{{ note.createdTime | date:'MMM d, y, h:mm a' }}</div>
+    <div class="text-nowrap">{{ note.createdBy?.email }}</div>
+</ng-template>
+
+<ng-template #noteTextTemplate let-note="rowData">
+    <div class="text-break vp-note-text">{{ note.noteText }}</div>
+</ng-template>
+
+<ng-template #actionsTemplate let-note="rowData">
+    <div *ngIf="!note.isReadOnly" class="d-flex gap-1">
+        <button type="button" class="btn btn-primary btn-sm" (click)="editNote(note)" aria-label="Edit">
+            <i class="fa-solid fa-pencil"></i>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="deleteNote(note)" aria-label="Delete">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+</ng-template>
+
+<vp-section header="Account Comment Log">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="loadNotes()"
+                  [(query)]="table.query"
+                  (queryChange)="loadNotes()"
+                  (queryReset)="loadNotes()"
+                  [showActionLabels]="false"
+                  [canAdd]="canModify"
+                  (add)="addNote()" />
+    </div>
+</vp-section>

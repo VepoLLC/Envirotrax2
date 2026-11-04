@@ -12,6 +12,8 @@ import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { CsiInspectionAssemblyTableComponent } from "./csi/csi-inspection-assembly-table.component";
+import { ProfessionalNotesComponent } from "./professional-notes/list/professional-notes.component";
+import { AddEditProfessionalNoteComponent } from "./professional-notes/edit/add-edit-professional-note.component";
 
 @NgModule({
     declarations: [
@@ -23,7 +25,9 @@ import { CsiInspectionAssemblyTableComponent } from "./csi/csi-inspection-assemb
         PropertyLogCellComponent,
         SiteLogEditComponent,
         CreditCardPaymentComponent,
-        CsiInspectionAssemblyTableComponent
+        CsiInspectionAssemblyTableComponent,
+        ProfessionalNotesComponent,
+        AddEditProfessionalNoteComponent
     ],
     imports: [
         EnvirotraxComponentsModule,
@@ -38,7 +42,8 @@ import { CsiInspectionAssemblyTableComponent } from "./csi/csi-inspection-assemb
         ProfessionalUserLookupComponent,
         WaterSupplierUserLookupComponent,
         CreditCardPaymentComponent,
-        CsiInspectionAssemblyTableComponent
+        CsiInspectionAssemblyTableComponent,
+        ProfessionalNotesComponent
     ]
 })
 export class SharedComponentsModule {

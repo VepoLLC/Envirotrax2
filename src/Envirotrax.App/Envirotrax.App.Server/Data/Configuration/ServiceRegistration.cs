@@ -111,6 +111,7 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalLicenseTypeRepository, ProfessionalLicenseTypeRepository>();
         services.AddTransient<IProfessionalInsuranceRepository, ProfessionalInsuranceRepository>();
         services.AddTransient<IProfessionalTransactionRepository, ProfessionalTransactionRepository>();
+        services.AddTransient<IProfessionalNoteRepository, ProfessionalNoteRepository>();
         services.AddTransient<IProfessionalDashboardRepository, ProfessionalDashboardRepository>();
         services.AddTransient<IBackflowGaugeRepository, BackflowGaugeRepository>();
         services.AddTransient<IFogVehicleRepository, FogVehicleRepository>();

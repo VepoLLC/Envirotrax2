@@ -28,7 +28,10 @@ import {
     FogTripTicketService
 } from '../../../shared/services/fog/fog-trip-ticket.service';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
+import { MODULE_COLORS } from '../../../shared/models/module-colors';
 import { WaterSupplierService } from '../../../shared/services/water-suppliers/water-supplier.service';
+import { WindowService } from '../../../shared/services/window.service';
+import { FogTripTicketDetailsComponent } from '../details/fog-trip-ticket-details.component';
 
 const CRITERIA_FIELDS: (keyof FogTripTicketSearchCriteria)[] = [
     'userEmail'
@@ -85,6 +88,7 @@ export class FogTripTicketListComponent implements OnInit {
         { id: InterceptorType.GritTrap, text: 'Grit Trap' },
         { id: InterceptorType.SepticTank, text: 'Septic Tank' },
         { id: InterceptorType.ChemicalToilet, text: 'Chemical Toilet' },
+        { id: InterceptorType.LintTrap, text: 'Lint Trap' },
         { id: InterceptorType.Other, text: 'Other' }
     ];
 
@@ -110,7 +114,8 @@ export class FogTripTicketListComponent implements OnInit {
 
     constructor(
         private readonly _fogTripTicketService: FogTripTicketService,
-        private readonly _waterSupplierService: WaterSupplierService
+        private readonly _waterSupplierService: WaterSupplierService,
+        private readonly _windowService: WindowService
     ) {
 
     }
@@ -178,6 +183,14 @@ export class FogTripTicketListComponent implements OnInit {
         await this.getTripTickets();
 
         this.showResults = true;
+    }
+
+    public openDetails(ticket: FogTripTicketRow): void {
+        this._windowService.addWindow(FogTripTicketDetailsComponent, {
+            title: [ticket.id, ticket.propertyAddress].filter(part => part).join(' - '),
+            color: MODULE_COLORS.FOG,
+            model: { id: ticket.id }
+        });
     }
 
     public async getTripTickets(): Promise<void> {

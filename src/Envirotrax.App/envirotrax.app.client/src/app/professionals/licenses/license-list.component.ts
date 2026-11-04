@@ -79,7 +79,7 @@ export class LicenseListComponent implements OnInit {
             this._licenseService.getAllTypesAsOptions({ sort: {}, filter: [] }, false)
         ]);
 
-        this._allLicenseTypes = licenseTypes.filter(l => l.data?.state?.id == professional.state?.id);
+        this._allLicenseTypes = this._licenseService.filterTypesByProfessionalState(licenseTypes, professional);
         this.professions = this.getProfessions(professional);
 
         if (this.professions.length > 0) {
@@ -106,21 +106,9 @@ export class LicenseListComponent implements OnInit {
             providedTypes.push(ProfessionalType.FogTransporter);
         }
 
-        const professions: InputOption<ProfessionalType>[] = [];
-
-        for (const providedType of providedTypes) {
-            const hasLicenseTypes = this._allLicenseTypes.some(licenseType => licenseType.data?.professionalType == providedType);
-
-            if (hasLicenseTypes) {
-                professions.push({
-                    id: providedType,
-                    text: professionalTypeLabels[providedType],
-                    data: providedType
-                });
-            }
-        }
-
-        return professions;
+        return this._licenseService
+            .getProfessionalTypeOptions(this._allLicenseTypes)
+            .filter(profession => providedTypes.includes(profession.data!));
     }
 
     private getColumns(): TableColumn<ProfessionalDashboardLicenseInsurance>[] {

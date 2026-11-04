@@ -19,6 +19,7 @@ import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, Modal
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { GeneralSettingsService } from "../../shared/services/settings/general-settings.service";
 import { PrintableTableService } from "../../shared/services/printable-table.service";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../shared/models/page-info";
 
 @Component({
     standalone: false,
@@ -252,7 +253,7 @@ export class SiteListComponent implements OnInit {
     public async getSites(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            this.table.items = await this._siteService.getAll(this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.table.query);
         } finally {
             this.table.isLoading = false;
         }

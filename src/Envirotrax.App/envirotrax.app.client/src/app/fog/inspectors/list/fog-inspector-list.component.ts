@@ -9,6 +9,7 @@ import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../shared/models/page-info';
 
 interface FogInspectorLicenseSearchVm {
     inspectorLicenseNumber?: string;
@@ -102,7 +103,7 @@ export class FogInspectorListComponent implements OnInit {
     public async getInspectors(): Promise<void> {
         try {
             this.table.isLoading = true;
-            const pageInfo = this.table.items?.pageInfo || {};
+            const pageInfo = this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE };
             const { inspectorLicenseNumber, insurancePolicyNumber } = this._licenseSearch;
 
             this.table.items = (inspectorLicenseNumber || insurancePolicyNumber)

@@ -16,6 +16,7 @@ import { ProfessionalLicenseService } from "../../shared/services/professionals/
 import { ProfessionalDashboardLicenseInsurance, ProfessionalDashboardRowType } from "../../shared/models/professionals/professional-dashboard-license-insurance";
 import { EditCompanyLicenseComponent } from "./edit/edit-company-license.component";
 import { HelperService } from "../../shared/services/helpers/helper.service";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../shared/models/page-info";
 
 @Component({
     selector: 'vp-license-list',
@@ -159,7 +160,7 @@ export class LicenseListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._companyLicenseService.getAllWithUserLicenses(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

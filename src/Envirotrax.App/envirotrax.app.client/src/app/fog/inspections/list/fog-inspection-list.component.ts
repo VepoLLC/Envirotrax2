@@ -15,6 +15,7 @@ import { AppContainerHelperService } from "../../../shared/services/helpers/app-
 import { PrintableTableService } from '../../../shared/services/printable-table.service';
 import { DownloadConfig } from '../../../shared/models/download-config';
 import { DownloadService } from '../../../shared/services/download.service';
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../shared/models/page-info';
 
 type DownloadCategory = 'property' | 'interceptor' | 'inspector' | 'mailing';
 
@@ -254,7 +255,7 @@ export class FogInspectionListComponent implements OnInit, OnDestroy {
         try {
             this.table.isLoading = true;
             this.table.items = await this._fogInspectionService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

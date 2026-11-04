@@ -11,6 +11,7 @@ import { PrintableTableService } from '../../../../shared/services/printable-tab
 import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
 import { DownloadConfig } from '../../../../shared/models/download-config';
 import { DownloadService } from '../../../../shared/services/download.service';
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../../shared/models/page-info';
 
 @Component({
     standalone: false,
@@ -143,7 +144,7 @@ export class CsiInspectionListComponent implements OnInit {
         try {
             this.inspections.isLoading = true;
 
-            this.inspections.items = await this._inspectionService.getProfessionalInspections(this.inspections?.items?.pageInfo || {}, this.inspections.query, this.latestOnly);
+            this.inspections.items = await this._inspectionService.getProfessionalInspections(this.inspections?.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.inspections.query, this.latestOnly);
         } finally {
             this.inspections.isLoading = false;
         }

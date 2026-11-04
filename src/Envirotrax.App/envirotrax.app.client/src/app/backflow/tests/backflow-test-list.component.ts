@@ -23,6 +23,7 @@ import { PrintableTableService } from '../../shared/services/printable-table.ser
 import { PropertyType } from '../../shared/enums/property-type.enum';
 import { BackflowComplianceParams } from '../../shared/models/backflow/backflow-compliance-params';
 import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
+import { STANDALONE_GRID_PAGE_SIZE } from '../../shared/models/page-info';
 
 @Component({
     standalone: false,
@@ -403,7 +404,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
         try {
             this.table.isLoading = true;
             const result = await this._backflowTestService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query,
                 this.getPaymentStatus()
             );

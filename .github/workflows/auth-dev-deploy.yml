@@ -48,7 +48,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/${{env.WEBAPP_PROJECT_NAME}}
 
   deploy:
-    runs-on: [self-hosted, dev]
+    runs-on: [self-hosted, test]
     needs: build
 
     steps:

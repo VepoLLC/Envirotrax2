@@ -1,0 +1,21 @@
+<vp-section [header]="'Vehicles (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [canAdd]="true"
+                  (add)="addVehicle()"
+                  [canEdit]="true"
+                  (edit)="editVehicle($event)"
+                  [canDelete]="true"
+                  (delete)="deleteVehicle($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getVehicles()"
+                  [(query)]="table.query"
+                  (queryChange)="getVehicles()"
+                  (queryReset)="getVehicles()" />
+    </div>
+</vp-section>

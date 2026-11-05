@@ -156,12 +156,16 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalReceiptReferenceProvider>(provider => provider.GetRequiredService<IFogInspectionCheckoutService>());
         services.AddTransient<IProfessionalReceiptReferenceProvider>(provider => provider.GetRequiredService<IFogTripTicketCheckoutService>());
 
-        services.AddEmailService(configuration.GetSection("Email"), opts =>
+        var appUrl = configuration["Sites:EnvirotraxApp:Url"];
+
+        Action<HtmlTemplateOptions> configureTemplates = opts =>
         {
             opts.Assembly = typeof(ServiceRegistration).Assembly;
             opts.Namespace = "Envirotrax.App.Server";
-        });
-        services.AddPdfTemplateService(environment.IsDevelopment(), configuration.GetSection("PdfTemplate"));
+        };
+
+        services.AddEmailService(configuration.GetSection("Email"), appUrl, configureTemplates);
+        services.AddPdfTemplateService(environment.IsDevelopment(), appUrl, configureTemplates, configuration.GetSection("PdfTemplate"));
 
         services.AddTransient<ICsvHelperService, CsvHelperService>();
 

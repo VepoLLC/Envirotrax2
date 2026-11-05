@@ -38,6 +38,13 @@ export class FogTripTicket {
     propertyCity?: string;
     propertyState?: State;
     propertyZip?: string;
+    fogGeneratorPhoneNumber?: string;
+    fogGeneratorEmailAddress?: string;
+    generatorContactName?: string;
+
+    generatorSignatureUrl?: string;
+    transporterSignatureUrl?: string;
+    receiverSignatureUrl?: string;
 
     professional?: ReferencedProfessional;
     transporter?: ReferencedProfessionalUser;
@@ -49,6 +56,14 @@ export class FogTripTicket {
     transporterZip?: string;
     transporterLicenseNumber?: string;
     transporterEmailAddress?: string;
+    transporterWorkNumber?: string;
+
+    vehicleLicensePlateNumber?: string;
+    vehicleManufacturer?: string;
+    vehicleYear?: number;
+    vehicleCapacity?: number;
+    vehicleCapacityType?: InterceptorCapacityType;
+    vehicleStickerNumber?: string;
 
     interceptorType?: string;
     interceptorOtherDescription?: string;
@@ -65,13 +80,48 @@ export class FogTripTicket {
     receiverState?: string;
     receiverZip?: string;
     receiverRegistrationNumber?: string;
+    receiverPhoneNumber?: string;
+    receiverEmailAddress?: string;
     receiverWasteDeliveredDate?: string;
+    comments?: string;
 
     pickupCompleted?: boolean;
     completed?: boolean;
     transactionId?: string;
 
+    needsValidation?: boolean;
+    validationOnHold?: boolean;
+    validationNewSite?: boolean;
+    validationSiteInformationChanged?: boolean;
+    validationReceiverInformationChanged?: boolean;
+
     createdTime?: string;
+}
+
+export interface FogTripTicketUpdateRequest {
+    propertyType?: PropertyType;
+    propertyBusinessName?: string;
+    propertyStreetNumber?: string;
+    propertyStreetName?: string;
+    propertyNumber?: string;
+    propertyCity?: string;
+    propertyState?: State;
+    propertyZip?: string;
+    fogGeneratorPhoneNumber?: string;
+    fogGeneratorEmailAddress?: string;
+    generatorContactName?: string;
+
+    interceptorType?: string;
+    interceptorOtherDescription?: string;
+    interceptorCapacity?: number;
+    interceptorCapacityType?: InterceptorCapacityType;
+    interceptorWasteRemovedAmount?: number;
+    interceptorWasteRemovedType?: InterceptorCapacityType;
+    interceptorWasteRemovedDate?: string;
+
+    receiverContactName?: string;
+    receiverWasteDeliveredDate?: string;
+    comments?: string;
 }
 
 export interface FogTripTicketRow extends FogTripTicket {

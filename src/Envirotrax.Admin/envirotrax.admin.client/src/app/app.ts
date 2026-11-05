@@ -16,10 +16,11 @@ import { FogDisposalSiteListComponent } from './fog/disposal-sites/list/fog-disp
 import { FogTripTicketListComponent } from './fog/trip-tickets/list/fog-trip-ticket-list.component';
 import { LetterGeneratorComponent } from './management-tools/letter-generator/letter-generator.component';
 import { LicenseManagementComponent } from './licenses/license-management.component';
+import { SubmissionValidationListComponent } from './validations/list/submission-validation-list.component';
 import { NavigationEnd, Router } from '@angular/router';
 import { ROLE_DEFINITIONS } from './shared/models/role-definitions';
 import { filter } from 'rxjs';
-import { MODULE_COLORS } from './shared/models/module-colors';
+import { MODULE_COLORS, NAVBAR_COLOR } from './shared/models/module-colors';
 
 @Component({
   selector: 'app-root',
@@ -32,6 +33,7 @@ export class App implements OnInit {
   public isNavbarVisible: boolean = false;
   public menuItems: MenuItem[] = [];
   public showWindowContainer: boolean = true;
+  public readonly navbarColor: string = NAVBAR_COLOR;
 
   constructor(
     private readonly _authService: AuthService,
@@ -158,6 +160,12 @@ export class App implements OnInit {
         iconCss: 'fa-solid fa-id-card',
         color: MODULE_COLORS.LICENSES,
         onClick: this.showLicenseManagement.bind(this)
+      },
+      {
+        title: 'Submission Validations',
+        iconCss: 'fa-solid fa-file-circle-check',
+        color: MODULE_COLORS.VALIDATION,
+        onClick: this.showSubmissionValidations.bind(this)
       },
       {
         title: 'Management Tools',
@@ -293,6 +301,13 @@ export class App implements OnInit {
     this._windowService.addWindow(LicenseManagementComponent, {
       title: 'License Management',
       color: MODULE_COLORS.LICENSES
+    });
+  }
+
+  public showSubmissionValidations(): void {
+    this._windowService.addWindow(SubmissionValidationListComponent, {
+      title: 'Validations',
+      color: MODULE_COLORS.VALIDATION
     });
   }
 

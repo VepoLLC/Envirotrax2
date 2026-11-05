@@ -8,6 +8,8 @@ namespace Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 public interface IProfessionalInsuranceService : IService<ProfessionalInsuranceDto>
 {
     Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto insurance);
+    Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(int professionalId, int insuranceId, ProfessionalInsuranceDto insurance, CancellationToken cancellationToken);
+    Task<ProfessionalInsuranceDto?> DeleteForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken);
     Task<IPagedData<ProfessionalInsuranceDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ILookup<int, ProfessionalInsuranceDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);
     Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
@@ -19,4 +21,5 @@ public interface IProfessionalInsuranceService : IService<ProfessionalInsuranceD
     Task EnsureSatisfiedForWaterSupplierAsync(int professionalId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken);
 
     Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken);
+    Task<Uri?> GenerateFileUrlForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken);
 }

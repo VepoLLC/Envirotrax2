@@ -135,8 +135,15 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         return MapToDto(added)!;
     }
 
-    public async Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto)
+    public async Task<ProfessionalUserLicenseDto?> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto, CancellationToken cancellationToken = default, ProfessionalType? professionalType = null)
     {
+        var belongsToProfessional = await _licenseRepository.ExistsForProfessionalAsync(professionalId, dto.Id, cancellationToken, professionalType);
+
+        if (!belongsToProfessional)
+        {
+            return null;
+        }
+
         var licenseType = await _licenseTypeService.EnsureLicenseScopeAsync(dto.LicenseType.Id, LicenseScope.User);
 
         dto.ProfessionalType = licenseType.ProfessionalType;
@@ -184,6 +191,18 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         await _licenseRepository.UpdateLastCheckDateAsync(id, DateTime.UtcNow);
 
         return tceqLicense;
+    }
+
+    public async Task<ProfessionalUserLicenseDto?> DeleteForProfessionalAsync(int professionalId, int licenseId, CancellationToken cancellationToken, ProfessionalType? professionalType = null)
+    {
+        var belongsToProfessional = await _licenseRepository.ExistsForProfessionalAsync(professionalId, licenseId, cancellationToken, professionalType);
+
+        if (!belongsToProfessional)
+        {
+            return null;
+        }
+
+        return await DeleteAsync(licenseId);
     }
 
     public async Task<IPagedData<ProfessionalUserLicenseDto>> GetAllAsync(int userId, PageInfo pageInfo, Query query)

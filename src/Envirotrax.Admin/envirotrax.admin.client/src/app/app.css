@@ -15,8 +15,21 @@
 }
 
 @media (min-width: 992px) {
+    /* Slimmer side padding than Bootstrap's 0.5rem lets the seven top-level menus fit in one row on a desktop window. */
     .vp-navbar {
         position: relative;
+        --bs-navbar-nav-link-padding-x: 0.3rem;
+    }
+
+    /* Keep each menu label on one line. When the menus still don't fit (a narrower window), whole items move to a
+       second row, as in the V1 Vepo Manager, instead of every label wrapping inside its own item. */
+    .vp-navbar .navbar-nav {
+        flex-wrap: wrap;
+        row-gap: 0.25rem;
+    }
+
+    .vp-navbar .nav-link {
+        white-space: nowrap;
     }
 }
 

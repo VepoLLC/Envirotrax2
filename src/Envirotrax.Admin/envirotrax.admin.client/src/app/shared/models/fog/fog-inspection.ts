@@ -11,6 +11,7 @@ export enum InterceptorType {
     GritTrap = 'Grit Trap',
     SepticTank = 'Septic Tank',
     ChemicalToilet = 'Chemical Toilet',
+    LintTrap = 'Lint Trap',
     Other = 'Other'
 }
 
@@ -86,6 +87,11 @@ export class FogInspection {
 
     inspectorCompanyName?: string;
     inspectorContactName?: string;
+
+    needsValidation?: boolean;
+    validationNewSite?: boolean;
+    validationSiteInformationChanged?: boolean;
+    validationOnHold?: boolean;
 
     createdTime?: string;
 

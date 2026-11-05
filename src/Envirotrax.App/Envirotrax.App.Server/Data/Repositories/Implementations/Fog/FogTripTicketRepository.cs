@@ -130,6 +130,52 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<FogTripTicket?> UpdateForAdminAsync(int id, FogTripTicketAdminUpdateRequest request, CancellationToken cancellationToken)
+    {
+        var ticket = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (ticket == null)
+        {
+            return null;
+        }
+
+        ticket.PropertyType = request.PropertyType;
+        ticket.PropertyBusinessName = request.PropertyBusinessName;
+        ticket.PropertyStreetNumber = request.PropertyStreetNumber;
+        ticket.PropertyStreetName = request.PropertyStreetName;
+        ticket.PropertyNumber = request.PropertyNumber;
+        ticket.PropertyCity = request.PropertyCity;
+        ticket.PropertyStateId = request.PropertyState?.Id;
+        ticket.PropertyZip = request.PropertyZip;
+        ticket.FogGeneratorPhoneNumber = request.FogGeneratorPhoneNumber;
+        ticket.FogGeneratorEmailAddress = request.FogGeneratorEmailAddress;
+        ticket.GeneratorContactName = request.GeneratorContactName;
+
+        ticket.InterceptorType = request.InterceptorType;
+        ticket.InterceptorOtherDescription = request.InterceptorOtherDescription;
+        ticket.InterceptorCapacity = request.InterceptorCapacity;
+        ticket.InterceptorCapacityType = request.InterceptorCapacityType;
+        ticket.InterceptorWasteRemovedAmount = request.InterceptorWasteRemovedAmount;
+        ticket.InterceptorWasteRemovedType = request.InterceptorWasteRemovedType;
+        ticket.InterceptorWasteRemovedDate = request.InterceptorWasteRemovedDate;
+
+        // The FOG reports sum these per-unit columns, so they follow the edited amount: the amount goes in the
+        // column of its own unit and 0 in the other ("CubicFeet" holds cubic yards, a V1 name). V1 trip_ticket_submit
+        // picks the column by the trap capacity unit instead, a V1 bug that isn't ported.
+        var isGallons = request.InterceptorWasteRemovedType == FogVehicleCapacityType.Gallons;
+
+        ticket.InterceptorWasteRemovedAmountGallons = isGallons ? request.InterceptorWasteRemovedAmount : 0;
+        ticket.InterceptorWasteRemovedAmountCubicFeet = isGallons ? 0 : request.InterceptorWasteRemovedAmount;
+
+        ticket.ReceiverContactName = request.ReceiverContactName;
+        ticket.ReceiverWasteDeliveredDate = request.ReceiverWasteDeliveredDate;
+        ticket.Comments = request.Comments;
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        return ticket;
+    }
+
     public async Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken)
     {
         var ticket = await GetNoIncludesAsync(id, cancellationToken);
@@ -149,6 +195,41 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         }
 
         await DbContext.SaveChangesAsync();
+
+        return ticket;
+    }
+
+    // Submission Validations window: the Hold checkbox and the Clear action.
+    public async Task<FogTripTicket?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken)
+    {
+        var ticket = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (ticket == null)
+        {
+            return null;
+        }
+
+        ticket.ValidationOnHold = onHold;
+
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        return ticket;
+    }
+
+    // Trip tickets have no record log, so the clearing date goes on the ticket itself, as in V1.
+    public async Task<FogTripTicket?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken)
+    {
+        var ticket = await GetTrackedForUpdateAsync(id, cancellationToken);
+
+        if (ticket == null)
+        {
+            return null;
+        }
+
+        ticket.NeedsValidation = needsValidation;
+        ticket.ValidationClearedDate = needsValidation ? null : DateTime.UtcNow;
+
+        await DbContext.SaveChangesAsync(cancellationToken);
 
         return ticket;
     }

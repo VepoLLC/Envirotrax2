@@ -1,0 +1,112 @@
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="Validation Filters">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <vp-filter-panel-field fieldName="waterSupplier.id"
+                                               label="Water Supplier"
+                                               type="select"
+                                               [form]="searchForm"
+                                               [options]="waterSupplierOptions" />
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <vp-filter-panel-field fieldName="propertyType"
+                                               label="Property Type"
+                                               type="select"
+                                               [form]="searchForm"
+                                               [options]="propertyTypeOptions" />
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-md-4 mb-2">
+                        <div class="form-check mb-1">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   [attr.id]="idPrefix + '-needs-validation'"
+                                   [checked]="true"
+                                   [disabled]="true">
+                            <label class="form-check-label d-flex align-items-center gap-2" [attr.for]="idPrefix + '-needs-validation'">
+                                <vp-submission-validation-badge [flag]="needsValidationFlag" />
+                                {{ needsValidationFlag.label }}
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-1">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   [attr.id]="idPrefix + '-on-hold'"
+                                   [(ngModel)]="validationOnHold"
+                                   [ngModelOptions]="{ standalone: true }">
+                            <label class="form-check-label d-flex align-items-center gap-2" [attr.for]="idPrefix + '-on-hold'">
+                                <vp-submission-validation-badge [flag]="onHoldFlag" />
+                                {{ onHoldFlag.label }}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-2" *ngFor="let column of reasonColumns">
+                        <div class="form-check mb-1" *ngFor="let flag of column">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   [attr.id]="idPrefix + '-' + flag.reason"
+                                   [(ngModel)]="selectedReasons[flag.reason]"
+                                   [ngModelOptions]="{ standalone: true }">
+                            <label class="form-check-label d-flex align-items-center gap-2" [attr.for]="idPrefix + '-' + flag.reason">
+                                <vp-submission-validation-badge [flag]="flag" />
+                                {{ flag.label }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="Search Results">
+        <div class="d-flex justify-content-center mb-3">
+            <button type="button" class="btn btn-primary vp-section-button" (click)="refresh()">
+                <i class="fa-solid fa-rotate me-1"></i>
+                Refresh
+            </button>
+        </div>
+
+        <div class="text-center mb-3">
+            <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
+                <li class="nav-item" *ngFor="let tab of tabs">
+                    <a class="nav-link" role="button"
+                       [class.active]="activeTab === tab.key"
+                       (click)="activeTab = tab.key">{{ tab.title }} ({{ tab.count }})</a>
+                </li>
+            </ul>
+        </div>
+
+        <div *ngFor="let tab of tabs" [hidden]="activeTab !== tab.key">
+            <vp-submission-validation-tab [source]="tab.source"
+                                          [filter]="tab.filter"
+                                          (countChange)="tab.count = $event" />
+        </div>
+    </vp-section>
+</div>

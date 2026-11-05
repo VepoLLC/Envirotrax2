@@ -49,25 +49,8 @@ public class FogInspectorUserController : AdminBaseController
     [HttpDelete("{userId}")]
     public async Task<IActionResult> DeleteAsync(int professionalId, int userId, CancellationToken cancellationToken)
     {
-        if (!await BelongsToProfessionalAsync(professionalId, userId, cancellationToken))
-        {
-            return NotFound();
-        }
-
-        var deleted = await _userService.DeleteAsync(userId);
+        var deleted = await _userService.DeleteForProfessionalAsync(professionalId, userId, cancellationToken);
 
         return deleted == null ? NotFound() : Ok();
-    }
-
-    private async Task<bool> BelongsToProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
-    {
-        var owned = await _userService.GetAllByProfessionalAsync(
-            professionalId,
-            new PageInfo(),
-            new Query(),
-            cancellationToken,
-            proUser => proUser.UserId == userId);
-
-        return owned.Data.Any();
     }
 }

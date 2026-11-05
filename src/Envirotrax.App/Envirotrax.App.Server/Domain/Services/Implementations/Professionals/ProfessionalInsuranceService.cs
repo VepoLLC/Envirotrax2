@@ -321,6 +321,24 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return added;
     }
 
+    public async Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(int professionalId, int insuranceId, ProfessionalInsuranceDto insurance, CancellationToken cancellationToken)
+    {
+        var belongsToProfessional = await _insuranceRepository.ExistsForProfessionalAsync(professionalId, insuranceId, cancellationToken);
+
+        if (!belongsToProfessional)
+        {
+            return null;
+        }
+
+        insurance.Id = insuranceId;
+        insurance.Professional = new ReferencedProfessionalDto
+        {
+            Id = professionalId
+        };
+
+        return await UpdateAsync(insurance);
+    }
+
     public override async Task<ProfessionalInsuranceDto?> DeleteAsync(int id)
     {
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -337,15 +355,54 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         }
     }
 
+    public async Task<ProfessionalInsuranceDto?> DeleteForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken)
+    {
+        var belongsToProfessional = await _insuranceRepository.ExistsForProfessionalAsync(professionalId, insuranceId, cancellationToken);
+
+        if (!belongsToProfessional)
+        {
+            return null;
+        }
+
+        return await DeleteAsync(insuranceId);
+    }
+
     public async Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken)
     {
         var insurance = await _insuranceRepository.GetNoIncludesAsync(id, cancellationToken);
 
+        return await GenerateFileUrlAsync(insurance);
+    }
+
+    public async Task<Uri?> GenerateFileUrlForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken)
+    {
+        var insurance = await _insuranceRepository.GetForProfessionalAsync(professionalId, insuranceId, cancellationToken);
+
+        return await GenerateFileUrlAsync(insurance);
+    }
+
+    private async Task<Uri?> GenerateFileUrlAsync(ProfessionalInsurance? insurance)
+    {
         if (insurance != null && !string.IsNullOrWhiteSpace(insurance.FilePath))
         {
             return await _fileStorageService.GenerateSasUrlAsync(insurance.FilePath);
         }
 
         return null;
+    }
+
+    public async Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(int professionalId, ProfessionalInsuranceDto dto, CancellationToken cancellationToken)
+    {
+        if (!await _insuranceRepository.ExistsForProfessionalAsync(professionalId, dto.Id, cancellationToken))
+        {
+            return null;
+        }
+
+        dto.Professional = new ReferencedProfessionalDto
+        {
+            Id = professionalId
+        };
+
+        return await UpdateAsync(dto);
     }
 }

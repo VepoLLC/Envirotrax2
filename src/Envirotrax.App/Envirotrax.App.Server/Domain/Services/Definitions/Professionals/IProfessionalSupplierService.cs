@@ -10,4 +10,5 @@ public interface IProfessionalSupplierService : IService<ProfessionalWaterSuppli
 {
     Task<IPagedData<AvailableWaterSupplierDto>> GetAllAvailableSuppliersAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IPagedData<ProfessionalWaterSupplierDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalWaterSupplier, bool>>? filter = null);
+    Task<ProfessionalWaterSupplierDto?> UpdateForProfessionalAsync(int professionalId, int waterSupplierId, ProfessionalWaterSupplierDto registration, CancellationToken cancellationToken);
 }

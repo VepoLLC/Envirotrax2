@@ -61,6 +61,11 @@ public static class ServiceRegistration
                 services.AddTransient<IFogInspectorLicenseService, FogInspectorLicenseService>();
                 services.AddTransient<IFogInspectorInsuranceService, FogInspectorInsuranceService>();
                 services.AddTransient<IFogTransporterService, FogTransporterService>();
+                services.AddTransient<IFogTransporterWaterSupplierService, FogTransporterWaterSupplierService>();
+                services.AddTransient<IFogTransporterUserService, FogTransporterUserService>();
+                services.AddTransient<IFogTransporterLicenseService, FogTransporterLicenseService>();
+                services.AddTransient<IFogTransporterInsuranceService, FogTransporterInsuranceService>();
+                services.AddTransient<IFogTransporterVehicleService, FogTransporterVehicleService>();
                 services.AddTransient<IFogTripTicketService, FogTripTicketService>();
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
                 services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();

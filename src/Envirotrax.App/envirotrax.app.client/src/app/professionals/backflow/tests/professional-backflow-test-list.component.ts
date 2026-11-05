@@ -91,6 +91,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
             fileName: 'Backflow Tests',
             endpoint: this._backflowTestService.getAllForProfessionalEndpoint(),
             pdfEndpoint: this._backflowTestService.getAllForProfessionalPdfEndpoint(),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },

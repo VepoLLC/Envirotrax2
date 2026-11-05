@@ -1,11 +1,14 @@
 
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Lookup;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Csi;
 
 public class CsiInspectionDto
 {
     public int Id { get; set; }
+
+    public ReferencedWaterSupplierDto? WaterSupplier { get; set; }
 
     public DateTime? InspectionDate { get; set; }
 
@@ -36,4 +39,15 @@ public class CsiInspectionDto
     public string? InspectorLicenseType { get; set; }
 
     public string? InspectorLicenseNumber { get; set; }
+
+    // Validation
+    public bool NeedsValidation { get; set; }
+
+    public bool ValidationNewSite { get; set; }
+
+    public bool ValidationSiteInformationChanged { get; set; }
+
+    public bool ValidationOnHold { get; set; }
+
+    public DateTime CreatedTime { get; set; }
 }

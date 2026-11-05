@@ -22,7 +22,7 @@ public class FogTripTicketProfile : Profile
             {
                 dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
-                dto.Site ??= new ReferencedSiteDto { Id = model.SiteId };
+                dto.Site ??= new ReferencedSiteDto { Id = model.SiteId, AccountNumber = model.Site?.AccountNumber };
                 dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId };
 
                 if (model.TransporterId.HasValue)

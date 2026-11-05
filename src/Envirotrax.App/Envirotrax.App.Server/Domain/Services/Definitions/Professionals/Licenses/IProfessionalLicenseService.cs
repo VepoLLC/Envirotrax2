@@ -9,8 +9,9 @@ public interface IProfessionalLicenseService : IService<ProfessionalLicense, Pro
     Task<IPagedData<ProfessionalLicenseDto>> GetAllByProfessionalAsync(int professionalId, ProfessionalType professionalType, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ILookup<int, ProfessionalLicenseDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken);
     Task<ProfessionalLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalLicenseDto dto);
-    Task<ProfessionalLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalLicenseDto dto);
+    Task<ProfessionalLicenseDto?> UpdateForProfessionalAsync(int professionalId, ProfessionalLicenseDto dto);
     Task<ProfessionalLicenseDto?> UpdateForAdminAsync(int id, ProfessionalLicenseDto dto);
+    Task<ProfessionalLicenseDto?> DeleteForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken);
     Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto);
     Task DeleteForWaterSupplierAsync(int id);
 }

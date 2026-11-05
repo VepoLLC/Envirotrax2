@@ -68,4 +68,23 @@ public class BackflowTestDto
     public string? BpatContactName { get; set; }
 
     public string? BpatLicenseNumber { get; set; }
+
+    // Validation
+    public bool NeedsValidation { get; set; }
+
+    public bool ValidationNewSite { get; set; }
+
+    public bool ValidationSiteInformationChanged { get; set; }
+
+    public bool ValidationUnknownSerialNumber { get; set; }
+
+    public bool ValidationDeviceInformationChanged { get; set; }
+
+    public bool ValidationDeviceMoved { get; set; }
+
+    public bool ValidationHazardTypeChanged { get; set; }
+
+    public bool ValidationCreatedFromCsi { get; set; }
+
+    public bool ValidationOnHold { get; set; }
 }

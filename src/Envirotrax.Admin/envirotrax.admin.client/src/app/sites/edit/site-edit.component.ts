@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { HelperService, InputOption, ModalHelperService, RecordLog, ToastService, ToastType } from '@envirotrax/common-ui';
+import { MODULE_COLORS } from '../../shared/models/module-colors';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
 import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteGisUpdate, SiteUpdate } from '../../shared/models/sites/site-update';
@@ -402,6 +403,7 @@ export class SiteEditComponent implements OnInit {
 
         this._windowService.addWindow(SiteEditComponent, {
             title: this.buildSiteWindowTitle(site),
+            color: MODULE_COLORS.SITE,
             model
         });
     }

@@ -7,4 +7,5 @@ public class HtmlTemplateOptions
 {
     public Assembly Assembly { get; set; } = null!;
     public string Namespace { get; set; } = null!;
+    public string BaseUrl { get; set; } = null!;
 }

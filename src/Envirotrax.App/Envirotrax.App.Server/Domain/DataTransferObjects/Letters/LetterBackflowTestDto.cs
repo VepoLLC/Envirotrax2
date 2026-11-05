@@ -1,3 +1,5 @@
+using Envirotrax.App.Server.Data.Models.Sites;
+
 namespace Envirotrax.App.Server.Domain.DataTransferObjects.Letters;
 
 public class LetterBackflowTestDto
@@ -19,4 +21,10 @@ public class LetterBackflowTestDto
     public string? TransactionId { get; set; }
     public DateTime? TestDate { get; set; }
     public DateTime? ExpirationDate { get; set; }
+
+    public bool ForceRenewal { get; set; }
+
+    public PropertyType SitePropertyType { get; set; }
+    public bool SiteHasOnSiteSewageFacility { get; set; }
+    public bool SiteHasAuxWaterSupply { get; set; }
 }

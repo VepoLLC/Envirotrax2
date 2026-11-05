@@ -12,9 +12,10 @@ public interface IProfessionalUserLicenseService : IService<ProfessionalUserLice
     Task<IPagedData<ProfessionalUserLicenseDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUserLicense, bool>>? filter = null);
     Task<ILookup<int, ProfessionalUserLicenseDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken);
     Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
-    Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
+    Task<ProfessionalUserLicenseDto?> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto, CancellationToken cancellationToken = default, ProfessionalType? professionalType = null);
     Task<ProfessionalUserLicenseDto?> UpdateForAdminAsync(int id, ProfessionalUserLicenseDto dto);
     Task<TceqLicenseDto?> CheckTceqLicenseAsync(int id);
+    Task<ProfessionalUserLicenseDto?> DeleteForProfessionalAsync(int professionalId, int licenseId, CancellationToken cancellationToken, ProfessionalType? professionalType = null);
     Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken);
     Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken);
     Task<BpatLicenseCheckDto> CheckBpatForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, CancellationToken cancellationToken);

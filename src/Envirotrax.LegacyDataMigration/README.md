@@ -35,7 +35,7 @@ Both databases below must be **local** — on your own machine, not the shared d
 
 Only once both databases exist **locally** should you move on to running this project.
 
-3. **Azure sign-in, plus access to the legacy file server.** The site log migration downloads every V1 file attachment from `https://iofiles.envirotrax.com` and uploads it to Azure Blob Storage, so the machine needs outbound access to that server and you need to be signed in to Azure (`az login`, or a signed-in Visual Studio) as an account holding the **Storage Blob Data Contributor** role on the storage account named in `Program.cs`. The app checks this with a probe upload before it starts; if the check fails it logs an error, moves no files, and leaves every attachment pending for a later run.
+3. **Azure sign-in, plus access to the legacy file server.** Several migrations download V1 files from `https://iofiles.envirotrax.com` and upload them to Azure Blob Storage — site log attachments, and the images of backflow tests, CSI inspections and FOG inspections — so the machine needs outbound access to that server and you need to be signed in to Azure (`az login`, or a signed-in Visual Studio) as an account holding the **Storage Blob Data Contributor** role on the storage account named in `Program.cs`. Each of them checks this with a probe upload before it starts; if the check fails it logs an error, moves no files, and leaves every file pending for a later run.
 
 > ⚠️ **The storage account is shared, and there is no local substitute for it.** Unlike the two databases, blob storage has no `(localdb)` equivalent, so a local run still writes into the real `envirotrax2dev` storage account. Re-running against the **same** V2 database is bounded: the blob name is fixed by the site's row id plus the V1 record id, so a retry overwrites the same file instead of piling up a new one. Rebuilding the V2 database from scratch is **not** bounded — `Sites.Id` is reassigned, so the next run writes the same files under different folders and leaves the previous run's blobs behind. Know what you are pointing at before you run.
 
@@ -135,9 +135,10 @@ Four things are worth knowing:
   Mixing them would point the composite foreign key at a person from another company.
   A test whose tester login matches no migrated professional user is recorded as skipped, because
   `ProfessionalId` is NOT NULL.
-- **V2 made 55 value columns NOT NULL that V1 leaves nullable.** Each falls back to `0`, so a single
-  legacy NULL cannot roll back the whole run. `CreatedTime` is deliberately not defaulted: there is
-  no honest stand-in for when a test was recorded, so a NULL there should stop the run.
+- **NOT NULL value columns fall back to `0`.** V1 declares nearly all of them NOT NULL as well, so the
+  fallback rarely fires; it is there so that a single stray NULL cannot roll back the whole run.
+  `CreatedTime` is deliberately not defaulted: there is no honest stand-in for when a test was
+  recorded, so a NULL there should stop the run.
 - **Text is copied without `LEFT()`.** V1 declares eight text columns wider than V2 does (the BPAT
   company, contact, address, city and ZIP, the property and mailing ZIPs, and the gauge serial
   number), but in the real V1 data only `MailingZIP` ever holds a longer value: seven tests from one
@@ -153,6 +154,10 @@ Tests that could not be migrated are queryable:
 
 `SELECT * FROM MigrationSkippedBackflowTests` — either the water supplier never migrated, or no
 migrated professional user matches the tester login the test was recorded under.
+
+Expect that table to be large. In the July 2026 copy of V1, about 534,000 of the 1.24 million tests
+have no tester login at all — mostly imported history and tests a supplier entered by hand — and V2
+requires a professional on every test, so all of them land there.
 
 ### How backflow test images are migrated
 
@@ -208,9 +213,10 @@ Six things are worth knowing:
   recorded as skipped too. If a later run migrates it, its entry in the skipped table is cleared.
 - **An unpaid inspection has a NULL `TransactionId`.** V1 marks one with an empty string, and some V2
   checks, such as the one that blocks downloading the report before payment, only test for NULL.
-- **Facility type and coordinates change shape.** `FacilityType` is the text of a dropdown in V1 and an
-  enum in V2; it goes through the same table as sites. The interceptor's latitude and longitude are
-  text in V1 and numbers in V2, and a blank one becomes NULL rather than 0.
+- **Facility type changes shape, and a 0 coordinate becomes NULL.** `FacilityType` is the text of a
+  dropdown in V1 and an enum in V2; it goes through the same table as sites. The interceptor's latitude
+  and longitude are numbers in both, and V1 stores 0 when there is none (every inspection in the July
+  2026 copy does), so a 0 becomes NULL instead of pinning the interceptor to 0,0.
 - **Text is copied without `LEFT()`.** V1 declares no text column wider than V2 does, and in the real
   V1 data the longest value of any column is well inside its V2 size, so nothing can be cut and no V2
   column needed widening. A value that did not fit would stop the run instead of being shortened.

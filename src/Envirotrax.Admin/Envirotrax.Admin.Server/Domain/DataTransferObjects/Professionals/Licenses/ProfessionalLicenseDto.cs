@@ -2,6 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Professionals.Licenses;
 
+/// <summary>
+/// Mirrors the App's ProfessionalLicenseDto: a company-level license (ProfessionalLicenses), which has no user,
+/// unlike ProfessionalUserLicenseDto. FOG transporter registrations are this kind.
+/// </summary>
 public class ProfessionalLicenseDto
 {
     public int Id { get; set; }

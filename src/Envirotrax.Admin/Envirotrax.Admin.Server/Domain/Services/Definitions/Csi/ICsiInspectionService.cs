@@ -13,6 +13,10 @@ public interface ICsiInspectionService
 
     Task<CsiInspectionDetailsDto?> UpdateAsync(int id, int waterSupplierId, CsiInspectionUpdateRequest request, CancellationToken cancellationToken);
 
+    Task<CsiInspectionDto?> UpdateValidationHoldAsync(int id, int waterSupplierId, bool onHold, CancellationToken cancellationToken);
+
+    Task<CsiInspectionDto?> UpdateNeedsValidationAsync(int id, int waterSupplierId, bool needsValidation, CancellationToken cancellationToken);
+
     Task<CsiInspectionCountsDto?> GetCountsAsync(int id, CancellationToken cancellationToken);
 
     Task<List<CsiInspectionAssemblyDto>?> GetAssembliesAsync(int id, CancellationToken cancellationToken);

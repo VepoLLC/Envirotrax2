@@ -47,6 +47,11 @@ const routes: Routes = [
     loadChildren: () => import('./licenses/licenses.module').then(m => m.LicensesModule)
   },
   {
+    path: 'validations',
+    title: 'Submission Validations',
+    loadChildren: () => import('./validations/validations.module').then(m => m.ValidationsModule)
+  },
+  {
     path: 'management-tools',
     title: 'Management Tools',
     loadChildren: () => import('./management-tools/management-tools.module').then(m => m.ManagementToolsModule)

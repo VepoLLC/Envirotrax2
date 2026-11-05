@@ -48,4 +48,9 @@ export class FogInspectionService {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}`);
         return lastValueFrom(this._http.get<FogInspection>(url));
     }
+
+    public getPdf(id: number): Promise<Blob> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspections/${id}/pdf`);
+        return lastValueFrom(this._http.get(url, { responseType: 'blob' }));
+    }
 }

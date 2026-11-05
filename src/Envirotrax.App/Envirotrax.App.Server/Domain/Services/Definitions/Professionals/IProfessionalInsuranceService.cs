@@ -11,6 +11,8 @@ public interface IProfessionalInsuranceService : IService<ProfessionalInsuranceD
     Task<IPagedData<ProfessionalInsuranceDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ILookup<int, ProfessionalInsuranceDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);
     Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken);
 
     Task<InsuranceCheckDto> CheckForWaterSupplierAsync(int professionalId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken);
 

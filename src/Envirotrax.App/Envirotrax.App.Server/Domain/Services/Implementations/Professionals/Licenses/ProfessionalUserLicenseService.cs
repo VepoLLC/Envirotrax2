@@ -30,6 +30,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
     private readonly IProfessionalUserLicenseRepository _licenseRepository;
     private readonly IProfessionalLicenseRepository _companyLicenseRepository;
     private readonly IProfessionalLicenseTypeService _licenseTypeService;
+    private readonly ITceqLicenseService _tceqLicenseService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
     private readonly IRecordLogService _recordLogService;
@@ -39,6 +40,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         IProfessionalUserLicenseRepository repository,
         IProfessionalLicenseRepository companyLicenseRepository,
         IProfessionalLicenseTypeService licenseTypeService,
+        ITceqLicenseService tceqLicenseService,
         ITimeZoneHelperService timeZoneHelper,
         IAuthService authService,
         IRecordLogService recordLogService)
@@ -47,6 +49,7 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         _licenseRepository = repository;
         _companyLicenseRepository = companyLicenseRepository;
         _licenseTypeService = licenseTypeService;
+        _tceqLicenseService = tceqLicenseService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
         _recordLogService = recordLogService;
@@ -142,6 +145,45 @@ public class ProfessionalUserLicenseService : Service<ProfessionalUserLicense, P
         model.ProfessionalId = professionalId;
         var updated = await Repository.UpdateAsync(model);
         return MapToDto(updated)!;
+    }
+
+    public async Task<ProfessionalUserLicenseDto?> UpdateForAdminAsync(int id, ProfessionalUserLicenseDto dto)
+    {
+        var existing = await Repository.GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (existing == null)
+        {
+            return null;
+        }
+
+        dto.Id = id;
+        dto.User = new ReferencedProfessionalUserDto
+        {
+            Id = existing.UserId
+        };
+
+        return await UpdateForProfessionalAsync(existing.ProfessionalId, dto);
+    }
+
+    public async Task<TceqLicenseDto?> CheckTceqLicenseAsync(int id)
+    {
+        var license = await Repository.GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (license == null)
+        {
+            throw new InvalidOperationException($"License {id} not found.");
+        }
+
+        var tceqLicense = await _tceqLicenseService.FindBpatLicenseAsync(license.LicenseNumber, CancellationToken.None);
+
+        if (tceqLicense == null)
+        {
+            return null;
+        }
+
+        await _licenseRepository.UpdateLastCheckDateAsync(id, DateTime.UtcNow);
+
+        return tceqLicense;
     }
 
     public async Task<IPagedData<ProfessionalUserLicenseDto>> GetAllAsync(int userId, PageInfo pageInfo, Query query)

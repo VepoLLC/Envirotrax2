@@ -143,6 +143,7 @@ public static class ServiceRegistration
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
+        services.AddHttpClient<ITceqLicenseService, TceqLicenseService>();
 
         services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));
         services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>(client => client.Timeout = TimeSpan.FromSeconds(60));

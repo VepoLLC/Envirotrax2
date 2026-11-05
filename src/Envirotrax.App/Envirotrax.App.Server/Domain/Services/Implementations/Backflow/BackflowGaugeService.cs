@@ -161,6 +161,21 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return _gaugeRepository.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
     }
 
+    public async Task<IPagedData<BackflowGaugeDto>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+
+        var gauges = await _gaugeRepository.GetUnverifiedForAdminAsync(pageInfo, query, cancellationToken);
+
+        return gauges.Select(gauge => MapToDto(gauge)!).ToPagedData(pageInfo);
+    }
+
+    public Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken)
+    {
+        return _gaugeRepository.CountUnverifiedForAdminAsync(cancellationToken);
+    }
+
     private static ProfessionalUser? ResolveSubmitter(
         BackflowGauge gauge,
         IReadOnlyDictionary<(int ProfessionalId, int UserId), ProfessionalUser> byAccount,

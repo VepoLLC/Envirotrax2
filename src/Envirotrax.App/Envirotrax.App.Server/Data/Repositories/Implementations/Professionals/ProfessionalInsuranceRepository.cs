@@ -75,6 +75,30 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<ProfessionalInsurance>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(ProfessionalInsurance.Id)] = SortOperator.Asc;
+        }
+
+        var paginated = await DbContext.Set<ProfessionalInsurance>()
+            .AsNoTracking()
+            .Where(insurance => insurance.ExpirationDate == null)
+            .Include(insurance => insurance.Professional)
+            .Include(insurance => insurance.CreatedBy)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken)
+    {
+        return DbContext.Set<ProfessionalInsurance>().CountAsync(insurance => insurance.ExpirationDate == null, cancellationToken);
+    }
+
     public async Task<Dictionary<int, ProfessionalType?>> GetProfessionalTypesAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken)
     {
         var registrations = await DbContext.ProfessionalWaterSuppliers

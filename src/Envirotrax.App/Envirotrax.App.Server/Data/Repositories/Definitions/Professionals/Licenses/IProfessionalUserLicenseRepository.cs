@@ -15,4 +15,5 @@ public interface IProfessionalUserLicenseRepository : IRepository<ProfessionalUs
     Task<IEnumerable<ProfessionalLicenseType>> GetLicenseTypesForWaterSupplierAsync(int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken);
     Task<ProfessionalUserLicense?> UpdateForWaterSupplierAsync(int id, string licenseNumber, string? contactName, DateTime? expirationDate, CancellationToken cancellationToken);
     Task<ProfessionalUserLicense> DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken);
+    Task<int> UpdateLastCheckDateAsync(int id, DateTime lastCheckDate);
 }

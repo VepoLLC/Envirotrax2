@@ -13,6 +13,8 @@ public interface IProfessionalUserLicenseService : IService<ProfessionalUserLice
     Task<ILookup<int, ProfessionalUserLicenseDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken);
     Task<ProfessionalUserLicenseDto> AddForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
     Task<ProfessionalUserLicenseDto> UpdateForProfessionalAsync(int professionalId, ProfessionalUserLicenseDto dto);
+    Task<ProfessionalUserLicenseDto?> UpdateForAdminAsync(int id, ProfessionalUserLicenseDto dto);
+    Task<TceqLicenseDto?> CheckTceqLicenseAsync(int id);
     Task<WaterSupplierLicenseDto> UpdateForWaterSupplierAsync(int id, UpdateWaterSupplierLicenseDto dto, CancellationToken cancellationToken);
     Task DeleteForWaterSupplierAsync(int id, CancellationToken cancellationToken);
     Task<BpatLicenseCheckDto> CheckBpatForWaterSupplierAsync(int professionalId, int userId, int waterSupplierId, CancellationToken cancellationToken);

@@ -9,7 +9,6 @@ public class ProfessionalNoteProfile : Profile
     public ProfessionalNoteProfile()
     {
         CreateMap<ProfessionalNote, ProfessionalNoteDto>()
-            .ForMember(dto => dto.IsReadOnly, opt => opt.Ignore())
             .ReverseMap()
             .ForMember(model => model.CreatedBy, opt => opt.Ignore());
     }

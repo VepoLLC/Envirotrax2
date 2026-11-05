@@ -30,9 +30,9 @@ public abstract class ProfessionalNotesController : WaterSupplierProtectedContro
 
     [HttpPost]
     [HasPermission(PermissionAction.CanModify)]
-    public async Task<IActionResult> AddAsync(int professionalId, [FromBody] ProfessionalNoteDto note)
+    public async Task<IActionResult> AddAsync(int professionalId, [FromBody] ProfessionalNoteDto note, CancellationToken cancellationToken)
     {
-        var added = await _noteService.AddForProfessionalAsync(professionalId, ProfessionalType, note);
+        var added = await _noteService.AddForProfessionalAsync(professionalId, ProfessionalType, note, cancellationToken);
 
         return Ok(added);
     }

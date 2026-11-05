@@ -4,8 +4,10 @@ using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
+using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.Common;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
@@ -13,25 +15,17 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals;
 public class ProfessionalNoteService : Service<ProfessionalNote, ProfessionalNoteDto>, IProfessionalNoteService
 {
     private readonly IProfessionalNoteRepository _noteRepository;
+    private readonly IWaterSupplierRepository _waterSupplierRepository;
     private readonly IAuthService _authService;
 
-    public ProfessionalNoteService(IMapper mapper, IProfessionalNoteRepository repository, IAuthService authService)
+    private bool IsAdmin => _authService.HasScope(ScopeDefinitions.AdminInternal);
+
+    public ProfessionalNoteService(IMapper mapper, IProfessionalNoteRepository repository, IWaterSupplierRepository waterSupplierRepository, IAuthService authService)
         : base(mapper, repository)
     {
         _noteRepository = repository;
+        _waterSupplierRepository = waterSupplierRepository;
         _authService = authService;
-    }
-
-    protected override ProfessionalNoteDto? MapToDto(ProfessionalNote? model)
-    {
-        var dto = base.MapToDto(model);
-
-        if (dto != null)
-        {
-            dto.IsReadOnly = model!.WaterSupplierId != _authService.WaterSupplierId;
-        }
-
-        return dto;
     }
 
     public async Task<IPagedData<ProfessionalNoteDto>> GetAllByProfessionalAsync(int professionalId, ProfessionalType professionalType, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -44,13 +38,20 @@ public class ProfessionalNoteService : Service<ProfessionalNote, ProfessionalNot
         return notes.Select(note => MapToDto(note)!).ToPagedData(pageInfo);
     }
 
-    public async Task<ProfessionalNoteDto> AddForProfessionalAsync(int professionalId, ProfessionalType professionalType, ProfessionalNoteDto note)
+    public async Task<ProfessionalNoteDto> AddForProfessionalAsync(int professionalId, ProfessionalType professionalType, ProfessionalNoteDto note, CancellationToken cancellationToken)
     {
         var model = MapToModel(note)!;
 
         model.Id = 0;
         model.ProfessionalId = professionalId;
         model.ProfessionalType = professionalType;
+
+        // The admin context does not stamp a tenant, so admin notes are kept under the Vepo LLC supplier,
+        // where no other water supplier can see them.
+        if (IsAdmin)
+        {
+            model.WaterSupplierId = await _waterSupplierRepository.GetEnvirotraxAdminSupplierIdAsync(cancellationToken);
+        }
 
         var added = await _noteRepository.AddAsync(model);
 

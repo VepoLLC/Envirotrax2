@@ -10,8 +10,6 @@ public class ProfessionalNoteDto : IDto
     [Required]
     public string NoteText { get; set; } = null!;
 
-    public bool IsReadOnly { get; set; }
-
     // Audit
     public DateTime CreatedTime { get; set; }
     public AppUserDto? CreatedBy { get; set; }

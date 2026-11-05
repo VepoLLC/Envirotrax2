@@ -6,7 +6,6 @@ export interface ProfessionalNoteCreatedBy {
 export interface ProfessionalNote {
     id?: number;
     noteText?: string;
-    isReadOnly?: boolean;
     createdTime?: string;
     createdBy?: ProfessionalNoteCreatedBy;
 }

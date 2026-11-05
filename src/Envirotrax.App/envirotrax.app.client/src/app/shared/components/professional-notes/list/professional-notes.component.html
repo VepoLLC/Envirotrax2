@@ -8,7 +8,7 @@
 </ng-template>
 
 <ng-template #actionsTemplate let-note="rowData">
-    <div *ngIf="!note.isReadOnly" class="d-flex gap-1">
+    <div class="d-flex gap-1">
         <button type="button" class="btn btn-primary btn-sm" (click)="editNote(note)" aria-label="Edit">
             <i class="fa-solid fa-pencil"></i>
         </button>

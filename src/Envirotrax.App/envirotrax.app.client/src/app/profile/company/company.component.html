@@ -119,6 +119,19 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <vp-input name="defaultStateId"
+                              label="Default State:"
+                              type="select"
+                              [form]="form"
+                              [ngModel]="professional.defaultState?.id"
+                              [options]="states"
+                              (ngModelChange)="defaultStateChanged($event)">
+                    </vp-input>
+                </div>
+            </div>
+
             <div class="d-flex justify-content-center mt-3 my-2">
                 <div>
                     <div class="form-check">

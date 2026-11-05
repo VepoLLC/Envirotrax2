@@ -69,6 +69,16 @@ export class FogInspectionOptionsService {
         ...this.interceptorTypeOptions
     ];
 
+    // Trip tickets also offer Lint Trap (V1 trip_ticket_submit and the App's submit form); inspections don't.
+    public readonly tripTicketInterceptorTypeOptions: InputOption[] = [
+        { id: InterceptorType.GreaseTrap, text: 'Grease Trap' },
+        { id: InterceptorType.GritTrap, text: 'Grit Trap' },
+        { id: InterceptorType.SepticTank, text: 'Septic Tank' },
+        { id: InterceptorType.ChemicalToilet, text: 'Chemical Toilet' },
+        { id: InterceptorType.LintTrap, text: 'Lint Trap' },
+        { id: InterceptorType.Other, text: 'Other' }
+    ];
+
     public readonly capacityTypeOptions: InputOption[] = [
         { id: InterceptorCapacityType.Gallons, text: 'Gallons' },
         { id: InterceptorCapacityType.CubicYards, text: 'Cubic Yards' }

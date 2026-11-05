@@ -21,6 +21,8 @@ public interface IFogTripTicketService : IService<FogTripTicket, FogTripTicketDt
         Stream? receiverSignatureStream, string? receiverSignatureFileName,
         CancellationToken cancellationToken);
 
+    Task<FogTripTicketDto?> UpdateForAdminAsync(int id, FogTripTicketAdminUpdateRequest request, CancellationToken cancellationToken);
+
     Task<FogTripTicketDto?> UpdateApprovalAsync(int id, bool disapproved, CancellationToken cancellationToken);
 
     Task<FogTripTicketDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default);

@@ -31,10 +31,17 @@ export enum ProfessionalType {
 export const professionalTypeLabels: Record<ProfessionalType, string> = {
     [ProfessionalType.Contractor]: 'Contractor',
     [ProfessionalType.PlanChecker]: 'Plan Checker',
-    [ProfessionalType.Bpat]: 'BPAT',
+    [ProfessionalType.Bpat]: 'Backflow Tester',
     [ProfessionalType.Inspector]: 'Inspector',
     [ProfessionalType.CsiInspector]: 'CSI Inspector',
     [ProfessionalType.FogTransporter]: 'FOG Transporter',
     [ProfessionalType.FogInspector]: 'FOG Inspector',
     [ProfessionalType.ComponentTester]: 'Component Tester'
 };
+
+export const licenseProfessionalTypes: ProfessionalType[] = [
+    ProfessionalType.Bpat,
+    ProfessionalType.CsiInspector,
+    ProfessionalType.FogInspector,
+    ProfessionalType.FogTransporter
+];

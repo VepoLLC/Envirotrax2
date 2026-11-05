@@ -23,6 +23,22 @@ public class FogTripTicketController : AdminBaseController
         return Ok(tickets);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var ticket = await _tripTicketService.GetAsync(id, cancellationToken);
+
+        return ticket == null ? NotFound() : Ok(ticket);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(int id, [FromQuery] int waterSupplierId, [FromBody] FogTripTicketUpdateRequest request, CancellationToken cancellationToken)
+    {
+        var ticket = await _tripTicketService.UpdateAsync(id, waterSupplierId, request, cancellationToken);
+
+        return ticket == null ? NotFound() : Ok(ticket);
+    }
+
     [HttpPut("{id}/validation-hold")]
     public async Task<IActionResult> UpdateValidationHoldAsync(int id, [FromQuery] int waterSupplierId, [FromBody] bool onHold, CancellationToken cancellationToken)
     {

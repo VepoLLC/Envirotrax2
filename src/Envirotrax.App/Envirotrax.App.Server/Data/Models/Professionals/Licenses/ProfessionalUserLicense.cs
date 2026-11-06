@@ -35,6 +35,8 @@ public class ProfessionalUserLicense : IProfessionalModel, ICreateAuditableModel
 
     public DateTime? ExpirationDate { get; set; }
 
+    public DateTime? LastCheckDate { get; set; }
+
     public int? CreatedById { get; set; }
     public AppUser? CreatedBy { get; set; }
     public DateTime CreatedTime { get; set; }

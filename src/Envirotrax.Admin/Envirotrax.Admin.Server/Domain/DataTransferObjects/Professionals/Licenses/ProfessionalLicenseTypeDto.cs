@@ -16,6 +16,8 @@ public class ProfessionalLicenseTypeDto
 
     public ProfessionalType ProfessionalType { get; set; }
 
+    public LicenseScope LicenseScope { get; set; }
+
     public StateDto? State { get; set; }
 }
 

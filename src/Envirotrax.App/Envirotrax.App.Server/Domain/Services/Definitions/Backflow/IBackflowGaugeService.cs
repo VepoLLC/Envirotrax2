@@ -12,4 +12,7 @@ public interface IBackflowGaugeService : IService<BackflowGaugeDto>
 
     Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken);
+
+    Task<IPagedData<BackflowGaugeDto>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken);
 }

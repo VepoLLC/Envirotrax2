@@ -53,7 +53,7 @@
 </div>
 
 <vp-section header="Register New License">
-    <div *ngIf="professions.length > 0" class="text-center mb-3">
+    <div *ngIf="professions.length > 1" class="text-center mb-3">
         <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
             <li *ngFor="let profession of professions" class="nav-item">
                 <a class="nav-link" [class.active]="activeProfession === profession.data"

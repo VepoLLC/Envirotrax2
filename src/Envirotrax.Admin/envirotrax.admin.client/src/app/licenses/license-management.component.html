@@ -1,0 +1,49 @@
+<ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center mb-3">
+    <li class="nav-item">
+        <a class="nav-link" role="button"
+           [class.active]="activeTab === 'unverified'"
+           (click)="setActiveTab('unverified')">Unverified Licenses ({{ counts.unverifiedCount }})</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" role="button"
+           [class.active]="activeTab === 'expired'"
+           (click)="setActiveTab('expired')">Expired Licenses ({{ counts.expiredCount }})</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" role="button"
+           [class.active]="activeTab === 'expiring'"
+           (click)="setActiveTab('expiring')">Expiring Licenses ({{ counts.expiringCount }})</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" role="button"
+           [class.active]="activeTab === 'insurance'"
+           (click)="setActiveTab('insurance')">Insurance ({{ counts.insuranceCount }})</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" role="button"
+           [class.active]="activeTab === 'gauges'"
+           (click)="setActiveTab('gauges')">Gauges ({{ counts.gaugeCount }})</a>
+    </li>
+</ul>
+
+<vp-section [header]="header" [collapsible]="false">
+    <vp-section-actions>
+        <button type="button" (click)="refresh()">
+            <i class="fa-solid fa-rotate me-1"></i>
+            Refresh
+        </button>
+    </vp-section-actions>
+
+    <vp-license-list *ngIf="activeTab === 'unverified'"
+                     licenseFilter="unverified" />
+
+    <vp-license-list *ngIf="activeTab === 'expired'"
+                     licenseFilter="expired" />
+
+    <vp-license-list *ngIf="activeTab === 'expiring'"
+                     licenseFilter="expiring" />
+
+    <vp-insurance-list *ngIf="activeTab === 'insurance'" />
+
+    <vp-gauge-list *ngIf="activeTab === 'gauges'" />
+</vp-section>

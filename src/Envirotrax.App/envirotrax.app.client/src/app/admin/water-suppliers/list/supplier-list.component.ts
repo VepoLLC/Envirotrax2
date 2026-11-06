@@ -7,6 +7,7 @@ import { CreateSupplierComponent } from "../create/create-supplier.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 @Component({
     templateUrl: './supplier-list.component.html',
@@ -66,7 +67,7 @@ export class SupplierListComponent implements OnInit {
     public async getSuppliers(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._waterSupplierService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            this.table.items = await this._waterSupplierService.getAll(this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.table.query);
         } finally {
             this.table.isLoading = false;
         }

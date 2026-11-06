@@ -22,6 +22,7 @@ import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 import { NotificationDetailsModalComponent } from "./notification-details-modal.component";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 const Locale = 'en-US';
 const DisplayDateFormat = 'MM/dd/yyyy';
@@ -355,7 +356,7 @@ export class NotificationHistoryComponent implements OnInit {
         try {
             this.table.isLoading = true;
 
-            const notifications = await this._service.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            const notifications = await this._service.getAll(this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.table.query);
             const pageNumber = notifications.pageInfo.pageNumber ?? 1;
             const pageSize = notifications.pageInfo.pageSize ?? notifications.data.length;
             const firstRowNumber = (pageNumber - 1) * pageSize + 1;

@@ -8,6 +8,7 @@ import { NgForm } from "@angular/forms";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { EditGaugeComponent } from "./edit/edit-gauge.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 @Component({
     standalone: false,
@@ -124,7 +125,7 @@ export class GaugeListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._gaugeService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

@@ -11,6 +11,7 @@ import { NotificationInterval } from "../../../shared/enums/notification-interva
 import { NotificationDeliveryType } from "../../../shared/enums/notification-delivery-type.enum";
 import { EditNotificationSettingComponent } from "../edit/edit-notification-setting.component";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 @Component({
     standalone: false,
@@ -128,7 +129,7 @@ export class NotificationSettingListComponent implements OnInit {
             this.table.isLoading = true;
 
             const settings = await this._service.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
 

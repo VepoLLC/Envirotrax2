@@ -7,6 +7,7 @@ import { TableViewModel } from '../shared/models/table-view-model';
 import { AuthService } from '../shared/services/auth/auth.service';
 import { FeatureType } from '../shared/models/feature-type';
 import { PermissionAction, PermissionType } from '../shared/models/permission-type';
+import { STANDALONE_GRID_PAGE_SIZE } from '../shared/models/page-info';
 
 @Component({
     templateUrl: './gauge-management.component.html',
@@ -78,7 +79,7 @@ export class GaugeManagementComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._gaugeService.getUnverifiedGauges(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

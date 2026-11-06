@@ -21,6 +21,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.Auth.Templates.Emails;
+using Envirotrax.Auth.Domain.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Envirotrax.Auth.Areas.Identity.Pages.Account
 {
@@ -33,6 +35,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly IEmailService _emailService;
+        private readonly SiteOptions _siteOptions;
 
         public RegisterModel(
             UserManager<AppUser> userManager,
@@ -40,7 +43,8 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             SignInManager<AppUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            IEmailService emailService)
+            IEmailService emailService,
+            IOptions<SiteOptions> siteOptions)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -49,6 +53,7 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _emailService = emailService;
+            _siteOptions = siteOptions.Value;
         }
 
         /// <summary>
@@ -135,7 +140,8 @@ namespace Envirotrax.Auth.Areas.Identity.Pages.Account
                         "/Account/ConfirmEmail",
                         pageHandler: null,
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                        protocol: _siteOptions.Url.Scheme,
+                        host: _siteOptions.Url.Authority);
 
                     await _emailService.SendAsync<RegistrationConfirmationVm>(new()
                     {

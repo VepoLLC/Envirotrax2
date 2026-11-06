@@ -102,6 +102,15 @@ export class CompanyComponent implements OnInit {
         }
     }
 
+    public defaultStateChanged(stateId: number): void {
+        if (stateId) {
+            this.professional.defaultState = this.professional.defaultState || {};
+            this.professional.defaultState.id = stateId;
+        } else {
+            this.professional.defaultState = undefined;
+        }
+    }
+
     private validateServices(): boolean {
         if (!this.professional.hasWiseGuys &&
             !this.professional.hasBackflowTesting &&

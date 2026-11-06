@@ -7,7 +7,7 @@ public interface IHtmlTemplateService
 {
     Task<string> ParseEmailAsync<T>(string pageName, T model);
 
-    Task<string> ParseEmailAsync<T>(string pageName, T model, ExpandoObject viewBag);
-
     Task<string> ParsePdfAsync<T>(string pageName, T model);
+
+    Task<string> ParsePdfAsync<T>(string pageName, T model, ExpandoObject viewBag);
 }

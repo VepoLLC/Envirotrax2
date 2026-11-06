@@ -53,6 +53,32 @@ public class BackflowTestController : AdminBaseController
         return Ok(test);
     }
 
+    [HttpPut("{id}/validation-hold")]
+    public async Task<IActionResult> UpdateValidationHoldAsync(int id, [FromBody] bool onHold, CancellationToken cancellationToken)
+    {
+        var test = await _testService.UpdateValidationHoldAsync(id, onHold, cancellationToken);
+
+        if (test == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(test);
+    }
+
+    [HttpPut("{id}/needs-validation")]
+    public async Task<IActionResult> UpdateNeedsValidationAsync(int id, [FromBody] bool needsValidation, CancellationToken cancellationToken)
+    {
+        var test = await _testService.UpdateNeedsValidationAsync(id, needsValidation, cancellationToken);
+
+        if (test == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(test);
+    }
+
     [HttpPost("{id}/images/{imageType}")]
     public async Task<IActionResult> UploadImageAsync(int id, string imageType, [FromForm] IFormFile file)
     {

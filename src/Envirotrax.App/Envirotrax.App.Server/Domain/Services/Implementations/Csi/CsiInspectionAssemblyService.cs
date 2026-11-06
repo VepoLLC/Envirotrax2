@@ -237,6 +237,7 @@ public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
             ReasonForTest = BackflowReasonForTest.AnnualTest,
             IsCurrent = true,
             NeedsValidation = true,
+            ValidationCreatedFromCsi = true,
 
             InitialTestDate = inspectionDate,
             RepairTestDate = inspectionDate,

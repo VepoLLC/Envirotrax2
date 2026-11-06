@@ -69,7 +69,7 @@ BEGIN TRY
         FROM MigrationLegacyProfessionalAccounts AS accounts
     )
     INSERT INTO ProfessionalUserLicenses
-        (LegacyRecordId, ProfessionalId, UserId, ProfessionalType, LicenseTypeId, LicenseNumber, ExpirationDate, CreatedById, CreatedTime)
+        (LegacyRecordId, ProfessionalId, UserId, ProfessionalType, LicenseTypeId, LicenseNumber, ExpirationDate, LastCheckDate, CreatedById, CreatedTime)
     SELECT
         licenses.ID,
         professionalUsers.ProfessionalId,
@@ -80,6 +80,7 @@ BEGIN TRY
         -- with the type and the expiration date that compliance is actually checked against.
         LEFT(ISNULL(licenses.Number, ''), 50),
         licenses.ExpirationDate,
+        licenses.LastCheckDate,
         NULL,
         -- No V1 page fills CreationDate in when a license is added, so it can be NULL. The account the
         -- license belongs to is the closest date that is certainly not later than the license itself.

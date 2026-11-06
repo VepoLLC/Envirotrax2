@@ -7,6 +7,7 @@ export interface DownloadConfig<T extends string = string> {
     columns: DownloadColumn<T>[];
     endpoint: DownloadEndpoint;
     pdfEndpoint?: DownloadEndpoint;
+    openPdfInNewWindow?: boolean;
     suppoertedFormats?: FileFormat[]
     selectedFormat?: FileFormat;
     csvDelimiter?: CsvDelimiter;

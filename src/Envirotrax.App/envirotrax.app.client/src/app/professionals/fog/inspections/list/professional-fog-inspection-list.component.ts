@@ -96,6 +96,7 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
             fileName: 'FOG Inspections',
             endpoint: this._fogInspectionService.getAllEndpoint(this.latestOnly),
             pdfEndpoint: this._fogInspectionService.getAllPdfEndpoint(this.latestOnly),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },

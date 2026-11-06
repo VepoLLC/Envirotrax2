@@ -11,7 +11,6 @@ public class LetterDto
 
     public List<LetterAssemblyDto> Assemblies { get; set; } = [];
 
-    public string OptInUrl { get; set; } = null!;
     public string OptInCode { get; set; } = null!;
     public string OptInExpirationDate { get; set; } = null!;
 }

@@ -29,4 +29,20 @@ public class FogInspectionController : WaterSupplierCrudController<FogInspection
 
         return File(pdfBytes, "application/pdf");
     }
+
+    [HttpGet("{id}/pdf")]
+    [HasPermission(PermissionAction.CanView)]
+    public async Task<IActionResult> GetPdfAsync(int id, CancellationToken cancellationToken)
+    {
+        var inspection = await _inspectionService.GetAsync(id, cancellationToken);
+
+        if (inspection == null)
+        {
+            return NotFound();
+        }
+
+        var pdfBytes = await _inspectionService.GeneratePdfAsync(inspection);
+
+        return File(pdfBytes, "application/pdf");
+    }
 }

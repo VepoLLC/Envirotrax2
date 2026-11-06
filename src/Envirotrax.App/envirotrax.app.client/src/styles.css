@@ -538,6 +538,12 @@ input:-webkit-autofill:active {
     font-size: 0.75rem;
 }
 
+/* Bootstrap sizes checkboxes in em, so the smaller table font above would shrink them. */
+.table td .form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
 .overview-box {
     font-size: 13px;
     font-weight: 600;

@@ -6,6 +6,7 @@ using Envirotrax.Common.Domain.Services.Defintions;
 using Envirotrax.Common.Domain.Services.Implementations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Envirotrax.Common.Configuration;
 
@@ -32,21 +33,43 @@ public static class ServiceRegistrations
             .AddTransient<IKeyHashingService, KeyHashingService>();
     }
 
-    public static IServiceCollection AddHtmlTemplateService(this IServiceCollection services, Action<HtmlTemplateOptions> templateConfigAction)
+    public static IServiceCollection AddHtmlTemplateService(this IServiceCollection services, string? baseUrl, Action<HtmlTemplateOptions> templateConfigAction)
     {
-        services
-            .AddHttpContextAccessor()
-            .Configure(templateConfigAction)
-            .AddSingleton<IHtmlTemplateService, HtmlTemplateService>();
+        var validBaseUrl = GetValidBaseUrl(baseUrl);
+
+        services.Configure<HtmlTemplateOptions>(opts =>
+        {
+            templateConfigAction(opts);
+            opts.BaseUrl = validBaseUrl;
+        });
+
+        services.TryAddSingleton<IHtmlTemplateService, HtmlTemplateService>();
 
         return services;
+    }
+
+    private static string GetValidBaseUrl(string? baseUrl)
+    {
+        var isValid = Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp);
+
+        if (!isValid)
+        {
+            throw new InvalidOperationException($"A valid absolute http(s) base URL is required for templates, but '{baseUrl}' was provided.");
+        }
+
+        return uri!.AbsoluteUri.TrimEnd('/');
     }
 
     public static IServiceCollection AddPdfTemplateService(
         this IServiceCollection services,
         bool isDevelopment,
+        string? baseUrl,
+        Action<HtmlTemplateOptions> templateConfigAction,
         IConfigurationSection? pdfConfigSection = null)
     {
+        services.AddHtmlTemplateService(baseUrl, templateConfigAction);
+
         services.Configure<PdfTemplateOptions>(opts =>
         {
             opts.IsDevelopment = isDevelopment;
@@ -56,9 +79,9 @@ public static class ServiceRegistrations
         return services;
     }
 
-    public static IServiceCollection AddEmailService(this IServiceCollection services, IConfigurationSection emailConfigSection, Action<HtmlTemplateOptions> templateConfigAction)
+    public static IServiceCollection AddEmailService(this IServiceCollection services, IConfigurationSection emailConfigSection, string? baseUrl, Action<HtmlTemplateOptions> templateConfigAction)
     {
-        services.AddHtmlTemplateService(templateConfigAction);
+        services.AddHtmlTemplateService(baseUrl, templateConfigAction);
 
         services.Configure<EmailOptions>(emailConfigSection);
         services.AddSingleton<IEmailService, EmailService>();

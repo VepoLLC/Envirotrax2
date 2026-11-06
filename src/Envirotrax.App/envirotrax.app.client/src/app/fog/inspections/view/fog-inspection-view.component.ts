@@ -6,6 +6,7 @@ import { FogInspection } from '../../../shared/models/fog/fog-inspection';
 import { FogInspectionResult, FogReasonForInspection, fogReasonForInspectionLabels } from '../../../shared/models/fog/fog-inspection-enums';
 import { FacilityType, facilityTypeLabels } from '../../../shared/enums/facility-type.enum';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
+import { DownloadService } from '../../../shared/services/download.service';
 
 @Component({
     standalone: false,
@@ -28,7 +29,8 @@ export class FogInspectionViewComponent implements OnInit {
     constructor(
         private readonly _destroyRef: DestroyRef,
         private readonly _route: ActivatedRoute,
-        private readonly _inspectionService: FogInspectionService
+        private readonly _inspectionService: FogInspectionService,
+        private readonly _downloadService: DownloadService
     ) {}
 
     public ngOnInit(): void {
@@ -47,6 +49,21 @@ export class FogInspectionViewComponent implements OnInit {
             this.isLoading = true;
             this.inspection = await this._inspectionService.getById(Number(idParam));
             this.setDisplayValues(this.inspection);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    public async exportPdf(): Promise<void> {
+        if (!this.inspection) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+
+            const inspectionId = this.inspection.id;
+            await this._downloadService.openBlobInNewWindow(() => this._inspectionService.getPdf(inspectionId));
         } finally {
             this.isLoading = false;
         }

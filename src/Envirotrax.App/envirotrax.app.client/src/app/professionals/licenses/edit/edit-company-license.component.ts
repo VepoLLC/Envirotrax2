@@ -6,6 +6,7 @@ import { ProfessionalLicense } from "../../../shared/models/professionals/licens
 import { LicenseScope, ProfessionalLicenseType } from "../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalLicenseService } from "../../../shared/services/professionals/professional-license.service";
 import { ProfessionalUserLicenseService } from "../../../shared/services/professionals/professional-user-license.service";
+import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 
 @Component({
@@ -21,6 +22,7 @@ export class EditCompanyLicenseComponent implements OnInit {
     constructor(
         private readonly _licenseService: ProfessionalLicenseService,
         private readonly _userLicenseService: ProfessionalUserLicenseService,
+        private readonly _professionalService: ProfesisonalService,
         private readonly _modalReference: ModalReference<ProfessionalLicense, ProfessionalLicense>,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
@@ -31,13 +33,16 @@ export class EditCompanyLicenseComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [license, licenseTypes] = await Promise.all([
+            const [license, professional, licenseTypes] = await Promise.all([
                 this._licenseService.get(this._modalReference.config.model!.id!),
+                this._professionalService.getLoggedInProfessional(),
                 this._userLicenseService.getAllTypesAsOptions({ sort: {}, filter: [{ columnName: 'licenseScope', comparisonOperator: 'Eq', value: LicenseScope.Company.toString() }] }, false)
             ]);
 
             this.license = license;
-            this.licenseTypes = licenseTypes.filter(type => type.data?.professionalType == license.professionalType);
+            this.licenseTypes = this._userLicenseService
+                .filterTypesByProfessionalState(licenseTypes, professional, license.licenseType?.id)
+                .filter(type => type.data?.professionalType == license.professionalType);
         } finally {
             this.isLoading = false;
         }

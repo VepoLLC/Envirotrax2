@@ -1,0 +1,75 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canSelect]="true"
+              (select)="selectLicense($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getLicenses()"
+              [(query)]="table.query"
+              (queryChange)="getLicenses()"
+              (queryReset)="getLicenses()" />
+</div>
+
+<ng-template #accountCell let-rowData="rowData">
+    <div>{{ rowData.companyName }}</div>
+    <div>{{ rowData.contactName }}</div>
+</ng-template>
+
+<ng-template #licenseTypeCell let-rowData="rowData">
+    <vp-input [(ngModel)]="rowData.licenseTypeId"
+              type="select"
+              [options]="rowData.licenseTypeOptions" />
+</ng-template>
+
+<ng-template #licenseNumberCell let-rowData="rowData">
+    <vp-input [(ngModel)]="rowData.licenseNumber"
+              [maxLength]="50" />
+</ng-template>
+
+<ng-template #expirationCell let-rowData="rowData">
+    <div class="p-1 rounded-3"
+         [class]="rowData.expirationCssClass">
+        <vp-input [(ngModel)]="rowData.expirationDate"
+                  type="date" />
+    </div>
+</ng-template>
+
+<ng-template #lastCheckedCell let-rowData="rowData">
+    <span class="fw-bold text-nowrap">{{ rowData.lastCheckedText }}</span>
+</ng-template>
+
+<ng-template #actionsCell let-rowData="rowData">
+    <div class="d-flex gap-1">
+        <button *ngIf="rowData.canViewAccount"
+                type="button"
+                class="btn btn-primary btn-sm"
+                title="View Account"
+                aria-label="View Account"
+                (click)="viewAccount(rowData)">
+            <i class="fa-solid fa-user"></i>
+        </button>
+
+        <button *ngIf="rowData.canCheckLicense"
+                type="button"
+                class="btn btn-primary btn-sm"
+                title="Check TCEQ License"
+                aria-label="Check TCEQ License"
+                (click)="checkLicense(rowData)">
+            <i class="fa-solid fa-id-card"></i>
+        </button>
+
+        <button *ngIf="rowData.isSelected || rowData.isSaved"
+                type="button"
+                class="btn btn-sm"
+                [class.btn-success]="rowData.isSaved"
+                [class.btn-primary]="!rowData.isSaved"
+                title="Save"
+                aria-label="Save"
+                (click)="saveLicense(rowData)">
+            <i class="fa-solid fa-floppy-disk"></i>
+        </button>
+    </div>
+</ng-template>

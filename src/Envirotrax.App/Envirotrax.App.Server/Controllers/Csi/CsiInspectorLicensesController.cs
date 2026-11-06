@@ -55,7 +55,7 @@ namespace Envirotrax.App.Server.Controllers.Csi
                 {
                         dto.Id = licenseId;
                         var result = await _licenseService.UpdateForProfessionalAsync(id, dto);
-                        return Ok(result);
+                        return result == null ? NotFound() : Ok(result);
                 }
 
                 [HttpDelete("{id}/licenses/{licenseId}")]

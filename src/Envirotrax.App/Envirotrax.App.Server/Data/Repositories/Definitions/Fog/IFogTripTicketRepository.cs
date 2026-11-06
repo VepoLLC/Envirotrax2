@@ -11,7 +11,13 @@ public interface IFogTripTicketRepository : IRepository<FogTripTicket>
 
     Task<IEnumerable<FogTripTicket>> SearchForAdminAsync(FogTripTicketSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
+    Task<FogTripTicket?> UpdateForAdminAsync(int id, FogTripTicketAdminUpdateRequest request, CancellationToken cancellationToken);
+
     Task<FogTripTicket?> UpdateApprovalAsync(int id, bool disapproved, int? approvedById, CancellationToken cancellationToken);
+
+    Task<FogTripTicket?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken);
+
+    Task<FogTripTicket?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken);
 
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
 

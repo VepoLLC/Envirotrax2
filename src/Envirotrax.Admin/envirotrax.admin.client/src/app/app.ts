@@ -33,6 +33,7 @@ export class App implements OnInit {
   public isNavbarVisible: boolean = false;
   public menuItems: MenuItem[] = [];
   public showWindowContainer: boolean = true;
+  public userEmail: string = '';
   public readonly navbarColor: string = NAVBAR_COLOR;
 
   constructor(
@@ -54,6 +55,8 @@ export class App implements OnInit {
       this.isAuthenticated = isLoggedIn;
 
       if (this.isAuthenticated) {
+        this.userEmail = await this._authService.getUserEmail() ?? '';
+
         if (!await this._authService.hasAnyRoles(ROLE_DEFINITIONS.SUPER_USER)) {
           this._router.navigate(['auth/unauthorized']);
           return;
@@ -62,6 +65,10 @@ export class App implements OnInit {
         this.menuItems = this.createMenuItems();
       }
     });
+  }
+
+  public signOut(): void {
+    this._authService.signOut();
   }
 
   private createMenuItems(): MenuItem[] {

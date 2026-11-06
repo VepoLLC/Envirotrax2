@@ -1,0 +1,71 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canSelect]="true"
+              (select)="selectInsurance($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getInsurances()"
+              [(query)]="table.query"
+              (queryChange)="getInsurances()"
+              (queryReset)="getInsurances()" />
+</div>
+
+<ng-template #accountCell let-rowData="rowData">
+    <div>{{ rowData.companyName }}</div>
+    <div>{{ rowData.contactName }}</div>
+</ng-template>
+
+<ng-template #policyNumberCell let-rowData="rowData">
+    <vp-input [(ngModel)]="rowData.insuranceNumber"
+              [maxLength]="50" />
+</ng-template>
+
+<ng-template #coverageCell let-rowData="rowData">
+    <vp-input [(ngModel)]="rowData.coverageAmount"
+              type="number"
+              [decimals]="2"
+              [min]="0" />
+</ng-template>
+
+<ng-template #expirationCell let-rowData="rowData">
+    <div class="p-1 rounded-3"
+         [class]="rowData.expirationCssClass">
+        <vp-input [(ngModel)]="rowData.expirationDate"
+                  type="date" />
+    </div>
+</ng-template>
+
+<ng-template #actionsCell let-rowData="rowData">
+    <div class="d-flex gap-1">
+        <button *ngIf="rowData.canViewAccount"
+                type="button"
+                class="btn btn-primary btn-sm"
+                title="View Account"
+                aria-label="View Account"
+                (click)="viewAccount(rowData)">
+            <i class="fa-solid fa-user"></i>
+        </button>
+
+        <button type="button"
+                class="btn btn-primary btn-sm"
+                title="View Certificate"
+                aria-label="View Certificate"
+                (click)="viewCertificate(rowData)">
+            <i class="fa-solid fa-file-lines"></i>
+        </button>
+
+        <button *ngIf="rowData.isSelected || rowData.isSaved"
+                type="button"
+                class="btn btn-sm"
+                [class.btn-success]="rowData.isSaved"
+                [class.btn-primary]="!rowData.isSaved"
+                title="Save"
+                aria-label="Save"
+                (click)="saveInsurance(rowData)">
+            <i class="fa-solid fa-floppy-disk"></i>
+        </button>
+    </div>
+</ng-template>

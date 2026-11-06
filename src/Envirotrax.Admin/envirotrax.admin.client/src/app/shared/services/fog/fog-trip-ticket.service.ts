@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
-import { FogTripTicket } from "../../models/fog/fog-trip-ticket";
+import { FogTripTicket, FogTripTicketUpdateRequest } from "../../models/fog/fog-trip-ticket";
 
 export interface FogTripTicketSearchCriteria {
     userEmail?: string | null;
@@ -34,6 +34,18 @@ export class FogTripTicketService {
         const observable = this._http.get<PagedData<FogTripTicket>>(url, { params });
 
         return await lastValueFrom(observable);
+    }
+
+    public async get(id: number): Promise<FogTripTicket> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}`);
+
+        return await lastValueFrom(this._http.get<FogTripTicket>(url));
+    }
+
+    public async update(id: number, waterSupplierId: number, request: FogTripTicketUpdateRequest): Promise<FogTripTicket> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}?waterSupplierId=${waterSupplierId}`);
+
+        return await lastValueFrom(this._http.put<FogTripTicket>(url, request));
     }
 
     public async updateValidationHold(id: number, waterSupplierId: number, onHold: boolean): Promise<FogTripTicket> {

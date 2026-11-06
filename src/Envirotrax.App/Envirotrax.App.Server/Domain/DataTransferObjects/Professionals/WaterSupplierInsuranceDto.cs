@@ -11,6 +11,7 @@ public class WaterSupplierInsuranceDto : IDto
     public string? CompanyName { get; set; }
     public string? ContactName { get; set; }
     public string InsuranceNumber { get; set; } = null!;
+    public decimal? CoverageAmount { get; set; }
     public DateTime? ExpirationDate { get; set; }
     public ProfessionalType? ProfessionalType { get; set; }
 }

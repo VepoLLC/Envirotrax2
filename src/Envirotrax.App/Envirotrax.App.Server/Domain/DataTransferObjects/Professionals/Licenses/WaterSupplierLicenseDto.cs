@@ -19,4 +19,6 @@ public class WaterSupplierLicenseDto : IDto
     public string LicenseNumber { get; set; } = null!;
     public DateTime? ExpirationDate { get; set; }
     public ExpirationType ExpirationType { get; set; }
+    public DateTime? LastCheckDate { get; set; }
+    public int? HoursSinceLastCheck { get; set; }
 }

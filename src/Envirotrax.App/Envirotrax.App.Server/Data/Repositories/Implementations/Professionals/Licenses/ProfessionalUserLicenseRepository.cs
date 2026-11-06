@@ -28,6 +28,20 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
             .Include(license => license.LicenseType);
     }
 
+    protected override void UpdateEntity(ProfessionalUserLicense model)
+    {
+        base.UpdateEntity(model);
+
+        DbContext.Entry(model).Property(license => license.LastCheckDate).IsModified = false;
+    }
+
+    public Task<int> UpdateLastCheckDateAsync(int id, DateTime lastCheckDate)
+    {
+        return DbContext.ProfessionalUserLicenses
+            .Where(license => license.Id == id)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(license => license.LastCheckDate, lastCheckDate));
+    }
+
     public async Task<IEnumerable<ProfessionalUserLicense>> GetAllAsync(int userId, PageInfo pageInfo, Query query)
     {
         var paginated = await GetListQuery()

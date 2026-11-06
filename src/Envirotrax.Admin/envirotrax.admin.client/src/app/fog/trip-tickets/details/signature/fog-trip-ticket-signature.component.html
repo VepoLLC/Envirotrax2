@@ -1,0 +1,7 @@
+<span class="col-form-label d-block">{{ label }}</span>
+
+<div class="border rounded p-2 text-center">
+    <img *ngIf="url" [src]="url" [alt]="label" class="img-fluid" style="max-height: 100px;" />
+
+    <span *ngIf="!url" class="text-muted">No signature on file</span>
+</div>

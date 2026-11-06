@@ -2798,6 +2798,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("LastCheckDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("LicenseNumber")
                         .IsRequired()
                         .HasMaxLength(50)

@@ -140,6 +140,20 @@ public class ProfessionalLicenseService : Service<ProfessionalLicense, Professio
         return MapToDto(updated)!;
     }
 
+    public async Task<ProfessionalLicenseDto?> UpdateForAdminAsync(int id, ProfessionalLicenseDto dto)
+    {
+        var existing = await Repository.GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (existing == null)
+        {
+            return null;
+        }
+
+        dto.Id = id;
+
+        return await UpdateForProfessionalAsync(existing.ProfessionalId, dto);
+    }
+
     public async Task<ProfessionalLicenseDto?> DeleteForProfessionalAsync(int professionalId, int id, CancellationToken cancellationToken)
     {
         if (!await _licenseRepository.ExistsForProfessionalAsync(professionalId, id, cancellationToken))

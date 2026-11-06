@@ -21,29 +21,28 @@ public class WaterSupplierLicenseRepository : IWaterSupplierLicenseRepository
         _timeZoneHelper = timeZoneHelper;
     }
 
-    public async Task<IEnumerable<WaterSupplierLicenseDto>> GetAllAsync(string? licenseFilter, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public Task<IEnumerable<WaterSupplierLicenseDto>> GetAllAsync(string? licenseFilter, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var licenses = ApplyLicenseFilter(GetLicensesQuery(), licenseFilter);
 
-        if (query.Sort.IsNullOrEmpty())
-        {
-            query.Sort[nameof(WaterSupplierLicenseDto.SubmittedOn)] = SortOperator.Asc;
-        }
-
-        query.Sort[nameof(WaterSupplierLicenseDto.LicenseScope)] = SortOperator.Asc;
-        query.Sort[nameof(WaterSupplierLicenseDto.Id)] = SortOperator.Asc;
-
-        var paginated = await licenses
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
+        return PaginateLicensesAsync(licenses, pageInfo, query, cancellationToken);
     }
 
     public Task<int> CountAsync(string? licenseFilter, CancellationToken cancellationToken)
     {
         return ApplyLicenseFilter(GetLicensesQuery(), licenseFilter).CountAsync(cancellationToken);
+    }
+
+    public Task<IEnumerable<WaterSupplierLicenseDto>> GetAllForAdminAsync(string? licenseFilter, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var licenses = ApplyLicenseFilter(GetAllLicensesQuery(), licenseFilter);
+
+        return PaginateLicensesAsync(licenses, pageInfo, query, cancellationToken);
+    }
+
+    public Task<int> CountForAdminAsync(string? licenseFilter, CancellationToken cancellationToken)
+    {
+        return ApplyLicenseFilter(GetAllLicensesQuery(), licenseFilter).CountAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<WaterSupplierLicenseDto>> GetUnverifiedRegistrationsAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -83,6 +82,32 @@ public class WaterSupplierLicenseRepository : IWaterSupplierLicenseRepository
         return ProjectUserLicenses(userLicenses).Concat(ProjectCompanyLicenses(companyLicenses));
     }
 
+    private IQueryable<WaterSupplierLicenseDto> GetAllLicensesQuery()
+    {
+        var userLicenses = _dbContext.ProfessionalUserLicenses.AsNoTracking();
+        var companyLicenses = _dbContext.ProfessionalLicenses.AsNoTracking();
+
+        return ProjectUserLicenses(userLicenses).Concat(ProjectCompanyLicenses(companyLicenses));
+    }
+
+    private static async Task<IEnumerable<WaterSupplierLicenseDto>> PaginateLicensesAsync(IQueryable<WaterSupplierLicenseDto> licenses, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(WaterSupplierLicenseDto.SubmittedOn)] = SortOperator.Asc;
+        }
+
+        query.Sort[nameof(WaterSupplierLicenseDto.LicenseScope)] = SortOperator.Asc;
+        query.Sort[nameof(WaterSupplierLicenseDto.Id)] = SortOperator.Asc;
+
+        var paginated = await licenses
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     private IQueryable<ProfessionalLicense> GetUnverifiedRegistrationsQuery()
     {
         return _dbContext.ProfessionalLicenses
@@ -108,7 +133,8 @@ public class WaterSupplierLicenseRepository : IWaterSupplierLicenseRepository
             LicenseTypeId = license.LicenseTypeId,
             LicenseTypeName = license.LicenseType!.Name,
             LicenseNumber = license.LicenseNumber,
-            ExpirationDate = license.ExpirationDate
+            ExpirationDate = license.ExpirationDate,
+            LastCheckDate = license.LastCheckDate
         });
     }
 
@@ -131,7 +157,8 @@ public class WaterSupplierLicenseRepository : IWaterSupplierLicenseRepository
             LicenseTypeId = license.LicenseTypeId,
             LicenseTypeName = license.LicenseType!.Name,
             LicenseNumber = license.LicenseNumber,
-            ExpirationDate = license.ExpirationDate
+            ExpirationDate = license.ExpirationDate,
+            LastCheckDate = null
         });
     }
 

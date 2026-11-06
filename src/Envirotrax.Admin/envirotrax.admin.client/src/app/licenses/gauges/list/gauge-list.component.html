@@ -1,0 +1,67 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canSelect]="true"
+              (select)="selectGauge($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getGauges()"
+              [(query)]="table.query"
+              (queryChange)="getGauges()"
+              (queryReset)="getGauges()" />
+</div>
+
+<ng-template #manufacturerCell let-rowData="rowData">
+    <vp-input [(ngModel)]="rowData.manufacturer"
+              [maxLength]="100" />
+</ng-template>
+
+<ng-template #modelCell let-rowData="rowData">
+    <vp-input [(ngModel)]="rowData.model"
+              [maxLength]="100" />
+</ng-template>
+
+<ng-template #waterSystemCell let-rowData="rowData">
+    <vp-input [(ngModel)]="rowData.waterSystemType"
+              type="select"
+              [options]="waterSystemOptions" />
+</ng-template>
+
+<ng-template #serialNumberCell let-rowData="rowData">
+    <vp-input [(ngModel)]="rowData.serialNumber"
+              [maxLength]="50" />
+</ng-template>
+
+<ng-template #calibrationCell let-rowData="rowData">
+    <div class="p-1 rounded-3"
+         [class]="rowData.expirationCssClass">
+        <vp-input [(ngModel)]="rowData.lastCalibrationDate"
+                  type="date" />
+    </div>
+</ng-template>
+
+<ng-template #actionsCell let-rowData="rowData">
+    <div class="d-flex gap-1">
+        <button *ngIf="rowData.filePath"
+                type="button"
+                class="btn btn-primary btn-sm"
+                title="View Certificate"
+                aria-label="View Certificate"
+                (click)="viewCertificate(rowData)">
+            <i class="fa-solid fa-file-lines"></i>
+        </button>
+
+        <button *ngIf="rowData.isSelected || rowData.isSaved"
+                type="button"
+                class="btn btn-sm"
+                [class.btn-success]="rowData.isSaved"
+                [class.btn-primary]="!rowData.isSaved"
+                title="Save"
+                aria-label="Save"
+                (click)="saveGauge(rowData)">
+            <i class="fa-solid fa-floppy-disk"></i>
+        </button>
+    </div>
+</ng-template>

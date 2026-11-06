@@ -5,6 +5,10 @@ using Envirotrax.Admin.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Fog;
 
+/// <summary>
+/// Mirror of the App's FogTripTicketDto. One shape serves the search grid and the details window; only the
+/// details GET fills the signature URLs.
+/// </summary>
 public class FogTripTicketDto
 {
     public int Id { get; set; }
@@ -30,6 +34,19 @@ public class FogTripTicketDto
 
     public string? PropertyZip { get; set; }
 
+    public string? FogGeneratorPhoneNumber { get; set; }
+
+    public string? FogGeneratorEmailAddress { get; set; }
+
+    public string? GeneratorContactName { get; set; }
+
+    // Signatures arrive as ready-to-use SAS URLs from the App's FogTripTicketService.GetAsync override.
+    public string? GeneratorSignatureUrl { get; set; }
+
+    public string? TransporterSignatureUrl { get; set; }
+
+    public string? ReceiverSignatureUrl { get; set; }
+
     // Transporter
     public ReferencedProfessionalDto? Professional { get; set; }
 
@@ -50,6 +67,21 @@ public class FogTripTicketDto
     public string? TransporterLicenseNumber { get; set; }
 
     public string? TransporterEmailAddress { get; set; }
+
+    public string? TransporterWorkNumber { get; set; }
+
+    // Vehicle
+    public string? VehicleLicensePlateNumber { get; set; }
+
+    public string? VehicleManufacturer { get; set; }
+
+    public int VehicleYear { get; set; }
+
+    public double VehicleCapacity { get; set; }
+
+    public int VehicleCapacityType { get; set; }
+
+    public string? VehicleStickerNumber { get; set; }
 
     // Interceptor / waste
     public string? InterceptorType { get; set; }
@@ -81,7 +113,13 @@ public class FogTripTicketDto
 
     public string? ReceiverRegistrationNumber { get; set; }
 
+    public string? ReceiverPhoneNumber { get; set; }
+
+    public string? ReceiverEmailAddress { get; set; }
+
     public DateTime? ReceiverWasteDeliveredDate { get; set; }
+
+    public string? Comments { get; set; }
 
     public bool PickupCompleted { get; set; }
 

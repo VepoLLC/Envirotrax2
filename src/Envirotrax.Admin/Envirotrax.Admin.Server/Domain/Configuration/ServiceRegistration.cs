@@ -22,6 +22,8 @@ using Envirotrax.Admin.Server.Domain.Services.Definitions.Letters;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Letters;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Professionals;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.Licenses;
+using Envirotrax.Admin.Server.Domain.Services.Implementations.Licenses;
 
 namespace Envirotrax.Admin.Server.Domain.Configuration;
 
@@ -52,6 +54,7 @@ public static class ServiceRegistration
                 services.AddTransient<IBackflowTesterLicenseService, BackflowTesterLicenseService>();
                 services.AddTransient<IBackflowTesterInsuranceService, BackflowTesterInsuranceService>();
                 services.AddTransient<IBackflowTesterGaugeService, BackflowTesterGaugeService>();
+                services.AddTransient<IBackflowGaugeService, BackflowGaugeService>();
                 services.AddTransient<IBackflowReplacementService, BackflowReplacementService>();
                 services.AddTransient<IFogInspectionService, FogInspectionService>();
                 services.AddTransient<IFogInspectorService, FogInspectorService>();
@@ -69,6 +72,8 @@ public static class ServiceRegistration
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
                 services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
                 services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();
+                services.AddTransient<ILicenseService, LicenseService>();
+                services.AddTransient<IInsuranceService, InsuranceService>();
 
                 return services;
         }

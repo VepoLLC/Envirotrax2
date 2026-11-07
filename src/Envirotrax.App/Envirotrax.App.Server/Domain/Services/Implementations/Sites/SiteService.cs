@@ -160,13 +160,20 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
     public async Task<SiteAccountNumberDto> GenerateAccountNumberAsync()
     {
-        var uniqueNumber = await _siteRepository.GetNextAccountNumberAsync();
-        var randomNumber = Random.Shared.Next(1000, 9999);
+        var accountNumber = await BuildAccountNumberAsync(_authService.WaterSupplierId);
 
         return new SiteAccountNumberDto
         {
-            AccountNumber = $"{_authService.WaterSupplierId}-{randomNumber}-{uniqueNumber}"
+            AccountNumber = accountNumber
         };
+    }
+
+    private async Task<string> BuildAccountNumberAsync(int waterSupplierId)
+    {
+        var uniqueNumber = await _siteRepository.GetNextAccountNumberAsync();
+        var randomNumber = Random.Shared.Next(1000, 9999);
+
+        return $"{waterSupplierId}-{randomNumber}-{uniqueNumber}";
     }
 
     private async Task KeepAccountNumberUnlessChangesAllowedAsync(SiteDto dto)
@@ -217,16 +224,9 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
 
     public async Task<SiteDto> AddWithGeneratedAccountNumberAsync(SiteDto dto)
     {
-        var prefix = $"{dto.WaterSupplier!.Id}-{Random.Shared.Next(1000, 10000)}";
-        dto.AccountNumber = prefix;
+        dto.AccountNumber = await BuildAccountNumberAsync(dto.WaterSupplier!.Id!.Value);
 
-        var added = await AddAsync(dto);
-
-        added.AccountNumber = $"{prefix}-{added.Id}";
-
-        await _siteRepository.UpdateAccountNumberAsync(added.Id, added.AccountNumber);
-
-        return added;
+        return await AddAsync(dto);
     }
 
     public async Task<IPagedData<SiteDto>> SearchAsync(PageInfo pageInfo, Query query, FogCompliancyStatus? fogCompliancyStatus, CancellationToken cancellationToken)

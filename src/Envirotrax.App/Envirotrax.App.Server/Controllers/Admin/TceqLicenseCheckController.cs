@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Admin;
 
-[Route("api/admin/licenses/{licenseId}/checks")]
-public class LicenseCheckController : AdminBaseController
+[Route("api/admin/licenses/{licenseId}/tceq-checks")]
+public class TceqLicenseCheckController : AdminBaseController
 {
     private readonly IProfessionalUserLicenseService _licenseService;
 
-    public LicenseCheckController(IProfessionalUserLicenseService licenseService)
+    public TceqLicenseCheckController(IProfessionalUserLicenseService licenseService)
     {
         _licenseService = licenseService;
     }

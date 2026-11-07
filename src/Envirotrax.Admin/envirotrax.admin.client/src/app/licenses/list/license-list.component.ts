@@ -10,7 +10,8 @@ import {
     ModalHelperService,
     TableColumn,
     TableViewModel,
-    ToastService
+    ToastService,
+    ToastType
 } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
 import {
@@ -161,6 +162,11 @@ export class LicenseListComponent implements OnInit {
         const tceqLicense = await this.findTceqLicense(license);
 
         if (!tceqLicense) {
+            this._toastService.show({
+                text: 'License was not found in TCEQ.',
+                type: ToastType.Warning
+            });
+
             return;
         }
 
@@ -181,7 +187,7 @@ export class LicenseListComponent implements OnInit {
         try {
             this.table.isLoading = true;
 
-            return await this._licenseService.check(license.id!);
+            return await this._licenseService.checkTceq(license.id!);
         } finally {
             this.table.isLoading = false;
         }

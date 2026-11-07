@@ -259,7 +259,7 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
             pageInfo,
             query,
             _authService.ProfessionalId,
-            _authService.UserId,
+            _authService.ActingAsUserId,
             cancellationToken)).ToList();
 
         var schedules = await _siteScheduleService.GetMyBySiteIdsAsync(sites.Select(s => s.Id), cancellationToken);

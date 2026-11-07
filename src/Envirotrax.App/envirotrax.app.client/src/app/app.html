@@ -87,6 +87,11 @@
             </button>
         </div>
     </div>
+
+    <div *ngIf="impersonatedUserName" class="alert alert-danger text-center py-1 mt-1 mb-0">
+        <i class="fa-solid fa-user-secret me-1"></i>
+        Logged in as <strong>{{impersonatedUserName}}</strong> on behalf of Vepo admin {{userEmail}}.
+    </div>
 </div>
 
 <div class="d-flex w-100 h-100 flex-fill position-relative">

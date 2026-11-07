@@ -23,6 +23,7 @@ export class App implements OnInit {
   public isNavbarVisible: boolean = false;
   public companyName: string = '';
   public userEmail: string = '';
+  public impersonatedUserName: string = '';
   public isDarkMode: boolean = false;
   public useContainer: boolean = false;
   public cartCount$: Observable<number>;
@@ -63,6 +64,7 @@ export class App implements OnInit {
 
   private async loadUserInfo(): Promise<void> {
     this.userEmail = await this._authService.getUserEmail() ?? '';
+    this.impersonatedUserName = await this._authService.getImpersonatedUserName() ?? '';
 
     const professionalId = await this._authService.getProfessionalId();
 

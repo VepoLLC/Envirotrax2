@@ -45,6 +45,10 @@ export class AuthService {
         window.open(`${environment.authUrl}/Identity/Account/Manage`, '_blank');
     }
 
+    public loginAsProfessionalUser(professionalId: number, userId: number): void {
+        window.open(`${environment.appUrl}/auth/login-redirect?professionalId=${professionalId}&impersonatedUserId=${userId}`, '_blank');
+    }
+
     private async getProfileField(fieldName: string): Promise<any> {
         const user = await this._userManager.getUser();
 

@@ -87,7 +87,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
     public async Task<ProfessionalUserDto?> GetMyDataAsync(CancellationToken cancellationToken)
     {
-        var dto = await GetAsync(_authService.UserId, cancellationToken);
+        var dto = await GetAsync(_authService.ActingAsUserId, cancellationToken);
 
         if (dto != null)
         {
@@ -106,7 +106,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
     public async Task<string?> SaveMySignatureAsync(Stream signatureStream, string signatureFileName)
     {
-        var userId = _authService.UserId;
+        var userId = _authService.ActingAsUserId;
         var professionalId = _authService.ProfessionalId;
 
         var extension = ValidateAndGetExtension(signatureFileName);
@@ -148,7 +148,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
     public async Task<ProfessionalUserDto?> UpdateMyDataAsync(ProfessionalUserDto user)
     {
-        user.Id = _authService.UserId;
+        user.Id = _authService.ActingAsUserId;
 
         var model = MapToModel(user);
         var saved = await _professionalUserRepository.UpdateNonSensitiveDataAsync(model!);

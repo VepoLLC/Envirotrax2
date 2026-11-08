@@ -143,6 +143,8 @@ public static class ServiceRegistration
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
+
+        services.Configure<TceqOptions>(configuration.GetSection("Tceq"));
         services.AddHttpClient<ITceqLicenseService, TceqLicenseService>();
 
         services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));

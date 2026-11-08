@@ -44,9 +44,9 @@ public class LicenseService : ILicenseService
         return _apiClient.PutAsync<ProfessionalUserLicenseDto, ProfessionalUserLicenseDto>($"{BaseUrl}/{id}", license, CancellationToken.None);
     }
 
-    public Task<TceqLicenseDto?> CheckAsync(int id)
+    public Task<TceqLicenseDto?> CheckTceqAsync(int id)
     {
-        return _apiClient.PostAsync<object?, TceqLicenseDto>($"{BaseUrl}/{id}/checks", null, CancellationToken.None);
+        return _apiClient.PostAsync<object?, TceqLicenseDto>($"{BaseUrl}/{id}/tceq-checks", null, CancellationToken.None);
     }
 
     public Task<ProfessionalLicenseDto?> UpdateCompanyLicenseAsync(int id, ProfessionalLicenseDto license)

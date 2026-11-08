@@ -13,7 +13,7 @@ public interface ILicenseService
 
     Task<ProfessionalUserLicenseDto?> UpdateAsync(int id, ProfessionalUserLicenseDto license);
 
-    Task<TceqLicenseDto?> CheckAsync(int id);
+    Task<TceqLicenseDto?> CheckTceqAsync(int id);
 
     Task<ProfessionalLicenseDto?> UpdateCompanyLicenseAsync(int id, ProfessionalLicenseDto license);
 }

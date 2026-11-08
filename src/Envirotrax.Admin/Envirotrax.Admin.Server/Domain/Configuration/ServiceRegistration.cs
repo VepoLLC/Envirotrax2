@@ -20,6 +20,8 @@ using Envirotrax.Admin.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Fog;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Letters;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Letters;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.Admin.Server.Domain.Services.Implementations.Professionals;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Licenses;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Licenses;
 
@@ -69,6 +71,7 @@ public static class ServiceRegistration
                 services.AddTransient<IFogTripTicketService, FogTripTicketService>();
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
                 services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
+                services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();
                 services.AddTransient<ILicenseService, LicenseService>();
                 services.AddTransient<IInsuranceService, InsuranceService>();
 

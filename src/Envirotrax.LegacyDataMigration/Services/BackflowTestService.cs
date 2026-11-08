@@ -21,6 +21,9 @@ public class BackflowTestService
     // A run takes hours, so the log says how far it has got every this many images.
     private const int ProgressLogInterval = 1000;
 
+    // Backflow tests are the largest V1 table, so their scripts run far past the default command timeout.
+    private static readonly TimeSpan ScriptCommandTimeout = TimeSpan.FromMinutes(20);
+
     private readonly ILogger<BackflowTestService> _logger;
     private readonly AppDbContext _appDbContext;
     private readonly LegacyFileServerService _legacyFileServerService;
@@ -53,14 +56,24 @@ public class BackflowTestService
         _logger.LogInformation("Executing database scripts from {folderName}.", ScriptsFolder);
 
         var scripts = Directory.GetFiles(ScriptsFolder, "*.sql").OrderBy(file => file);
+        var originalTimeout = _appDbContext.Database.GetCommandTimeout();
 
-        foreach (var file in scripts)
+        _appDbContext.Database.SetCommandTimeout(ScriptCommandTimeout);
+
+        try
         {
-            _logger.LogInformation("Executing script {file}", file);
-            var sql = await File.ReadAllTextAsync(file);
+            foreach (var file in scripts)
+            {
+                _logger.LogInformation("Executing script {file}", file);
+                var sql = await File.ReadAllTextAsync(file);
 
-            var addedRows = await _appDbContext.Database.ExecuteSqlRawAsync(sql);
-            _logger.LogInformation("Imported backflow tests. Count: {count}", addedRows);
+                var addedRows = await _appDbContext.Database.ExecuteSqlRawAsync(sql);
+                _logger.LogInformation("Imported backflow tests. Count: {count}", addedRows);
+            }
+        }
+        finally
+        {
+            _appDbContext.Database.SetCommandTimeout(originalTimeout);
         }
 
         _logger.LogInformation("Completed executing database scripts from {folderName}.", ScriptsFolder);

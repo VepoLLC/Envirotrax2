@@ -7,6 +7,7 @@ import { Site } from "../../../../shared/models/sites/site";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { QueryProperty } from "../../../../shared/models/query";
 import { CellTemplateData, ColumnType, TableColumn, TableCustomAction } from "@envirotrax/common-ui";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../../shared/models/page-info";
 
 @Component({
     standalone: false,
@@ -90,7 +91,7 @@ export class ProfessionalFogSubmissionPropertySearchComponent implements OnInit 
             this.table.query.filter = filter;
 
             this.table.items = await this._siteService.getAllForProfessional(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

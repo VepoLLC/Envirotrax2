@@ -1,13 +1,14 @@
 using System.Globalization;
+using Envirotrax.App.Server.Domain.Configuration;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Options;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Professionals.Licenses;
 
 public class TceqLicenseService : ITceqLicenseService
 {
-    private const string SearchUrl = "https://www2.tceq.texas.gov/lic_dpa/index.cfm";
     private const string BpatLicenseType = "BACKFLOW PREVENTION ASSEMBLY TESTER";
 
     private const string LicenseeNameXPath = "//body[1]/div[1]/div[2]/div[1]/p[2]";
@@ -22,10 +23,12 @@ public class TceqLicenseService : ITceqLicenseService
     private static readonly CultureInfo TceqCulture = CultureInfo.GetCultureInfo("en-US");
 
     private readonly HttpClient _http;
+    private readonly TceqOptions _options;
 
-    public TceqLicenseService(HttpClient http)
+    public TceqLicenseService(HttpClient http, IOptions<TceqOptions> options)
     {
         _http = http;
+        _options = options.Value;
     }
 
     public async Task<TceqLicenseDto?> FindBpatLicenseAsync(string licenseNumber, CancellationToken cancellationToken)
@@ -40,7 +43,7 @@ public class TceqLicenseService : ITceqLicenseService
         };
 
         using var content = new FormUrlEncodedContent(formFields);
-        using var response = await _http.PostAsync(SearchUrl, content, cancellationToken);
+        using var response = await _http.PostAsync(_options.LicenseSearchUrl, content, cancellationToken);
 
         response.EnsureSuccessStatusCode();
 

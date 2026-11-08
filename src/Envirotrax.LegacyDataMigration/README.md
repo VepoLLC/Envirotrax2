@@ -358,6 +358,31 @@ ticket's creation date, the moment V1 copied the signature and V2 would stamp it
 - **Still pending:** `SELECT COUNT(*) FROM FogTripTickets WHERE (HasLegacyTransporterSignature = 1 AND TransporterSignaturePath IS NULL) OR (HasLegacyGeneratorSignature = 1 AND GeneratorSignaturePath IS NULL) OR (HasLegacyReceiverSignature = 1 AND ReceiverSignaturePath IS NULL)`
 - **Not found in V1:** logged to `Logs/FogTripTicketService.log` with per-run counts.
 
+## How account comments are migrated
+
+V1 keeps the comments water suppliers and Vepo administrators write about a professional account in one
+table, `SaveAccountCommentLog`, which names the account by login and type. A comment on a master account
+becomes a `ProfessionalNotes` row for the company; a comment on a sub-account becomes a
+`ProfessionalUserNotes` row for that person in the company, through `ProfessionalUsers`. V2 gives each
+note a new `Id`; the V1 id goes into `LegacyRecordId`.
+
+Three things are worth knowing:
+
+- **A comment is copied to every water supplier its author belongs to.** V1 records no supplier on a
+  comment; it shows one to every supplier the author is a user of. V2 notes belong to one supplier, so the
+  script writes a copy under each, and the guard reads `LegacyRecordId` together with `WaterSupplierId`.
+  Vepo administrators are users of V1 supplier 0, which V2 has as the Vepo LLC supplier (domain `vepollc`),
+  so their comments go there, where only the Admin portal shows them.
+- **Empty comments are skipped.** The Management Studio writes an empty comment as soon as Add is clicked,
+  so an empty one is a note nobody wrote.
+- **Comments on deleted sub-accounts are skipped.** V1 deletes a sub-account and leaves its comments
+  behind, so there is no account to attach them to.
+
+Comments that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedProfessionals WHERE SourceTable = 'SaveAccountCommentLog'` — the comment is
+empty, its account or sub-account never migrated, or none of its author's water suppliers did.
+
 ## How backflow renewal requirements are migrated
 
 **Note:** Re-running the migration after renewal requirements have been deleted or copied in V2 may restore

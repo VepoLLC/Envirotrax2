@@ -124,6 +124,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierLicenseService, WaterSupplierLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
         services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
+        services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();
         services.AddTransient<IProfessionalDashboardService, ProfessionalDashboardService>();
 
         services.AddTransient<IGisAreaService, GisAreaService>();
@@ -143,6 +144,8 @@ public static class ServiceRegistration
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
+
+        services.Configure<TceqOptions>(configuration.GetSection("Tceq"));
         services.AddHttpClient<ITceqLicenseService, TceqLicenseService>();
 
         services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));

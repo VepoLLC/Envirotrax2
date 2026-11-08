@@ -4,10 +4,12 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { State } from '../../../shared/models/lookup/state';
+import { ProfessionalType } from '../../../shared/models/professionals/licenses/professional-user-license';
 import { Professional } from '../../../shared/models/professionals/professional';
 import { FogInspectorService } from '../../../shared/services/fog/fog-inspector.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { WindowReference } from '../../../window/window-config';
+import { ProfessionalNotesComponent } from '../../../shared/components/professional-notes/list/professional-notes.component';
 import { FogInspectorInsuranceListComponent } from './insurances/list/fog-inspector-insurance-list.component';
 import { FogInspectorLicenseListComponent } from './licenses/list/fog-inspector-license-list.component';
 import { FogInspectorUserListComponent } from './users/list/fog-inspector-user-list.component';
@@ -22,11 +24,14 @@ import { FogInspectorWaterSupplierListComponent } from './water-suppliers/list/f
         FogInspectorWaterSupplierListComponent,
         FogInspectorUserListComponent,
         FogInspectorLicenseListComponent,
-        FogInspectorInsuranceListComponent
+        FogInspectorInsuranceListComponent,
+        ProfessionalNotesComponent
     ],
 })
 export class FogInspectorDetailsComponent implements OnInit {
     public professionalId: number = 0;
+
+    public readonly professionalType: ProfessionalType = ProfessionalType.FogInspector;
 
     public idPrefix: string = 'fog-inspector';
 

@@ -7,6 +7,7 @@ import { ProfessionalFogVehicleService } from "../../../../../shared/services/fo
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { EditFogVehicleComponent } from "../edit/edit-fog-vehicle.component";
 import { CellTemplateData, ColumnType, HelperService, InputOption, ModalHelperService, TableColumn, ToastService } from '@envirotrax/common-ui';
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../../../shared/models/page-info";
 
 @Component({
     standalone: false,
@@ -91,7 +92,7 @@ export class ProfessionalFogVehicleListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._vehicleService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

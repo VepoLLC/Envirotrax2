@@ -14,6 +14,7 @@ import {
     RegisteredProfessional,
     RegisteredProfessionalAccountType
 } from "../../shared/models/professionals/registered-professional";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../shared/models/page-info";
 
 /**
  * Row of the results grid. Every displayed value is pre-computed here so the cell templates bind
@@ -170,7 +171,7 @@ export class RegisteredProfessionalSearchComponent implements OnInit, OnDestroy 
             const results = await this._registeredProfessionalService.search(
                 Number(this.selectedWaterSupplierId),
                 this.accountType!.professionalType,
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
 

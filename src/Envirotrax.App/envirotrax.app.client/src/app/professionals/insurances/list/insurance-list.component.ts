@@ -8,6 +8,7 @@ import { NgForm } from "@angular/forms";
 import { DownloadService } from "../../../shared/services/download.service";
 import { ExpirationType } from "../../../shared/models/professionals/licenses/professional-user-license";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 @Component({
     selector: 'vp-insurance-list',
@@ -90,7 +91,7 @@ export class InsuranceListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._insuranceService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

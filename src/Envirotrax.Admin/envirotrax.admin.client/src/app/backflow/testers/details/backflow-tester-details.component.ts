@@ -4,10 +4,12 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { State } from '../../../shared/models/lookup/state';
+import { ProfessionalType } from '../../../shared/models/professionals/licenses/professional-user-license';
 import { Professional } from '../../../shared/models/professionals/professional';
 import { BackflowTesterService } from '../../../shared/services/backflow/backflow-tester.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { WindowReference } from '../../../window/window-config';
+import { ProfessionalNotesComponent } from '../../../shared/components/professional-notes/list/professional-notes.component';
 import { BackflowTesterGaugeListComponent } from './gauges/list/backflow-tester-gauge-list.component';
 import { BackflowTesterInsuranceListComponent } from './insurances/list/backflow-tester-insurance-list.component';
 import { BackflowTesterLicenseListComponent } from './licenses/list/backflow-tester-license-list.component';
@@ -28,11 +30,14 @@ import { BackflowTesterWaterSupplierListComponent } from './water-suppliers/list
         BackflowTesterUserListComponent,
         BackflowTesterLicenseListComponent,
         BackflowTesterInsuranceListComponent,
-        BackflowTesterGaugeListComponent
+        BackflowTesterGaugeListComponent,
+        ProfessionalNotesComponent
     ],
 })
 export class BackflowTesterDetailsComponent implements OnInit {
     public professionalId: number = 0;
+
+    public readonly professionalType: ProfessionalType = ProfessionalType.Bpat;
 
     // Several of these windows can be open at once, so element ids must be unique per window
     // or a label's `for` would toggle the checkbox in a different window.

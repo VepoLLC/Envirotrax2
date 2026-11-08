@@ -10,6 +10,7 @@ import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../shared/models/page-info';
 
 const CRITERIA_FIELDS: (keyof FogTransporterSearchCriteria)[] = [
     'registrationNumber',
@@ -118,7 +119,7 @@ export class FogTransporterListComponent implements OnInit {
             this.table.isLoading = true;
             this.table.items = await this._fogTransporterService.search(
                 this._criteria,
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

@@ -16,25 +16,25 @@ public class WaterSupplierUserRepository : IWaterSupplierUserRepository
 
     public async Task<WaterSupplierUser?> GetAsync(int supplierId, int userId)
     {
-        var supplierUser = await _dbContext
-            .WaterSupplierUsers
-            .SingleOrDefaultAsync(s => s.WaterSupplierId == supplierId && s.UserId == userId);
+        var parentId = await _dbContext
+            .WaterSuppliers
+            .Where(t => t.Id == supplierId)
+            .Select(t => t.ParentId)
+            .SingleOrDefaultAsync();
 
-        if (supplierUser == null)
+        if (parentId.HasValue)
         {
-            var parentId = await _dbContext
-                    .WaterSuppliers
-                    .Where(t => t.Id == supplierId)
-                    .Select(t => t.ParentId)
-                    .SingleOrDefaultAsync();
+            var parentUser = await GetAsync(parentId.Value, userId);
 
-            if (parentId.HasValue)
+            if (parentUser != null)
             {
-                supplierUser = await GetAsync(parentId.Value, userId);
+                return parentUser;
             }
         }
 
-        return supplierUser;
+        return await _dbContext
+            .WaterSupplierUsers
+            .SingleOrDefaultAsync(s => s.WaterSupplierId == supplierId && s.UserId == userId);
     }
 
     public async Task<IEnumerable<RolePermission>> GetAllPermissionsAsync(int supplierId, int userId)

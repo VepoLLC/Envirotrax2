@@ -9,6 +9,7 @@ import { AuthService } from "../../shared/services/auth/auth.service";
 import { DownloadService } from "../../shared/services/download.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../shared/models/page-info";
 
 interface PaymentReceiptRowVm extends ProfessionalTransaction {
     account?: string;
@@ -126,7 +127,7 @@ export class PaymentReceiptsComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const transactions = await this._transactionService.getAll(this.table.items?.pageInfo || {}, query);
+            const transactions = await this._transactionService.getAll(this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, query);
 
             this.table.items = this.toRowVms(transactions);
         } finally {

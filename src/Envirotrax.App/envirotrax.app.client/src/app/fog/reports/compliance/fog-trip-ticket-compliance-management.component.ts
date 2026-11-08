@@ -11,7 +11,7 @@ import { AuthService } from "../../../shared/services/auth/auth.service";
 import { DownloadService } from "../../../shared/services/download.service";
 import { PrintableTableService } from "../../../shared/services/printable-table.service";
 import { DownloadConfig } from "../../../shared/models/download-config";
-import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
+import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
 import { complianceOverdueSeverityClasses } from "../../../shared/enums/compliance-overdue-severity.enum";
@@ -225,7 +225,7 @@ export class FogTripTicketComplianceManagementComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._siteService.getFogTripTicketCompliance(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query,
                 this.dueDateFrom,
                 this.dueDateTo,

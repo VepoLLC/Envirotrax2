@@ -15,7 +15,7 @@ import { UserService } from "../../../shared/services/water-suppliers/user.servi
 import { DownloadService } from "../../../shared/services/download.service";
 import { PrintableTableService } from "../../../shared/services/printable-table.service";
 import { DownloadColumn, DownloadConfig } from "../../../shared/models/download-config";
-import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
+import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 
 export enum PropertyLogFilterType {
@@ -192,7 +192,7 @@ export class PropertyLogManagementComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._propertyLogService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query,
                 this.buildLogTypeFilter()
             );

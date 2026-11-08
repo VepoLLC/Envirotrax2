@@ -45,8 +45,8 @@ export class LicenseService {
         return lastValueFrom(this._http.put<ProfessionalUserLicense>(url, license));
     }
 
-    public check(id: number): Promise<TceqLicense | null> {
-        const url = this._urlResolver.resolveUrl(`/api/licenses/${id}/checks`);
+    public checkTceq(id: number): Promise<TceqLicense | null> {
+        const url = this._urlResolver.resolveUrl(`/api/licenses/${id}/tceq-checks`);
 
         return lastValueFrom(this._http.post<TceqLicense | null>(url, null));
     }

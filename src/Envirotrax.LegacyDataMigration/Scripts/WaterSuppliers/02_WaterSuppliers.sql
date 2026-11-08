@@ -23,12 +23,16 @@ BEGIN TRY
         legacyWaterSuppliers.LetterContactPhoneNumber, legacyWaterSuppliers.LetterContactFaxNumber, legacyWaterSuppliers.LetterContactEmailAddress,
         legacyWaterSuppliers.GISCenterLatitude, legacyWaterSuppliers.GISCenterLongitude, legacyWaterSuppliers.GISCenterZoom, legacyWaterSuppliers.Active, legacyWaterSuppliers.CreationDate
     FROM Vepo.dbo.WaterSuppliers AS legacyWaterSuppliers
+    -- V1 stores the full state name here, but the code is matched too in case some rows hold an abbreviation.
     LEFT JOIN States AS states
-        ON states.Code = legacyWaterSuppliers.State
+        ON states.Name = legacyWaterSuppliers.State
+        OR states.Code = legacyWaterSuppliers.State
     LEFT JOIN States AS letterStates
-        ON letterStates.Code = legacyWaterSuppliers.LetterState
+        ON letterStates.Name = legacyWaterSuppliers.LetterState
+        OR letterStates.Code = legacyWaterSuppliers.LetterState
     LEFT JOIN States AS letterContactStates
-        ON letterContactStates.Code = legacyWaterSuppliers.LetterContactState
+        ON letterContactStates.Name = legacyWaterSuppliers.LetterContactState
+        OR letterContactStates.Code = legacyWaterSuppliers.LetterContactState
     WHERE (legacyWaterSuppliers.MasterWaterSupplierID2 > 0
         -- Supplier IDs up to 3 don't actually exist in the system, but there are records with those parent IDs
         OR (legacyWaterSuppliers.MasterWaterSupplierID < 4 AND legacyWaterSuppliers.MasterWaterSupplierID2 = 0))
@@ -62,11 +66,14 @@ BEGIN TRY
         INNER JOIN WaterSuppliers AS parents
             ON parents.LegacyRecordId = legacyWaterSuppliers.MasterWaterSupplierID
         LEFT JOIN States AS states
-            ON states.Code = legacyWaterSuppliers.State
+            ON states.Name = legacyWaterSuppliers.State
+            OR states.Code = legacyWaterSuppliers.State
         LEFT JOIN States AS letterStates
-            ON letterStates.Code = legacyWaterSuppliers.LetterState
+            ON letterStates.Name = legacyWaterSuppliers.LetterState
+            OR letterStates.Code = legacyWaterSuppliers.LetterState
         LEFT JOIN States AS letterContactStates
-            ON letterContactStates.Code = legacyWaterSuppliers.LetterContactState
+            ON letterContactStates.Name = legacyWaterSuppliers.LetterContactState
+            OR letterContactStates.Code = legacyWaterSuppliers.LetterContactState
         WHERE NOT EXISTS (
             SELECT 1
             FROM WaterSuppliers AS alreadyInserted

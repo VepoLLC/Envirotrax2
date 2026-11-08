@@ -3,7 +3,7 @@ import { FogDisposalSite } from "../../../../../shared/models/fog/fog-disposal-s
 import { PhysicalType, PHYSICAL_TYPE_LABELS } from "../../../../../shared/models/fog/fog-disposal-site-enums";
 import { ProfessionalFogDisposalSiteService } from "../../../../../shared/services/fog/professional-fog-disposal-site.service";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
-import { MAX_PAGE_SIZE } from "../../../../../shared/models/page-info";
+import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from "../../../../../shared/models/page-info";
 import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 
 @Component({
@@ -82,7 +82,7 @@ export class ProfessionalFogDisposalSiteListComponent implements OnInit {
             this.table.isLoading = true;
 
             const [allSites, registeredSites] = await Promise.all([
-                this._siteService.getAll(this.table.items?.pageInfo || {}, this.table.query),
+                this._siteService.getAll(this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.table.query),
                 this._siteService.getRegistered({ pageSize: MAX_PAGE_SIZE }, {})
             ]);
 

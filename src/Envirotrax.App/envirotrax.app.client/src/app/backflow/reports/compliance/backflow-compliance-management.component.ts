@@ -7,7 +7,7 @@ import { BackflowTestResult } from "../../../shared/models/backflow/backflow-tes
 import { ComparisonOperator, Query, QueryProperty } from "../../../shared/models/query";
 import { WaterSupplierUser } from "../../../shared/models/users/water-supplier-user";
 import { DownloadConfig } from "../../../shared/models/download-config";
-import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
+import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FacilityType } from "../../../shared/enums/facility-type.enum";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
@@ -260,7 +260,7 @@ export class BackflowComplianceManagementComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._backflowTestService.getBackflowCompliance(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
 

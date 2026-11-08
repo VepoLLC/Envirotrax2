@@ -5,6 +5,7 @@ import { ProfesionalUserService } from "../../../shared/services/professionals/p
 import { ActivatedRoute, Router } from "@angular/router";
 import { CreateProfessionalUserComponent } from "../create/create-professional-user.component";
 import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 // A grid row: a user decorated with the abbreviated job functions shown in the Job Functions column.
 type ProfessionalUserRow = ProfessionalUser & {
@@ -75,7 +76,7 @@ export class ProfessionalUserListComponent implements OnInit {
         try {
             this.table.isLoading = true;
 
-            const users = await this._userService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            const users = await this._userService.getAll(this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.table.query);
 
             this.table.items = {
                 ...users,

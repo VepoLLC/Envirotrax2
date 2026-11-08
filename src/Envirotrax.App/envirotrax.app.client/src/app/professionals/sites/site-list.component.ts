@@ -21,6 +21,7 @@ import { SiteSchedule } from "../../shared/models/sites/site-schedule";
 import { EditSiteScheduleComponent, EditSiteScheduleModel } from "./schedule/edit-site-schedule.component";
 import { SITE_SCHEDULE_TYPE_NAMES, SiteScheduleService, SiteScheduleType } from "../../shared/services/sites/site-schedule.service";
 import { GeneralSettingsService } from "../../shared/services/settings/general-settings.service";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../shared/models/page-info";
 
 const CRITERIA_FIELDS: (keyof ProfessionalSiteSearchCriteria)[] = [
     "workedOnly",
@@ -244,7 +245,7 @@ export class SiteListComponent implements OnInit {
             this.table.isLoading = true;
 
             const result = await this._siteService.getAllForProfessional(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query,
                 this._criteria
             );

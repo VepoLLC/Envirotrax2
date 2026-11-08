@@ -15,7 +15,7 @@ import { InterceptorType } from '../../../../shared/enums/interceptor-type.enum'
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
-import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
+import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { PrintableTableService } from '../../../../shared/services/printable-table.service';
 import { DownloadConfig } from '../../../../shared/models/download-config';
 import { DownloadService } from '../../../../shared/services/download.service';
@@ -240,7 +240,7 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._fogTripTicketService.searchForProfessional(
-                this.table.items?.pageInfo || {}, this.table.query, this.selectedWaterSupplierId);
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.table.query, this.selectedWaterSupplierId);
         } finally {
             this.table.isLoading = false;
         }

@@ -9,6 +9,7 @@ import { ColumnType, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 import { DownloadConfig } from "../../../shared/models/download-config";
 import { DownloadService } from "../../../shared/services/download.service";
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../shared/models/page-info';
 
 const CRITERIA_FIELDS: (keyof BackflowTesterSearchCriteria)[] = [
     "bpatLicenseNumber",
@@ -118,7 +119,7 @@ export class BackflowTesterListComponent implements OnInit {
             // licence-only call and silently dropped every company filter.
             this.table.items = await this._backflowTesterManagementService.search(
                 this._criteria,
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

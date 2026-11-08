@@ -7,6 +7,7 @@ import { CreateUserComponent } from "../create/create-user.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 @Component({
     standalone: false,
@@ -72,7 +73,7 @@ export class UserListComponent implements OnInit {
     public async getUsers(): Promise<void> {
         try {
             this.table.isLoading = true;
-            this.table.items = await this._userService.getAll(this.table.items?.pageInfo || {}, this.table.query);
+            this.table.items = await this._userService.getAll(this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.table.query);
         } finally {
             this.table.isLoading = false;
         }

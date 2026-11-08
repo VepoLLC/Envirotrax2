@@ -7,7 +7,7 @@ import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
 import { BackflowSubmissionSite } from "../../../shared/models/backflow/backflow-submission-site";
 import { Site } from "../../../shared/models/sites/site";
 import { BackflowSubmissionSearchCriteria, SiteService } from "../../../shared/services/sites/site.service";
-import { PageInfo } from "../../../shared/models/page-info";
+import { PageInfo, STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 import { Query } from "../../../shared/models/query";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
 
@@ -43,7 +43,7 @@ export class BackflowTestAssemblySearchComponent implements OnInit, OnDestroy {
     public resultsHeader = '';
 
     public siteBoxes: SubmissionSiteBox[] = [];
-    public pageInfo: PageInfo = {};
+    public pageInfo: PageInfo = { pageSize: STANDALONE_GRID_PAGE_SIZE };
 
     private readonly _query: Query = {
         sort: { streetNumber: 'Asc', streetName: 'Desc' },
@@ -92,7 +92,7 @@ export class BackflowTestAssemblySearchComponent implements OnInit, OnDestroy {
         }
 
         this.errorMessage = '';
-        this.pageInfo = {};
+        this.pageInfo = { pageSize: STANDALONE_GRID_PAGE_SIZE };
         this.buildSearch();
 
         await this.getSites();

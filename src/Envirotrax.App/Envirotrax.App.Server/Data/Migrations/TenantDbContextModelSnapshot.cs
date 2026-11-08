@@ -2993,6 +2993,50 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("ProfessionalInsurances");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalNote", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoteText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfessionalType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("ProfessionalId", "ProfessionalType");
+
+                    b.ToTable("ProfessionalNotes");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalTransaction", b =>
                 {
                     b.Property<int>("Id")
@@ -3124,6 +3168,53 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ProfessionalUsers");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUserNote", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoteText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProfessionalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfessionalType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("ProfessionalId", "UserId", "ProfessionalType");
+
+                    b.ToTable("ProfessionalUserNotes");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalWaterSupplier", b =>
@@ -5412,6 +5503,39 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Professional");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalNote", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Professional");
+
+                    b.Navigation("UpdatedBy");
+
+                    b.Navigation("WaterSupplier");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalTransaction", b =>
                 {
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
@@ -5455,6 +5579,39 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Professional");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUserNote", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "ProfessionalUser")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ProfessionalUser");
+
+                    b.Navigation("UpdatedBy");
+
+                    b.Navigation("WaterSupplier");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalWaterSupplier", b =>

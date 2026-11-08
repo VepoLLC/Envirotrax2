@@ -22,6 +22,7 @@ export class App implements OnInit {
   public menuItems: MenuItem[] = [];
   public isNavbarVisible: boolean = false;
   public companyName: string = '';
+  public companyLink: string[] = [];
   public userEmail: string = '';
   public isDarkMode: boolean = false;
   public useContainer: boolean = false;
@@ -69,9 +70,11 @@ export class App implements OnInit {
     if (professionalId) {
       const professional = await this._professionalService.getLoggedInProfessional();
       this.companyName = professional.name ?? '';
+      this.companyLink = ['/profile'];
     } else {
       const supplier = await this._waterSupplierService.getLoggedInSupplier();
       this.companyName = supplier.name ?? '';
+      this.companyLink = ['/auth/water-suppliers'];
     }
   }
 

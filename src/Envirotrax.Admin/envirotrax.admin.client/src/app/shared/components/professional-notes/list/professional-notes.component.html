@@ -1,0 +1,30 @@
+<ng-template #createdTemplate let-note="rowData">
+    <div class="text-nowrap">{{ note.createdTime | date:'MMM d, y, h:mm a' }}</div>
+    <div class="text-nowrap">{{ note.createdBy?.email }}</div>
+</ng-template>
+
+<ng-template #noteTextTemplate let-note="rowData">
+    <div class="text-break vp-note-text">{{ note.noteText }}</div>
+</ng-template>
+
+<vp-section header="Account Comment Log">
+    <div dp-spinner-parent>
+        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [canAdd]="true"
+                  (add)="addNote()"
+                  [canEdit]="true"
+                  (edit)="editNote($event)"
+                  [canDelete]="true"
+                  (delete)="deleteNote($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="loadNotes()"
+                  [(query)]="table.query"
+                  (queryChange)="loadNotes()"
+                  (queryReset)="loadNotes()" />
+    </div>
+</vp-section>

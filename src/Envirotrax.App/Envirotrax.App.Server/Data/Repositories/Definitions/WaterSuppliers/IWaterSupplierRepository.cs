@@ -15,6 +15,8 @@ public interface IWaterSupplierRepository : IRepository<WaterSupplier>
 
     Task<WaterSupplier?> GetUnscopedAsync(int waterSupplierId, CancellationToken cancellationToken);
 
+    Task<int> GetEnvirotraxAdminSupplierIdAsync(CancellationToken cancellationToken);
+
     Task<IEnumerable<int>> GetChildSupplierIdsAsync(int parentWaterSupplierId, CancellationToken cancellationToken);
 
     Task<WaterSupplier?> UpdateOwnAsync(WaterSupplier supplier);

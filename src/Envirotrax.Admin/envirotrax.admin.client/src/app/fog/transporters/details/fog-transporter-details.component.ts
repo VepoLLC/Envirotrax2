@@ -4,10 +4,12 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { State } from '../../../shared/models/lookup/state';
+import { ProfessionalType } from '../../../shared/models/professionals/licenses/professional-user-license';
 import { Professional } from '../../../shared/models/professionals/professional';
 import { FogTransporterService } from '../../../shared/services/fog/fog-transporter.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { WindowReference } from '../../../window/window-config';
+import { ProfessionalNotesComponent } from '../../../shared/components/professional-notes/list/professional-notes.component';
 import { FogTransporterInsuranceListComponent } from './insurances/list/fog-transporter-insurance-list.component';
 import { FogTransporterLicenseListComponent } from './licenses/list/fog-transporter-license-list.component';
 import { FogTransporterUserListComponent } from './users/list/fog-transporter-user-list.component';
@@ -24,11 +26,14 @@ import { FogTransporterWaterSupplierListComponent } from './water-suppliers/list
         FogTransporterUserListComponent,
         FogTransporterLicenseListComponent,
         FogTransporterInsuranceListComponent,
-        FogTransporterVehicleListComponent
+        FogTransporterVehicleListComponent,
+        ProfessionalNotesComponent
     ],
 })
 export class FogTransporterDetailsComponent implements OnInit {
     public professionalId: number = 0;
+
+    public readonly professionalType: ProfessionalType = ProfessionalType.FogTransporter;
 
     public idPrefix: string = 'fog-transporter';
 

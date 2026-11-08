@@ -116,6 +116,15 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             .FirstOrDefaultAsync(supplier => supplier.Id == waterSupplierId, cancellationToken);
     }
 
+    public Task<int> GetEnvirotraxAdminSupplierIdAsync(CancellationToken cancellationToken)
+    {
+        return DbContext
+            .WaterSuppliers
+            .Where(supplier => supplier.Domain == WaterSupplier.EnvirotraxAdminDomain)
+            .Select(supplier => supplier.Id)
+            .SingleAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<int>> GetChildSupplierIdsAsync(int parentWaterSupplierId, CancellationToken cancellationToken)
     {
         return await DbContext

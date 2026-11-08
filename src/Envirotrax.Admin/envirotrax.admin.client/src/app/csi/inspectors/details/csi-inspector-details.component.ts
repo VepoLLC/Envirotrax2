@@ -5,11 +5,13 @@ import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui'
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { CsiInspectorAccount, CsiInspectorAccountDetails } from '../../../shared/models/csi/csi-inspector-account';
 import { State } from '../../../shared/models/lookup/state';
+import { ProfessionalType } from '../../../shared/models/professionals/licenses/professional-user-license';
 import { Professional, ProfessionalUser } from '../../../shared/models/professionals/professional';
 import { ProfessionalWaterSupplier } from '../../../shared/models/professionals/professional-water-supplier';
 import { CsiInspectorService } from '../../../shared/services/csi/csi-inspector.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { WindowReference } from '../../../window/window-config';
+import { ProfessionalNotesComponent } from '../../../shared/components/professional-notes/list/professional-notes.component';
 import { CsiInspectorInsuranceListComponent } from './insurances/list/csi-inspector-insurance-list.component';
 import { CsiInspectorLicenseListComponent } from './licenses/list/csi-inspector-license-list.component';
 import { CsiInspectorUserListComponent } from './users/list/csi-inspector-user-list.component';
@@ -22,7 +24,8 @@ import { CsiInspectorUserListComponent } from './users/list/csi-inspector-user-l
         SharedComponentsModule,
         CsiInspectorUserListComponent,
         CsiInspectorLicenseListComponent,
-        CsiInspectorInsuranceListComponent
+        CsiInspectorInsuranceListComponent,
+        ProfessionalNotesComponent
     ],
 })
 export class CsiInspectorDetailsComponent implements OnInit {
@@ -33,6 +36,8 @@ export class CsiInspectorDetailsComponent implements OnInit {
 
     public professionalId: number = 0;
     public userId?: number;
+
+    public readonly professionalType: ProfessionalType = ProfessionalType.CsiInspector;
 
     // Several of these windows can be open at once, so element ids must be unique per window
     // or a label's `for` would toggle the checkbox in a different window.

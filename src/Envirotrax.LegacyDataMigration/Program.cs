@@ -61,6 +61,7 @@ services.AddTransient<ProfessionalService>();
 services.AddTransient<ProfessionalWaterSupplierService>();
 services.AddTransient<ProfessionalLicenseService>();
 services.AddTransient<ProfessionalInsuranceService>();
+services.AddTransient<ProfessionalNoteService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
@@ -103,6 +104,11 @@ await professionalLicenseService.MigrateAsync();
 
 var professionalInsuranceService = provider.GetRequiredService<ProfessionalInsuranceService>();
 await professionalInsuranceService.MigrateAsync();
+
+// After the professionals, their users and the supplier users: a comment is about a company or one of its
+// sub-accounts, and it is copied to every water supplier its author is a user of.
+var professionalNoteService = provider.GetRequiredService<ProfessionalNoteService>();
+await professionalNoteService.MigrateAsync();
 
 var gisAreaService = provider.GetRequiredService<GisAreaService>();
 await gisAreaService.MigrateAsync();

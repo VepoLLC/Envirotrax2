@@ -7,6 +7,7 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses;
@@ -211,6 +212,13 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         {
             return null;
         }
+
+        return MapToDto(saved);
+    }
+
+    public async Task<ProfessionalUserDto?> UpdatePaymentBypassAsync(int professionalId, int userId, ProfessionalType professionalType, bool isPaymentBypassed)
+    {
+        var saved = await _professionalUserRepository.UpdatePaymentBypassAsync(professionalId, userId, professionalType, isPaymentBypassed);
 
         return MapToDto(saved);
     }

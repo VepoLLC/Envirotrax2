@@ -1,3 +1,6 @@
+<ng-template #paymentBypassTemplate let-user="rowData">
+    <vp-professional-payment-bypass [professionalType]="professionalType" [professionalId]="inspectorId" [user]="user" (loadingChange)="table.isLoading = $event" />
+</ng-template>
 
 <vp-section header="Licensed Personnel User Accounts">
     <div dp-spinner-parent>

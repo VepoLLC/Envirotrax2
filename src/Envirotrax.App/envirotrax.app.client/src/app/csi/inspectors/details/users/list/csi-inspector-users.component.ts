@@ -1,8 +1,9 @@
-﻿import { Component, Input, OnInit } from "@angular/core";
+﻿import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
+import { ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { CsiInspectorSubAccountsService } from "../../../../../shared/services/csi/csi-inspector-user.service";
-import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { CellTemplateData, ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { FeatureType } from "../../../../../shared/models/feature-type";
@@ -17,7 +18,13 @@ import { AddEditCsiInspectorUserComponent, CsiUserModalData } from "../edit/add-
 export class CsiInspectorUsersComponent implements OnInit {
     @Input() public inspectorId!: number;
 
+    @ViewChild('paymentBypassTemplate', { static: true })
+    public paymentBypassTemplate!: TemplateRef<CellTemplateData<ProfessionalUser>>;
+
+    public readonly professionalType = ProfessionalType.CsiInspector;
+
     public canManage: boolean = false;
+    public canManagePaymentBypass: boolean = false;
 
     public table: TableViewModel<ProfessionalUser> = {
         columns: [],
@@ -40,6 +47,7 @@ export class CsiInspectorUsersComponent implements OnInit {
     private async setPermissions(): Promise<void> {
         const canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.CsiInspectors);
         this.canManage = canEdit && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalUsers);
+        this.canManagePaymentBypass = canEdit && await this._authService.hasAnyFeatures(FeatureType.ManagePaymentBypass);
     }
 
     private setupColumns(): void {
@@ -47,7 +55,7 @@ export class CsiInspectorUsersComponent implements OnInit {
     }
 
     private getColumns(): TableColumn<ProfessionalUser>[] {
-        return [
+        const columns: TableColumn<ProfessionalUser>[] = [
             {
                 field: 'emailAddress',
                 caption: 'Email Address',
@@ -64,6 +72,18 @@ export class CsiInspectorUsersComponent implements OnInit {
                 type: ColumnType.text
             }
         ];
+
+        if (this.canManagePaymentBypass) {
+            columns.push({
+                field: '',
+                caption: 'Payment Bypass',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.paymentBypassTemplate
+            });
+        }
+
+        return columns;
     }
 
     public addUser(): void {

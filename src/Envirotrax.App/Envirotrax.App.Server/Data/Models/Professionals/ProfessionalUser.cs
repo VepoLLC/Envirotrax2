@@ -36,6 +36,11 @@ public class ProfessionalUser : IProfessionalModel
     public bool IsFogInspector { get; set; }
     public bool IsFogTransporter { get; set; }
 
+    public bool IsBackflowTestingPaymentBypassed { get; set; }
+    public bool IsCsiInspectionPaymentBypassed { get; set; }
+    public bool IsFogInspectionPaymentBypassed { get; set; }
+    public bool IsFogTransportationPaymentBypassed { get; set; }
+
     [StringLength(255)]
     public string? BillingFirstName { get; set; }
 

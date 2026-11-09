@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
+import { ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { FogTransporterSubAccountsService } from "../../../../../shared/services/fog/fog-transporter-user.service";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
@@ -7,7 +8,7 @@ import { PermissionAction, PermissionType } from "../../../../../shared/models/p
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { EditFogTransporterUserComponent, FogUserModalData } from "../edit/edit-fog-transporter-user.component";
-import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'vp-fog-transporter-users',
@@ -17,7 +18,13 @@ import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-
 export class FogTransporterUsersComponent implements OnInit {
     @Input() public transporterId!: number;
 
+    @ViewChild('paymentBypassTemplate', { static: true })
+    public paymentBypassTemplate!: TemplateRef<CellTemplateData<ProfessionalUser>>;
+
+    public readonly professionalType = ProfessionalType.FogTransporter;
+
     public canManage: boolean = false;
+    public canManagePaymentBypass: boolean = false;
 
     public table: TableViewModel<ProfessionalUser> = {
         columns: [],
@@ -39,6 +46,7 @@ export class FogTransporterUsersComponent implements OnInit {
     private async setPermissions(): Promise<void> {
         const canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.FogTransporters);
         this.canManage = canEdit && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalUsers);
+        this.canManagePaymentBypass = canEdit && await this._authService.hasAnyFeatures(FeatureType.ManagePaymentBypass);
     }
 
     private setupColumns(): void {
@@ -46,7 +54,7 @@ export class FogTransporterUsersComponent implements OnInit {
     }
 
     private getColumns(): TableColumn<ProfessionalUser>[] {
-        return [
+        const columns: TableColumn<ProfessionalUser>[] = [
             {
                 field: 'emailAddress',
                 caption: 'Email Address',
@@ -63,6 +71,18 @@ export class FogTransporterUsersComponent implements OnInit {
                 type: ColumnType.text
             }
         ];
+
+        if (this.canManagePaymentBypass) {
+            columns.push({
+                field: '',
+                caption: 'Payment Bypass',
+                type: ColumnType.other,
+                queryColumnExcluded: true,
+                cellTemplate: this.paymentBypassTemplate
+            });
+        }
+
+        return columns;
     }
 
     public addUser(): void {

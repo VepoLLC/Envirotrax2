@@ -15,4 +15,5 @@ public enum FeatureType
     ManageGisAreas = 10,
     ManageProfessionalUsers = 11,
     BackflowTestForceRenewal = 12,
+    ManagePaymentBypass = 13,
 }

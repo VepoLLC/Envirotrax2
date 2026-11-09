@@ -18,7 +18,8 @@ public class ProfessionalNoteService : Service<ProfessionalNote, ProfessionalNot
     private readonly IWaterSupplierRepository _waterSupplierRepository;
     private readonly IAuthService _authService;
 
-    private bool IsAdmin => _authService.HasScope(ScopeDefinitions.AdminInternal);
+    private bool IsAdmin => _authService.HasScope(ScopeDefinitions.AdminInternal)
+        || _authService.HasAnyRole(RoleDefinitions.SuperUser);
 
     public ProfessionalNoteService(IMapper mapper, IProfessionalNoteRepository repository, IWaterSupplierRepository waterSupplierRepository, IAuthService authService)
         : base(mapper, repository)
@@ -46,8 +47,8 @@ public class ProfessionalNoteService : Service<ProfessionalNote, ProfessionalNot
         model.ProfessionalId = professionalId;
         model.ProfessionalType = professionalType;
 
-        // The admin context does not stamp a tenant, so admin notes are kept under the Vepo LLC supplier,
-        // where no other water supplier can see them.
+        // As in V1, a note an admin writes, in the Admin portal or as a super user in the App, is seen only by
+        // admins, so it is kept under the Vepo LLC supplier rather than the supplier being worked in.
         if (IsAdmin)
         {
             model.WaterSupplierId = await _waterSupplierRepository.GetEnvirotraxAdminSupplierIdAsync(cancellationToken);

@@ -52,6 +52,7 @@ public class AuthService : TenantProviderService, IAuthService
     private async Task SetWaterSupplierClaimsAsync(ClaimsPrincipal principal, int userId, UserAccessDto userAccess)
     {
         SetWaterSupplier(principal, userAccess.WaterSupplierIdRequested!.Value);
+        SetParentWaterSupplier(principal, userAccess.WaterSupplierId!.Value);
 
         var permissions = await _supplierUserRepository.GetAllPermissionsAsync(userAccess.WaterSupplierId!.Value, userId);
 

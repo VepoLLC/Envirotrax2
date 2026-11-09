@@ -83,6 +83,28 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
             .CountAsync(g => g.LastCalibrationDate == null && !g.IsManaged, cancellationToken);
     }
 
+    public async Task<IEnumerable<BackflowGauge>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(BackflowGauge.Id)] = SortOperator.Asc;
+        }
+
+        var paginated = await DbContext.BackflowGauges
+            .AsNoTracking()
+            .Where(gauge => gauge.LastCalibrationDate == null)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken)
+    {
+        return DbContext.BackflowGauges.CountAsync(gauge => gauge.LastCalibrationDate == null, cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalUser>> GetProfessionalUsersAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken)
     {
         return await DbContext.ProfessionalUsers

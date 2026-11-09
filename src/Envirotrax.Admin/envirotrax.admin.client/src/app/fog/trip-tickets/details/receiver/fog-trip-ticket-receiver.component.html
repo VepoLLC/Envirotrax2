@@ -1,0 +1,51 @@
+<vp-section header="Receiver Information">
+    <div class="row">
+        <div class="col-md-6">
+            <dl class="row mb-0">
+                <dt class="col-5 fw-normal">Waste Receiver:</dt>
+                <dd class="col-7 mb-1">{{ ticket.receiverCompanyName }}</dd>
+                <dt class="col-5 fw-normal">Address:</dt>
+                <dd class="col-7 mb-1">
+                    <div>{{ ticket.receiverAddress }}</div>
+                    <div *ngIf="cityStateZip">{{ cityStateZip }}</div>
+                </dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6 mt-3 mt-md-0">
+            <dl class="row mb-0">
+                <dt class="col-5 fw-normal">Registration Number:</dt>
+                <dd class="col-7 mb-1">{{ ticket.receiverRegistrationNumber }}</dd>
+                <dt class="col-5 fw-normal">Email Address:</dt>
+                <dd class="col-7 mb-1 text-break">{{ ticket.receiverEmailAddress }}</dd>
+                <dt class="col-5 fw-normal">Phone Number:</dt>
+                <dd class="col-7 mb-1">{{ ticket.receiverPhoneNumber }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6 mb-2">
+            <vp-input name="receiverContactName"
+                      label="Receiver Contact Name"
+                      [form]="form"
+                      [maxLength]="50"
+                      [(ngModel)]="ticket.receiverContactName" />
+        </div>
+
+        <div class="col-md-6 mb-2">
+            <vp-input name="receiverWasteDeliveredDate"
+                      type="datetime"
+                      label="Waste Delivered Date"
+                      [form]="form"
+                      [required]="true"
+                      [(ngModel)]="ticket.receiverWasteDeliveredDate" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 offset-md-6 mb-2">
+            <vp-fog-trip-ticket-signature label="Receiver Signature" [url]="ticket.receiverSignatureUrl" />
+        </div>
+    </div>
+</vp-section>

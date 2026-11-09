@@ -139,6 +139,20 @@ public class FogTripTicketService : Service<FogTripTicket, FogTripTicketDto>, IF
         return dto;
     }
 
+    // A single SaveChanges, so no TransactionScope. The reload goes through GetAsync for the details
+    // includes and the signature URLs the window shows.
+    public async Task<FogTripTicketDto?> UpdateForAdminAsync(int id, FogTripTicketAdminUpdateRequest request, CancellationToken cancellationToken)
+    {
+        var ticket = await _repository.UpdateForAdminAsync(id, request, cancellationToken);
+
+        if (ticket == null)
+        {
+            return null;
+        }
+
+        return await GetAsync(id, cancellationToken);
+    }
+
     public async Task<FogTripTicketDto?> UpdateApprovalAsync(int id, bool disapproved, CancellationToken cancellationToken)
     {
         var ticket = await _repository.UpdateApprovalAsync(id, disapproved, _authService.UserId, cancellationToken);

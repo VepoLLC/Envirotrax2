@@ -5,6 +5,7 @@ import { HelperService, InputOption, QueryProperty } from '@envirotrax/common-ui
 import { BackflowTestDetailsComponent } from '../../backflow/tests/details/backflow-test-details.component';
 import { CsiInspectionDetailsComponent } from '../../csi/inspections/details/csi-inspection-details.component';
 import { FogInspectionDetailsComponent } from '../../fog/inspections/details/fog-inspection-details.component';
+import { FogTripTicketDetailsComponent } from '../../fog/trip-tickets/details/fog-trip-ticket-details.component';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { CsiInspection } from '../../shared/models/csi/csi-inspection';
@@ -230,7 +231,6 @@ export class SubmissionValidationListComponent implements OnInit {
                 }
             },
             {
-                // There is no Admin trip ticket details window yet, so these rows have no View action.
                 key: SubmissionValidationTab.FogTripTickets,
                 title: 'FOG Trip Tickets',
                 count: 0,
@@ -238,6 +238,8 @@ export class SubmissionValidationListComponent implements OnInit {
                 source: {
                     infoCaption: 'Ticket Information',
                     reasons: TRIP_TICKET_REASONS,
+                    detailsComponent: FogTripTicketDetailsComponent,
+                    detailsColor: MODULE_COLORS.FOG,
                     actions: this._fogTripTicketService,
                     load: async (pageInfo, query) => {
                         const tickets = await this._fogTripTicketService.getAll(pageInfo, query, {});

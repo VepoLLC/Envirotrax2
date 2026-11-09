@@ -42,6 +42,11 @@ const routes: Routes = [
     loadChildren: () => import('./fog/fog.module').then(m => m.FogModule)
   },
   {
+    path: 'licenses',
+    title: 'License Management',
+    loadChildren: () => import('./licenses/licenses.module').then(m => m.LicensesModule)
+  },
+  {
     path: 'validations',
     title: 'Submission Validations',
     loadChildren: () => import('./validations/validations.module').then(m => m.ValidationsModule)

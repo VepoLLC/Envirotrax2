@@ -13,5 +13,7 @@ public interface IBackflowGaugeRepository : IRepository<BackflowGauge>
 
     Task<IEnumerable<BackflowGauge>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<BackflowGauge>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUser>> GetProfessionalUsersAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);
 }

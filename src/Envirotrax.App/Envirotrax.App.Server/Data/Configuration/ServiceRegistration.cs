@@ -132,6 +132,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierDashboardRepository, WaterSupplierDashboardRepository>();
 
         services.AddTransient<ILetterRepository, LetterRepository>();
+        services.AddTransient<ISiteLetterLogRepository, SiteLetterLogRepository>();
 
         return services;
     }

@@ -1,5 +1,6 @@
 using System.Dynamic;
 using Envirotrax.Common.Configuration;
+using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.Extensions.Options;
 using PuppeteerSharp;
@@ -28,17 +29,24 @@ public class PdfTemplateService : IPdfTemplateService
         return await GeneratePdfAsync(browser, pageName, model);
     }
 
-    public async Task<List<byte[]>> GenerateManyAsync<T>(string pageName, List<T> models)
+    public async Task<List<GeneratedPdfDto<TScriptResult>>> GenerateManyAsync<T, TScriptResult>(string pageName, List<T> models, string resultScript)
     {
-        var pdfs = new List<byte[]>();
+        var pdfs = new List<GeneratedPdfDto<TScriptResult>>();
 
         await using var browser = await LaunchBrowserAsync();
 
         foreach (var model in models)
         {
-            var pdf = await GeneratePdfAsync(browser, pageName, model);
+            await using var page = await OpenPageAsync(browser, pageName, model);
 
-            pdfs.Add(pdf);
+            var scriptResult = await page.EvaluateExpressionAsync<TScriptResult>(resultScript);
+            var content = await PrintPdfAsync(page);
+
+            pdfs.Add(new GeneratedPdfDto<TScriptResult>
+            {
+                Content = content,
+                ScriptResult = scriptResult
+            });
         }
 
         return pdfs;
@@ -58,19 +66,32 @@ public class PdfTemplateService : IPdfTemplateService
 
     private async Task<byte[]> GeneratePdfAsync<T>(IBrowser browser, string pageName, T model)
     {
+        await using var page = await OpenPageAsync(browser, pageName, model);
+
+        return await PrintPdfAsync(page);
+    }
+
+    private async Task<IPage> OpenPageAsync<T>(IBrowser browser, string pageName, T model)
+    {
         dynamic viewBag = new ExpandoObject();
 
         viewBag.BaseUrl = _options.BaseUrl;
 
         string html = await _htmlTemplateService.ParsePdfAsync(pageName, model, viewBag);
 
-        await using var page = await browser.NewPageAsync();
+        var page = await browser.NewPageAsync();
+
         await page.SetContentAsync(html, new NavigationOptions
         {
             WaitUntil = [WaitUntilNavigation.Networkidle0]
         });
 
-        return await page.PdfDataAsync(new PdfOptions
+        return page;
+    }
+
+    private static Task<byte[]> PrintPdfAsync(IPage page)
+    {
+        return page.PdfDataAsync(new PdfOptions
         {
             Format = PaperFormat.Letter,
             PrintBackground = true,

@@ -3,6 +3,7 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.Letters;
 public class LetterDto
 {
     public int SiteId { get; set; }
+    public int WaterSupplierId { get; set; }
 
     public List<string> MailingLines { get; set; } = [];
 

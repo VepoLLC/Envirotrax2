@@ -13,8 +13,8 @@ public class LetterGeneratorService : ILetterGeneratorService
         _apiClient = apiClient;
     }
 
-    public Task<GeneratedLettersDto?> GenerateAsync(int waterSupplierId)
+    public Task<GeneratedLettersDto?> GenerateAsync(int waterSupplierId, GenerateLettersDto generateLetters)
     {
-        return _apiClient.PostAsync<object?, GeneratedLettersDto>(waterSupplierId, $"/api/admin/water-suppliers/{waterSupplierId}/letters", null, CancellationToken.None);
+        return _apiClient.PostAsync<GenerateLettersDto, GeneratedLettersDto>(waterSupplierId, $"/api/admin/water-suppliers/{waterSupplierId}/letters", generateLetters, CancellationToken.None);
     }
 }

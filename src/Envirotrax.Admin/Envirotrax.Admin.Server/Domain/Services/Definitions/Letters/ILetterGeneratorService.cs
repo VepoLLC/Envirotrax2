@@ -4,5 +4,5 @@ namespace Envirotrax.Admin.Server.Domain.Services.Definitions.Letters;
 
 public interface ILetterGeneratorService
 {
-    Task<GeneratedLettersDto?> GenerateAsync(int waterSupplierId);
+    Task<GeneratedLettersDto?> GenerateAsync(int waterSupplierId, GenerateLettersDto generateLetters);
 }

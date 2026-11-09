@@ -3575,6 +3575,45 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("Sites");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.SiteLetterLog", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Page")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ProcessDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SiteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("ProcessDate");
+
+                    b.HasIndex("SiteId");
+
+                    b.ToTable("SiteLetterLogs");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.SiteLog", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -5504,6 +5543,25 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("UpdatedBy");
 
                     b.Navigation("UserAccountAssignment");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Sites.SiteLetterLog", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Sites.Site", "Site")
+                        .WithMany()
+                        .HasForeignKey("SiteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Site");
 
                     b.Navigation("WaterSupplier");
                 });

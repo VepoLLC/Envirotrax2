@@ -56,6 +56,7 @@ public static class ServiceRegistration
                 services.AddTransient<IFogTripTicketService, FogTripTicketService>();
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
                 services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
+                services.AddTransient<ILetterProcessService, LetterProcessService>();
 
                 return services;
         }

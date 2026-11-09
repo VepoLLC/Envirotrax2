@@ -5,6 +5,7 @@ namespace Envirotrax.App.Server.Domain.DataTransferObjects.Letters;
 public class LetterSiteDto
 {
     public int Id { get; set; }
+    public int WaterSupplierId { get; set; }
 
     public string AccountNumber { get; set; } = null!;
     public string? WaterSupplierAccountNumber { get; set; }

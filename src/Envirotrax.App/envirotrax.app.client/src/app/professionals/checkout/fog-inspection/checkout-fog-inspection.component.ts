@@ -33,7 +33,7 @@ export class CheckoutFogInspectionComponent implements OnInit {
     public items: TableViewModel<CheckoutFogInspectionVm> = {
         query: { sort: {}, filter: [] }
     };
-    public amounts: CheckoutAmounts = { total: 0, fromBalance: 0, cardCharge: 0 };
+    public amounts: CheckoutAmounts = { total: 0, fromBalance: 0, cardCharge: 0, isPaymentBypassed: false };
     public accountBalance = 0;
     public reportForOptions: InputOption[] = [];
     public reportFor = '';
@@ -42,6 +42,7 @@ export class CheckoutFogInspectionComponent implements OnInit {
     public receipt?: ProfessionalCheckoutReceipt<FogInspection>;
 
     private _currentUserId?: number;
+    private _isPaymentBypassed = false;
     private _professionalName?: string;
 
     @ViewChild(CheckoutPaymentComponent)
@@ -118,13 +119,15 @@ export class CheckoutFogInspectionComponent implements OnInit {
 
             this.items.query.filter = filter;
 
-            const [inspections, professional] = await Promise.all([
+            const [inspections, professional, currentUser] = await Promise.all([
                 this._fogInspectionService.getAll({ pageSize: MAX_PAGE_SIZE }, this.items.query, false),
-                this._professionalService.reloadLoggedInProfessional()
+                this._professionalService.reloadLoggedInProfessional(),
+                this._professionalUserService.reloadMyData()
             ]);
 
             this.items.items = inspections;
             this.accountBalance = professional.accountBalance ?? 0;
+            this._isPaymentBypassed = !!currentUser.isFogInspectionPaymentBypassed;
 
             this.items.items.data.forEach(inspection => inspection.selected = true);
             this.recalculateAmounts();
@@ -147,7 +150,7 @@ export class CheckoutFogInspectionComponent implements OnInit {
     }
 
     private recalculateAmounts(): void {
-        this.amounts = calculateCheckoutAmounts(this.getSelectedInspections().map(inspection => inspection.amount || 0), this.accountBalance);
+        this.amounts = calculateCheckoutAmounts(this.getSelectedInspections().map(inspection => inspection.amount || 0), this.accountBalance, this._isPaymentBypassed);
     }
 
     private getSelectedInspections(): CheckoutFogInspectionVm[] {

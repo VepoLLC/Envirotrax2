@@ -7,6 +7,6 @@ import { CheckoutAmounts } from "../../../../shared/utils/checkout-amounts.util"
     templateUrl: './checkout-amounts.component.html'
 })
 export class CheckoutAmountsComponent {
-    @Input() public amounts: CheckoutAmounts = { total: 0, fromBalance: 0, cardCharge: 0 };
+    @Input() public amounts: CheckoutAmounts = { total: 0, fromBalance: 0, cardCharge: 0, isPaymentBypassed: false };
     @Input() public accountBalance = 0;
 }

@@ -33,7 +33,7 @@ export class CheckoutFogTransportComponent implements OnInit {
     public items: TableViewModel<CheckoutFogTripTicketVm> = {
         query: { sort: {}, filter: [] }
     };
-    public amounts: CheckoutAmounts = { total: 0, fromBalance: 0, cardCharge: 0 };
+    public amounts: CheckoutAmounts = { total: 0, fromBalance: 0, cardCharge: 0, isPaymentBypassed: false };
     public accountBalance = 0;
     public reportForOptions: InputOption[] = [];
     public reportFor = '';
@@ -42,6 +42,7 @@ export class CheckoutFogTransportComponent implements OnInit {
     public receipt?: ProfessionalCheckoutReceipt<FogTripTicket>;
 
     private _currentUserId?: number;
+    private _isPaymentBypassed = false;
     private _professionalName?: string;
 
     @ViewChild(CheckoutPaymentComponent)
@@ -125,13 +126,15 @@ export class CheckoutFogTransportComponent implements OnInit {
 
             this.items.query.filter = filter;
 
-            const [tickets, professional] = await Promise.all([
+            const [tickets, professional, currentUser] = await Promise.all([
                 this._fogTripTicketService.searchForProfessional({ pageSize: MAX_PAGE_SIZE }, this.items.query),
-                this._professionalService.reloadLoggedInProfessional()
+                this._professionalService.reloadLoggedInProfessional(),
+                this._professionalUserService.reloadMyData()
             ]);
 
             this.items.items = tickets;
             this.accountBalance = professional.accountBalance ?? 0;
+            this._isPaymentBypassed = !!currentUser.isFogTransportationPaymentBypassed;
 
             this.items.items.data.forEach(ticket => {
                 ticket.selected = true;
@@ -157,7 +160,7 @@ export class CheckoutFogTransportComponent implements OnInit {
     }
 
     private recalculateAmounts(): void {
-        this.amounts = calculateCheckoutAmounts(this.getSelectedTickets().map(ticket => ticket.amount || 0), this.accountBalance);
+        this.amounts = calculateCheckoutAmounts(this.getSelectedTickets().map(ticket => ticket.amount || 0), this.accountBalance, this._isPaymentBypassed);
     }
 
     private getSelectedTickets(): CheckoutFogTripTicketVm[] {

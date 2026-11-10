@@ -22,4 +22,6 @@ public class ProfessionalTransactionDto
     public decimal CardCharge { get; set; }
 
     public decimal Amount { get; set; }
+
+    public bool IsPaymentBypassed { get; set; }
 }

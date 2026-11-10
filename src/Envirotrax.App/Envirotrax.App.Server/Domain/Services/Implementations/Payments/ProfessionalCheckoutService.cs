@@ -16,6 +16,7 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfession
     private const string AmountsChangedMessage = "The amounts have changed. Please refresh the page and try again.";
 
     private readonly IProfessionalRepository _professionalRepository;
+    private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IProfessionalTransactionRepository _transactionRepository;
     private readonly IProfessionalPaymentService _paymentService;
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
@@ -27,12 +28,14 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfession
     public ProfessionalCheckoutService(
         IAuthService authService,
         IProfessionalRepository professionalRepository,
+        IProfessionalUserRepository professionalUserRepository,
         IProfessionalTransactionRepository transactionRepository,
         IProfessionalPaymentService paymentService,
         IMailingInfoRedactionService mailingInfoRedactionService)
     {
         AuthService = authService;
         _professionalRepository = professionalRepository;
+        _professionalUserRepository = professionalUserRepository;
         _transactionRepository = transactionRepository;
         _paymentService = paymentService;
         _mailingInfoRedactionService = mailingInfoRedactionService;
@@ -74,6 +77,8 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfession
 
     protected abstract ReceiptReferenceDto BuildReceiptReference(List<TItemDto> items);
 
+    protected abstract bool IsPaymentBypassed(ProfessionalUser payer);
+
     protected abstract Task<List<TItem>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken);
 
     protected abstract Task<int> MarkItemsPaidAsync(List<TItem> items, ProfessionalTransaction transaction, List<int> emailPdfIds);
@@ -102,7 +107,8 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfession
             BalanceAdjustment = transaction.BalanceAdjustment,
             CardCharge = transaction.CardCharge,
             NameOnCard = transaction.NameOnCard,
-            CardNumber = transaction.CardNumber
+            CardNumber = transaction.CardNumber,
+            IsPaymentBypassed = transaction.IsPaymentBypassed
         };
     }
 
@@ -151,15 +157,24 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfession
 
     private async Task<CheckoutAmounts> CalculateAmountsAsync(List<TItem> items, CancellationToken cancellationToken)
     {
-        var professional = await _professionalRepository.GetNoIncludesAsync(AuthService.ProfessionalId, cancellationToken)
-            ?? throw new InvalidOperationException("Professional not found.");
+        var payer = await _professionalUserRepository.GetAsync(AuthService.UserId, cancellationToken)
+            ?? throw new InvalidOperationException("Professional user not found.");
 
         var total = RoundToCents(items.Sum(item => item.Amount));
         var totalShare = RoundToCents(items.Sum(item => item.AmountShare));
+
+        if (total > 0 && IsPaymentBypassed(payer))
+        {
+            return new CheckoutAmounts(total, totalShare, 0, 0, true);
+        }
+
+        var professional = await _professionalRepository.GetNoIncludesAsync(AuthService.ProfessionalId, cancellationToken)
+            ?? throw new InvalidOperationException("Professional not found.");
+
         var availableBalance = Math.Round(professional.AccountBalance, 2, MidpointRounding.ToZero);
         var fromBalance = Math.Min(availableBalance, total);
 
-        return new CheckoutAmounts(total, totalShare, fromBalance, total - fromBalance);
+        return new CheckoutAmounts(total, totalShare, fromBalance, total - fromBalance, false);
     }
 
     private async Task<AuthorizeNetChargeResult> ChargeCardAsync(ProfessionalCheckoutRequestDto request, decimal amount)
@@ -186,7 +201,8 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfession
             Amount = amounts.Total,
             AmountShare = amounts.TotalShare,
             NameOnCard = charge != null ? $"{request.Card!.BillingFirstName} {request.Card.BillingLastName}" : null,
-            CardNumber = charge?.CardNumber
+            CardNumber = charge?.CardNumber,
+            IsPaymentBypassed = amounts.IsPaymentBypassed
         };
     }
 
@@ -222,5 +238,5 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfession
         return Math.Round(amount, 2, MidpointRounding.AwayFromZero);
     }
 
-    private record CheckoutAmounts(decimal Total, decimal TotalShare, decimal FromBalance, decimal CardCharge);
+    private record CheckoutAmounts(decimal Total, decimal TotalShare, decimal FromBalance, decimal CardCharge, bool IsPaymentBypassed);
 }

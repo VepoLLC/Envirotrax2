@@ -3,6 +3,9 @@
 @{
 	var loginUrl = Configuration["Envirotrax:LoginUrl"];
 
+	// V2 has no W.I.S.E. Guys program. V1 keeps running it, so its contractors still sign in to V1.
+	var wiseGuysLoginUrl = Configuration["Envirotrax:WiseGuysLoginUrl"];
+
 	// The registered professional directories are pages of Envirotrax.App, not CMS content. Link
 	// straight to them so visitors skip a redirect hop. With no app URL configured these fall back
 	// to the site's own /registered-professionals/... paths, which RegisteredProfessionalsController
@@ -104,10 +107,40 @@
 						</ul>
 					</li>
 
-					<li class="nav-item">
-						<a class="nav-link nav-link-login" href="@loginUrl">
+					<li class="nav-item dropdown">
+						<a class="nav-link nav-link-login dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+						   aria-expanded="false">
 							<i class="fa-solid fa-right-to-bracket"></i>Account Login
 						</a>
+						<ul class="dropdown-menu dropdown-menu-lg-end" data-bs-theme="light">
+							<li>
+								<a class="dropdown-item" href="@loginUrl">Backflow Tester Login</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="@loginUrl">CSI Inspector Login</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="@loginUrl">FOG Inspector Login</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="@loginUrl">FOG Transporter Login</a>
+							</li>
+							<li>
+								<hr class="dropdown-divider">
+							</li>
+							<li>
+								<a class="dropdown-item" href="@loginUrl">Water Supplier Login</a>
+							</li>
+							@if (!string.IsNullOrWhiteSpace(wiseGuysLoginUrl))
+							{
+								<li>
+									<hr class="dropdown-divider">
+								</li>
+								<li>
+									<a class="dropdown-item" href="@wiseGuysLoginUrl">W.I.S.E. Guys Contractor Login</a>
+								</li>
+							}
+						</ul>
 					</li>
 
 				</ul>

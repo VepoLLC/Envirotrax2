@@ -3,6 +3,8 @@ using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.Extensions.Options;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 
@@ -29,27 +31,56 @@ public class PdfTemplateService : IPdfTemplateService
         return await GeneratePdfAsync(browser, pageName, model);
     }
 
-    public async Task<List<GeneratedPdfDto<TScriptResult>>> GenerateManyAsync<T, TScriptResult>(string pageName, List<T> models, string resultScript)
+    public async IAsyncEnumerable<GeneratedPdfDto<TScriptResult>> GenerateManyAsync<T, TScriptResult>(string pageName, List<List<T>> documents, string resultScript)
     {
-        var pdfs = new List<GeneratedPdfDto<TScriptResult>>();
-
         await using var browser = await LaunchBrowserAsync();
 
-        foreach (var model in models)
+        foreach (var parts in documents)
         {
-            await using var page = await OpenPageAsync(browser, pageName, model);
+            var contents = new List<byte[]>();
+            var scriptResults = new List<TScriptResult>();
 
-            var scriptResult = await page.EvaluateExpressionAsync<TScriptResult>(resultScript);
-            var content = await PrintPdfAsync(page);
-
-            pdfs.Add(new GeneratedPdfDto<TScriptResult>
+            foreach (var part in parts)
             {
-                Content = content,
-                ScriptResult = scriptResult
-            });
+                await using var page = await OpenPageAsync(browser, pageName, part);
+
+                scriptResults.Add(await page.EvaluateExpressionAsync<TScriptResult>(resultScript));
+                contents.Add(await PrintPdfAsync(page));
+            }
+
+            yield return new GeneratedPdfDto<TScriptResult>
+            {
+                Content = MergePdfs(contents),
+                ScriptResults = scriptResults
+            };
+        }
+    }
+
+    private static byte[] MergePdfs(List<byte[]> contents)
+    {
+        if (contents.Count == 1)
+        {
+            return contents[0];
         }
 
-        return pdfs;
+        using var mergedDocument = new PdfDocument();
+
+        foreach (var content in contents)
+        {
+            using var partStream = new MemoryStream(content);
+            using var partDocument = PdfReader.Open(partStream, PdfDocumentOpenMode.Import);
+
+            foreach (var page in partDocument.Pages)
+            {
+                mergedDocument.AddPage(page);
+            }
+        }
+
+        using var mergedStream = new MemoryStream();
+
+        mergedDocument.Save(mergedStream);
+
+        return mergedStream.ToArray();
     }
 
     private async Task<IBrowser> LaunchBrowserAsync()

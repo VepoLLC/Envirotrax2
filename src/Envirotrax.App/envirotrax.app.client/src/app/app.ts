@@ -601,14 +601,14 @@ export class App implements OnInit {
       {
         title: 'FOG Management',
         iconCss: 'fa-regular fa-tank-water',
-        hasPermission: isFogInspector,
-        hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection),
+        hasPermission: isFogInspector || isFogTransporter,
+        hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection, FeatureType.FogTransportation),
         children: [
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['professionals/sites'],
-            hasPermission: isFogInspector,
+            hasPermission: isFogInspector || isFogTransporter,
             hasFeature: true
           },
           {

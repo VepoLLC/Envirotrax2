@@ -29,6 +29,10 @@ export interface ProfessionalSiteSearchCriteria {
     scheduledOnly?: string | null;
     scheduledFrom?: string | null;
     scheduledTo?: string | null;
+    csiRenewalFrom?: string | null;
+    csiRenewalTo?: string | null;
+    fogInspectionExpirationFrom?: string | null;
+    fogInspectionExpirationTo?: string | null;
 }
 
 export interface BackflowSubmissionSearchCriteria {

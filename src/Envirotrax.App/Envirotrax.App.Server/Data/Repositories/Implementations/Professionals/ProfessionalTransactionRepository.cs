@@ -35,7 +35,7 @@ public class ProfessionalTransactionRepository : Repository<ProfessionalTransact
     {
         var isAdmin = _authService.HasAnyRole(RoleDefinitions.Professionals.Admin);
 
-        return query.WhereIf(!isAdmin, transaction => transaction.UserId == _authService.UserId);
+        return query.WhereIf(!isAdmin, transaction => transaction.UserId == _authService.ActingAsUserId);
     }
 
     public async Task<ProfessionalTransaction?> GetByTransactionIdAsync(string transactionId, CancellationToken cancellationToken)

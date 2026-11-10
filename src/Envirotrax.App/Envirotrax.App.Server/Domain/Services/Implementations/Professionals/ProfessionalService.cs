@@ -117,7 +117,7 @@ public class ProfessionalService : Service<Professional, ProfessionalDto>, IProf
         {
             TransactionDate = DateTime.UtcNow,
             ProfessionalId = _authService.ProfessionalId,
-            UserId = _authService.UserId,
+            UserId = _authService.ActingAsUserId,
             TransactionId = dto.TransactionId,
             TransactionType = ProfessionalTransactionType.BalanceAdjustment,
             BalanceAdjustment = amount,

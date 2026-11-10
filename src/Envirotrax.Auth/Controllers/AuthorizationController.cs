@@ -53,6 +53,11 @@ namespace Envirotrax.Auth.Controllers
             return GetIntegerFromAcr(acrValues, "professionalId");
         }
 
+        private int? GetImpersonatedUserId(string? acrValues)
+        {
+            return GetIntegerFromAcr(acrValues, "impersonatedUserId");
+        }
+
         private int GetUserId(ClaimsPrincipal claimsPrincipal)
         {
             var userIdClaim = claimsPrincipal.FindFirstValue(OpenIddictConstants.Claims.Subject);
@@ -76,7 +81,8 @@ namespace Envirotrax.Auth.Controllers
                 principal: claimsPrincipal,
                 userId: GetUserId(claimsPrincipal),
                 waterSupplierId: GetWaterSupplierId(request.AcrValues),
-                professionalId: GetProfessionalId(request.AcrValues)
+                professionalId: GetProfessionalId(request.AcrValues),
+                impersonatedUserId: GetImpersonatedUserId(request.AcrValues)
             );
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
@@ -90,11 +96,16 @@ namespace Envirotrax.Auth.Controllers
 
             claimsPrincipal.SetAudiences(request.ClientId!);
 
+            var userId = GetUserId(claimsPrincipal);
+
+            await _authService.ValidateImpersonationAsync(claimsPrincipal, userId);
+
             await _authService.SetSecurityPropertiesAsync(
                 principal: claimsPrincipal,
-                userId: GetUserId(claimsPrincipal),
+                userId: userId,
                 waterSupplierId: GetWaterSupplierId(request.AcrValues),
-                professionalId: GetProfessionalId(request.AcrValues)
+                professionalId: GetProfessionalId(request.AcrValues),
+                impersonatedUserId: GetImpersonatedUserId(request.AcrValues)
             );
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.

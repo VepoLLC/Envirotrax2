@@ -18,4 +18,8 @@ public class UserAccessDto
     public int? ProfessionalIdRequested { get; set; }
 
     public List<string> ProfessionalRoles { get; set; } = [];
+
+    public int? ImpersonatedUserId { get; set; }
+
+    public string? ImpersonatedUserName { get; set; }
 }

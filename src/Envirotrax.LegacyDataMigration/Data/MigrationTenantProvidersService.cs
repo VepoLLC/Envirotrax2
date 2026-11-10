@@ -10,6 +10,8 @@ public class MigrationTenantProvidersService : ITenantProvidersService
     public int ParentWaterSupplierId => 0;
     public string Domain => string.Empty;
     public int UserId => 0;
+    public int ImpersonatedUserId => 0;
+    public int ActingAsUserId => 0;
     public int ProfessionalId => 0;
     public int ParentProfessionalId => 0;
     public string? IpAddress => null;
@@ -27,6 +29,10 @@ public class MigrationTenantProvidersService : ITenantProvidersService
     }
 
     public void SetProfessional(ClaimsPrincipal principal, int professionalId)
+    {
+    }
+
+    public void SetImpersonatedUser(ClaimsPrincipal principal, int userId, string userName)
     {
     }
 

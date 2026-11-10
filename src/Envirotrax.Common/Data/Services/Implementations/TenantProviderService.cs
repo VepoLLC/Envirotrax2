@@ -8,6 +8,9 @@ namespace Envirotrax.Common.Data.Services.Implementations
 {
     public class TenantProviderService : ITenantProvidersService
     {
+        public const string ImpersonatedUserIdClaim = "impUsrId";
+        public const string ImpersonatedUserNameClaim = "impUsrName";
+
         private readonly IHttpContextAccessor _contextAccessor;
 
         public int WaterSupplierId
@@ -60,6 +63,29 @@ namespace Envirotrax.Common.Data.Services.Implementations
                 }
 
                 return TryGetInteger(OpenIddictConstants.Claims.Subject);
+            }
+        }
+
+        public int ImpersonatedUserId
+        {
+            get
+            {
+                return TryGetInteger(ImpersonatedUserIdClaim);
+            }
+        }
+
+        public int ActingAsUserId
+        {
+            get
+            {
+                var impersonatedUserId = ImpersonatedUserId;
+
+                if (impersonatedUserId != default)
+                {
+                    return impersonatedUserId;
+                }
+
+                return UserId;
             }
         }
 
@@ -146,6 +172,15 @@ namespace Envirotrax.Common.Data.Services.Implementations
             if (principal.Identity is ClaimsIdentity claimsIdentity)
             {
                 claimsIdentity.AddClaim(new Claim("prfId", professionalId.ToString()).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
+            }
+        }
+
+        public void SetImpersonatedUser(ClaimsPrincipal principal, int userId, string userName)
+        {
+            if (principal.Identity is ClaimsIdentity claimsIdentity)
+            {
+                claimsIdentity.AddClaim(new Claim(ImpersonatedUserIdClaim, userId.ToString()).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
+                claimsIdentity.AddClaim(new Claim(ImpersonatedUserNameClaim, userName).SetDestinations(OpenIddictConstants.Destinations.AccessToken));
             }
         }
 

@@ -1,6 +1,9 @@
-<section class="border rounded shadow-sm d-flex flex-column h-100">
-    <div class="bg-info px-3 py-1 rounded-top">
-        <div role="button" class="d-flex justify-content-between text-white">
+<section class="vp-window-frame rounded shadow-sm d-flex flex-column h-100"
+         [style.--vp-window-color]="colors.background">
+    <div class="px-3 py-1 rounded-top"
+         [class]="colors.contrast.text"
+         [style.background-color]="colors.background">
+        <div role="button" class="d-flex justify-content-between">
             <div class="d-flex align-items-center">
                 <h1 *ngIf="config.title" class="h4 mb-0">
                     {{config.title}}
@@ -8,18 +11,24 @@
             </div>
 
             <div class="d-flex align-items-center gap-2">
-                <button type="button" class="border btn btn-sm text-white" (click)="onMinimize()">
+                <button type="button"
+                        class="border btn btn-sm"
+                        [class]="colors.contrast.button"
+                        (click)="onMinimize()">
                     <i class="fa-solid fa-window-minimize"></i>
                 </button>
 
-                <button type="button" class="border btn btn-sm text-white" (click)="onClose()">
+                <button type="button"
+                        class="border btn btn-sm"
+                        [class]="colors.contrast.button"
+                        (click)="onClose()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="bg-white rounded-bottom border border-info border-top-0 flex-fill overflow-y-auto p-3"
+    <div class="bg-white rounded-bottom vp-window-body flex-fill overflow-y-auto p-3"
          dp-spinner-parent>
         <ng-container #hostContainer></ng-container>
     </div>

@@ -8,6 +8,8 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Notifications;
 using Envirotrax.App.Server.Domain.Services.Implementations.Logs;
 using Envirotrax.App.Server.Domain.Services.Implementations.Notifications;
+using Envirotrax.App.Server.Domain.Services.Definitions.TableSettings;
+using Envirotrax.App.Server.Domain.Services.Implementations.TableSettings;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
@@ -122,6 +124,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierLicenseService, WaterSupplierLicenseService>();
         services.AddTransient<IProfessionalLicenseTypeService, ProfessionalLicenseTypeService>();
         services.AddTransient<IProfessionalInsuranceService, ProfessionalInsuranceService>();
+        services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();
         services.AddTransient<IProfessionalDashboardService, ProfessionalDashboardService>();
 
         services.AddTransient<IGisAreaService, GisAreaService>();
@@ -133,6 +136,8 @@ public static class ServiceRegistration
         services.AddTransient<IBackflowTestNotificationMatcher, BackflowTestNotificationMatcher>();
         services.AddTransient<INotificationDigestService, NotificationDigestService>();
 
+        services.AddTransient<ITableSettingService, TableSettingService>();
+
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
 
         services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
@@ -140,6 +145,9 @@ public static class ServiceRegistration
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();
+
+        services.Configure<TceqOptions>(configuration.GetSection("Tceq"));
+        services.AddHttpClient<ITceqLicenseService, TceqLicenseService>();
 
         services.Configure<AuthorizeNetOptions>(configuration.GetSection("AuthorizeNet"));
         services.AddHttpClient<IAuthorizeNetPaymentService, AuthorizeNetPaymentService>(client => client.Timeout = TimeSpan.FromSeconds(60));
@@ -152,12 +160,16 @@ public static class ServiceRegistration
         services.AddTransient<IProfessionalReceiptReferenceProvider>(provider => provider.GetRequiredService<IFogInspectionCheckoutService>());
         services.AddTransient<IProfessionalReceiptReferenceProvider>(provider => provider.GetRequiredService<IFogTripTicketCheckoutService>());
 
-        services.AddEmailService(configuration.GetSection("Email"), opts =>
+        var appUrl = configuration["Sites:EnvirotraxApp:Url"];
+
+        Action<HtmlTemplateOptions> configureTemplates = opts =>
         {
             opts.Assembly = typeof(ServiceRegistration).Assembly;
             opts.Namespace = "Envirotrax.App.Server";
-        });
-        services.AddPdfTemplateService(environment.IsDevelopment(), configuration.GetSection("PdfTemplate"));
+        };
+
+        services.AddEmailService(configuration.GetSection("Email"), appUrl, configureTemplates);
+        services.AddPdfTemplateService(environment.IsDevelopment(), appUrl, configureTemplates, configuration.GetSection("PdfTemplate"));
 
         services.AddTransient<ICsvHelperService, CsvHelperService>();
 

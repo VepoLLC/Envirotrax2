@@ -7,6 +7,9 @@ import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
 import { ColumnType, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { DownloadConfig } from "../../../shared/models/download-config";
+import { DownloadService } from "../../../shared/services/download.service";
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../shared/models/page-info';
 
 const CRITERIA_FIELDS: (keyof BackflowTesterSearchCriteria)[] = [
     "bpatLicenseNumber",
@@ -40,14 +43,33 @@ export class BackflowTesterListComponent implements OnInit {
         }
     };
 
+    public downloadConfig: DownloadConfig;
+
     private _criteria: BackflowTesterSearchCriteria = {};
 
     constructor(
         private readonly _backflowTesterManagementService: BackflowTesterManagementService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _downloadService: DownloadService
     ) {
+        this.downloadConfig = {
+            fileName: 'Backflow Testers',
+            endpoint: this._backflowTesterManagementService.getSearchEndpoint(this._criteria),
+            suppoertedFormats: ['CSV', 'Excel'],
+            columns: [
+                { field: 'name', caption: 'CompanyName' },
+                { field: 'companyEmail', caption: 'CompanyEmail' },
+                { field: 'address', caption: 'Address' },
+                { field: 'city', caption: 'City' },
+                { field: 'state.code', caption: 'State' },
+                { field: 'zipCode', caption: 'ZIP' },
+                { field: 'phoneNumber', caption: 'WorkNumber' },
+                { field: 'faxNumber', caption: 'FaxNumber' },
+                { field: 'webSiteUrl', caption: 'WebsiteUrl' }
+            ]
+        };
     }
 
     public async ngOnInit(): Promise<void> {
@@ -97,7 +119,7 @@ export class BackflowTesterListComponent implements OnInit {
             // licence-only call and silently dropped every company filter.
             this.table.items = await this._backflowTesterManagementService.search(
                 this._criteria,
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {
@@ -120,6 +142,12 @@ export class BackflowTesterListComponent implements OnInit {
         }
 
         this.table.query.filter = queryProperties.filter(p => !CRITERIA_FIELDS.includes(p.columnName as keyof BackflowTesterSearchCriteria));
+    }
+
+    public showDownloadManager(): void {
+        this.downloadConfig.endpoint = this._backflowTesterManagementService.getSearchEndpoint(this._criteria);
+
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
     public openDetails(row: any): void {

@@ -125,6 +125,11 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId, cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken)
     {
         var dbQuery = DbContext.ProfessionalUsers

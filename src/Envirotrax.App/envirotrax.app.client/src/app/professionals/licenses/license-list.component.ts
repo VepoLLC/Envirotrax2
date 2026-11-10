@@ -16,6 +16,7 @@ import { ProfessionalLicenseService } from "../../shared/services/professionals/
 import { ProfessionalDashboardLicenseInsurance, ProfessionalDashboardRowType } from "../../shared/models/professionals/professional-dashboard-license-insurance";
 import { EditCompanyLicenseComponent } from "./edit/edit-company-license.component";
 import { HelperService } from "../../shared/services/helpers/helper.service";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../shared/models/page-info";
 
 @Component({
     selector: 'vp-license-list',
@@ -79,7 +80,7 @@ export class LicenseListComponent implements OnInit {
             this._licenseService.getAllTypesAsOptions({ sort: {}, filter: [] }, false)
         ]);
 
-        this._allLicenseTypes = licenseTypes.filter(l => l.data?.state?.id == professional.state?.id);
+        this._allLicenseTypes = this._licenseService.filterTypesByProfessionalState(licenseTypes, professional);
         this.professions = this.getProfessions(professional);
 
         if (this.professions.length > 0) {
@@ -106,21 +107,9 @@ export class LicenseListComponent implements OnInit {
             providedTypes.push(ProfessionalType.FogTransporter);
         }
 
-        const professions: InputOption<ProfessionalType>[] = [];
-
-        for (const providedType of providedTypes) {
-            const hasLicenseTypes = this._allLicenseTypes.some(licenseType => licenseType.data?.professionalType == providedType);
-
-            if (hasLicenseTypes) {
-                professions.push({
-                    id: providedType,
-                    text: professionalTypeLabels[providedType],
-                    data: providedType
-                });
-            }
-        }
-
-        return professions;
+        return this._licenseService
+            .getProfessionalTypeOptions(this._allLicenseTypes)
+            .filter(profession => providedTypes.includes(profession.data!));
     }
 
     private getColumns(): TableColumn<ProfessionalDashboardLicenseInsurance>[] {
@@ -159,7 +148,7 @@ export class LicenseListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._companyLicenseService.getAllWithUserLicenses(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {
@@ -170,7 +159,8 @@ export class LicenseListComponent implements OnInit {
     public lookupUser(): void {
         this._modalHelper.show<ProfessionalUser>(ProfessionalUserLookupComponent, {
             title: 'Accounts',
-            size: ModalSize.large
+            size: ModalSize.large,
+            mode: 'disableFullScreen'
         }).result()
             .subscribe(selectedUser => {
                 this.newLicense.user = selectedUser;
@@ -179,12 +169,8 @@ export class LicenseListComponent implements OnInit {
 
     public selectProfession(professionalType: ProfessionalType): void {
         this.newLicense.professionalType = professionalType;
-        this.professionChange();
-    }
-
-    public professionChange(): void {
-        this.activeProfession = this.newLicense.professionalType;
-        this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == this.newLicense.professionalType);
+        this.activeProfession = professionalType;
+        this.licenseTypes = this._allLicenseTypes.filter(t => t.data?.professionalType == professionalType);
         this.newLicense.licenseType = undefined;
 
         this.updateLicenseScope();
@@ -239,7 +225,7 @@ export class LicenseListComponent implements OnInit {
                 this.newLicense = {};
                 this.hasReadHelp = false;
 
-                form.resetForm({ professionalType: professionalType });
+                form.resetForm();
                 this.selectProfession(professionalType);
 
                 this.getLicenses();

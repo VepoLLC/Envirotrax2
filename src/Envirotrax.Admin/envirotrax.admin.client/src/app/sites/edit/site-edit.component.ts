@@ -1,18 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { HelperService, InputOption, ModalHelperService, RecordLog, ToastService, ToastType } from '@envirotrax/common-ui';
+import { Subscription } from 'rxjs';
+import { MODULE_COLORS } from '../../shared/models/module-colors';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
 import { SiteDetail, SiteEditWindowModel } from '../../shared/models/sites/site-detail';
 import { SiteGisUpdate, SiteUpdate } from '../../shared/models/sites/site-update';
 import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
 import { SiteService } from '../../shared/services/sites/site.service';
+import { SITE_DRAG_DATA_TYPE, SiteDragDropService, SiteMerged } from '../../shared/services/sites/site-drag-drop.service';
+import { WindowService } from '../../shared/services/window.service';
 import { LookupService } from '../../shared/services/lookup/lookup.service';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
 import { WaterSupplierLookupComponent } from '../../shared/components/lookups/water-supplier-lookup.component';
 import { WindowReference } from '../../window/window-config';
 import { SiteEditSectionsModule } from './sections/site-edit-sections.module';
+import { SiteMergeConfirmationComponent, SiteMergeConfirmationModel } from './merge/site-merge-confirmation.component';
 
 type SiteEditTab = 'details' | 'logs';
 
@@ -32,7 +37,9 @@ type SiteEditTab = 'details' | 'logs';
     standalone: true,
     imports: [CommonModule, FormsModule, SharedComponentsModule, SiteEditSectionsModule],
 })
-export class SiteEditComponent implements OnInit {
+export class SiteEditComponent implements OnInit, OnDestroy {
+    private _siteMergedSubscription?: Subscription;
+
     // The single page-level form. Child section controls register into it via ControlContainer, so
     // this component can read whole-page validity (form.valid) and dirty state (form.dirty) for the
     // future Save flow.
@@ -67,7 +74,9 @@ export class SiteEditComponent implements OnInit {
         private readonly _lookupService: LookupService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _helperService: HelperService
+        private readonly _helperService: HelperService,
+        private readonly _windowService: WindowService,
+        private readonly _siteDragDropService: SiteDragDropService
     ) {
 
     }
@@ -78,11 +87,17 @@ export class SiteEditComponent implements OnInit {
         this.siteId = model?.siteId;
         this.waterSupplierId = model?.waterSupplierId;
 
+        this._siteMergedSubscription = this._siteDragDropService.onSiteMerged().subscribe(siteMerged => this.onSiteMerged(siteMerged));
+
         await Promise.all([
             this.loadStates(),
             this.loadSite(),
             this.loadRecordLogs()
         ]);
+    }
+
+    public ngOnDestroy(): void {
+        this._siteMergedSubscription?.unsubscribe();
     }
 
     public onTabChange(tab: SiteEditTab): void {
@@ -331,6 +346,179 @@ export class SiteEditComponent implements OnInit {
             this._toastService.successfullySaved();
         } finally {
             this.isSaving = false;
+        }
+    }
+
+    public deleteSite(): void {
+        this._modalHelper
+            .showDeleteConfirmation()
+            .result()
+            .subscribe(() => this.processDelete());
+    }
+
+    private async processDelete(): Promise<void> {
+        if (this.siteId == null) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            await this._siteService.delete(this.siteId);
+        } finally {
+            this.isSaving = false;
+        }
+
+        this._toastService.successFullyDeleted('Site');
+
+        this._windowReference.close();
+    }
+
+    public copySite(): void {
+        this._modalHelper
+            .confirm({
+                title: 'Confirm Copy Site',
+                messages: ['Are you sure you want to create a copy of this site?']
+            })
+            .result()
+            .subscribe(() => this.processCopy());
+    }
+
+    private async processCopy(): Promise<void> {
+        if (this.siteId == null || this.waterSupplierId == null) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            const copy = await this._siteService.copy(this.siteId, this.waterSupplierId);
+
+            this.openSite(copy);
+        } finally {
+            this.isSaving = false;
+        }
+    }
+
+    private openSite(site: SiteDetail): void {
+        if (site.id == null) {
+            return;
+        }
+
+        const model: SiteEditWindowModel = {
+            siteId: site.id,
+            waterSupplierId: site.waterSupplier?.id
+        };
+
+        this._windowService.addWindow(SiteEditComponent, {
+            title: this.buildSiteWindowTitle(site),
+            color: MODULE_COLORS.SITE,
+            model
+        });
+    }
+
+    private buildSiteWindowTitle(site: SiteDetail): string {
+        const address = [site.streetNumber, site.streetName]
+            .filter(part => !!part && part.trim().length > 0)
+            .join(' ');
+
+        return address ? `${site.id} - ${address}` : `${site.id}`;
+    }
+
+    // Only the site id goes into the drag data, because it has to reach site windows in other browser windows
+    // too. The drop target loads the site itself.
+    public startSiteDrag(event: DragEvent): void {
+        if (!event.dataTransfer || this.siteId == null) {
+            return;
+        }
+
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData(SITE_DRAG_DATA_TYPE, String(this.siteId));
+    }
+
+    // While dragging, the browser exposes only the drag data types, not the values, so the type is what
+    // identifies a site drag.
+    public allowSiteDrop(event: DragEvent): void {
+        if (event.dataTransfer?.types.includes(SITE_DRAG_DATA_TYPE) && !this.isSaving) {
+            event.preventDefault();
+        }
+    }
+
+    public async dropSite(event: DragEvent): Promise<void> {
+        const sourceSiteId = Number(event.dataTransfer?.getData(SITE_DRAG_DATA_TYPE));
+
+        if (!sourceSiteId || !this.originalSite || this.isSaving) {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (sourceSiteId === this.siteId) {
+            this._modalHelper.showMessage({
+                title: 'Site Merge Error',
+                type: 'error',
+                messages: ['Cannot merge a site onto itself.']
+            });
+
+            return;
+        }
+
+        let sourceSite: SiteDetail;
+
+        try {
+            this.isSaving = true;
+
+            sourceSite = await this._siteService.getById(sourceSiteId);
+        } finally {
+            this.isSaving = false;
+        }
+
+        this._modalHelper
+            .show<SiteMergeConfirmationModel, void>(SiteMergeConfirmationComponent, {
+                title: 'Confirm Record Transfer',
+                model: {
+                    sourceSite,
+                    destinationSite: this.originalSite
+                },
+                size: ModalSize.large,
+                mode: 'disableFullScreen'
+            })
+            .result()
+            .subscribe(() => this.mergeSite(sourceSiteId));
+    }
+
+    private async mergeSite(sourceSiteId: number): Promise<void> {
+        if (this.siteId == null || this.waterSupplierId == null) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            await this._siteService.merge(this.siteId, this.waterSupplierId, sourceSiteId);
+        } finally {
+            this.isSaving = false;
+        }
+
+        // The source site's window may be in another browser window, so it is closed through the broadcast.
+        this._siteDragDropService.notifySiteMerged({
+            sourceSiteId,
+            destinationSiteId: this.siteId
+        });
+
+        this._toastService.show({
+            text: 'Sites Merged',
+            type: ToastType.Success
+        });
+    }
+
+    // Runs in every site window of every browser window and tab, including the one that merged. The merge
+    // deletes the source site and moves its records and record log to the destination site.
+    private onSiteMerged(siteMerged: SiteMerged): void {
+        if (siteMerged.sourceSiteId === this.siteId) {
+            this._windowReference.close();
+        } else if (siteMerged.destinationSiteId === this.siteId) {
+            this.loadRecordLogs();
         }
     }
 

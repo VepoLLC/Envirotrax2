@@ -15,6 +15,7 @@ import { AppContainerHelperService } from '../../../../shared/services/helpers/a
 import { PrintableTableService } from '../../../../shared/services/printable-table.service';
 import { DownloadConfig } from '../../../../shared/models/download-config';
 import { DownloadService } from '../../../../shared/services/download.service';
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../../shared/models/page-info';
 
 type DownloadCategory = 'property' | 'interceptor' | 'inspector' | 'mailing';
 
@@ -96,6 +97,7 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
             fileName: 'FOG Inspections',
             endpoint: this._fogInspectionService.getAllEndpoint(this.latestOnly),
             pdfEndpoint: this._fogInspectionService.getAllPdfEndpoint(this.latestOnly),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },
@@ -212,7 +214,7 @@ export class ProfessionalFogInspectionListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             this.table.items = await this._fogInspectionService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query,
                 this.latestOnly
             );

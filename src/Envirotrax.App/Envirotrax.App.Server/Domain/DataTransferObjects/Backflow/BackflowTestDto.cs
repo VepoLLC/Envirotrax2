@@ -79,7 +79,7 @@ public class BackflowTestDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRed
 
     public ReferencedStateDto? PropertyState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? PropertyZip { get; set; }
 
     PropertyType IPropertyLocationDto.PropertyType
@@ -109,7 +109,7 @@ public class BackflowTestDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRed
 
     public ReferencedStateDto? MailingState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? MailingZip { get; set; }
 
     [StringLength(50)]
@@ -379,6 +379,10 @@ public class BackflowTestDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRed
     public bool ValidationSiteInformationChanged { get; set; }
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
+    public bool ValidationDeviceMoved { get; set; }
+    public bool ValidationHazardTypeChanged { get; set; }
+    public bool ValidationCreatedFromCsi { get; set; }
+    public bool ValidationOnHold { get; set; }
 
     // Images
     public string? AssemblyImagePath { get; set; }

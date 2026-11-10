@@ -150,6 +150,13 @@
 
             <!-- Main Search Criteria -->
             <vp-section header="Search Criteria">
+                <vp-section-actions>
+                    <button type="button" class="btn-primary" (click)="showSearchTemplates()">
+                        <i class="fa-solid fa-floppy-disk me-1"></i>
+                        Search Templates
+                    </button>
+                </vp-section-actions>
+
                 <div class="row">
                     <div class="col-md-8 d-flex flex-column">
                         <div class="row">
@@ -510,7 +517,7 @@
 
 <div *ngIf="showMapResults && !isMapLoading" class="border bg-white p-3">
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <button type="button" class="btn btn-primary vp-section-button">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showDownloadManager()">
             <i class="fa-solid fa-file-export me-1"></i>Export Results
         </button>
         <span class="fw-bold fs-5">Backflow Test Search ({{ mapResultCount }} Results)</span>

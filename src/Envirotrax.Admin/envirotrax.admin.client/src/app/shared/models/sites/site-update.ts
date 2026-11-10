@@ -78,3 +78,7 @@ export interface SiteGisUpdate {
 export interface SiteWaterSupplierUpdate {
     waterSupplierId: number;
 }
+
+export interface SiteMerge {
+    sourceSiteId: number;
+}

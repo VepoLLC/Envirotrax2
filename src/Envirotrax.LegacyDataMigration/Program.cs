@@ -61,6 +61,7 @@ services.AddTransient<ProfessionalService>();
 services.AddTransient<ProfessionalWaterSupplierService>();
 services.AddTransient<ProfessionalLicenseService>();
 services.AddTransient<ProfessionalInsuranceService>();
+services.AddTransient<ProfessionalNoteService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
@@ -75,6 +76,8 @@ services.AddTransient<FogTripTicketService>();
 services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 services.AddTransient<ApiAccountService>();
+services.AddTransient<BackflowRenewalRequirementService>();
+services.AddTransient<SiteScheduleService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -102,6 +105,11 @@ await professionalLicenseService.MigrateAsync();
 var professionalInsuranceService = provider.GetRequiredService<ProfessionalInsuranceService>();
 await professionalInsuranceService.MigrateAsync();
 
+// After the professionals, their users and the supplier users: a comment is about a company or one of its
+// sub-accounts, and it is copied to every water supplier its author is a user of.
+var professionalNoteService = provider.GetRequiredService<ProfessionalNoteService>();
+await professionalNoteService.MigrateAsync();
+
 var gisAreaService = provider.GetRequiredService<GisAreaService>();
 await gisAreaService.MigrateAsync();
 
@@ -123,6 +131,7 @@ await backflowGaugeService.MigrateAsync();
 
 // After the sites and the professionals, because a test is recorded against a site by a tester who
 // belongs to one of them, and before the notifications, whose RecordId points at a test by its V1 id.
+// Its assembly, serial number, bypass and air gap images are moved into Azure Storage here too.
 var backflowTestService = provider.GetRequiredService<BackflowTestService>();
 await backflowTestService.MigrateAsync();
 
@@ -164,3 +173,9 @@ await notificationService.MigrateAsync();
 
 var apiAccountService = provider.GetRequiredService<ApiAccountService>();
 await apiAccountService.MigrateAsync();
+
+var backflowRenewalRequirementService = provider.GetRequiredService<BackflowRenewalRequirementService>();
+await backflowRenewalRequirementService.MigrateAsync();
+
+var siteScheduleService = provider.GetRequiredService<SiteScheduleService>();
+await siteScheduleService.MigrateAsync();

@@ -132,6 +132,20 @@ export class CsiInspectionService {
         return lastValueFrom(this._http.get<PagedData<CsiInspection>>(url, { params }));
     }
 
+    public getProfessionalInspectionsEndpoint(latestOnly: boolean): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl(`/api/professionals/csi/inspections?latestOnly=${latestOnly}`)
+        };
+    }
+
+    public getProfessionalInspectionsPdfEndpoint(latestOnly: boolean): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/pdf?latestOnly=${latestOnly}`)
+        };
+    }
+
     public deleteForProfessional(id: number): Promise<CsiInspection> {
         const url = this._urlResolver.resolveUrl(`/api/professionals/csi/inspections/${id}`);
         return lastValueFrom(this._http.delete<CsiInspection>(url));

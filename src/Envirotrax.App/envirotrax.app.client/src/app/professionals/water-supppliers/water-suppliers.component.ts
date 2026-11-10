@@ -12,6 +12,7 @@ import { ToastService, CellTemplateData, ColumnType, CurrencyCellComponent, Inpu
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../shared/models/page-info";
 
 type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 
@@ -171,7 +172,7 @@ export class WaterSuppliersComponent implements OnInit {
         try {
             this.suppliers.isLoading = true;
 
-            const allSuppliers = await this._professionalSupplierService.getAllAvailableSuppliers(this.suppliers.items?.pageInfo || {}, this.suppliers.query);
+            const allSuppliers = await this._professionalSupplierService.getAllAvailableSuppliers(this.suppliers.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.suppliers.query);
             const mySuppliers = await this._professionalSupplierService.getAllMy();
 
             this.suppliers.items = {

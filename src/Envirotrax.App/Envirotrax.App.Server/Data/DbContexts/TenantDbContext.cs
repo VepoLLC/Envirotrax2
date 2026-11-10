@@ -17,6 +17,7 @@ using System.Reflection;
 using Envirotrax.App.Server.Data.Models.WaterSuppliers.Features;
 using Envirotrax.App.Server.Data.Models.GisAreas;
 using Envirotrax.App.Server.Data.Models.Notifications;
+using Envirotrax.App.Server.Data.Models.TableSettings;
 
 namespace Envirotrax.App.Server.Data.DbContexts;
 
@@ -44,6 +45,8 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
     public DbSet<NotificationSetting> NotificationSettings { get; set; }
     public DbSet<Notification> Notifications { get; set; }
 
+    public DbSet<TableSetting> TableSettings { get; set; }
+
     public DbSet<ApiAccount> ApiAccounts { get; set; }
 
     public DbSet<Professional> Professionals { get; set; }
@@ -54,6 +57,8 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
     public DbSet<ProfessionalLicense> ProfessionalLicenses { get; set; }
     public DbSet<ProfessionalInsurance> ProfessionalInsurances { get; set; }
     public DbSet<ProfessionalTransaction> ProfessionalTransactions { get; set; }
+    public DbSet<ProfessionalNote> ProfessionalNotes { get; set; }
+    public DbSet<ProfessionalUserNote> ProfessionalUserNotes { get; set; }
     public DbSet<BackflowGauge> BackflowGauges { get; set; }
     public DbSet<FogTripTicket> FogTripTickets { get; set; }
     public DbSet<FogVehicle> FogVehicles { get; set; }

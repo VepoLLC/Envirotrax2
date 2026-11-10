@@ -1,0 +1,59 @@
+<div>
+    <div class="row">
+        <div class="col-6">
+            <h2 class="h6 border-bottom pb-1">Source Site</h2>
+
+            <dl class="row mb-0">
+                <dt class="col-5">Site ID</dt>
+                <dd class="col-7">{{ sourceSite.id }}</dd>
+
+                <dt class="col-5">Property Type</dt>
+                <dd class="col-7">{{ sourceSite.propertyType }}</dd>
+
+                <dt class="col-5">Business Name</dt>
+                <dd class="col-7">{{ sourceSite.businessName }}</dd>
+
+                <dt class="col-5">Address</dt>
+                <dd class="col-7 mb-0">
+                    {{ sourceSite.address }}<br />
+                    {{ sourceSite.cityStateZip }}
+                </dd>
+            </dl>
+        </div>
+
+        <div class="col-6">
+            <h2 class="h6 border-bottom pb-1">Destination Site</h2>
+
+            <dl class="row mb-0">
+                <dt class="col-5">Site ID</dt>
+                <dd class="col-7">{{ destinationSite.id }}</dd>
+
+                <dt class="col-5">Property Type</dt>
+                <dd class="col-7">{{ destinationSite.propertyType }}</dd>
+
+                <dt class="col-5">Business Name</dt>
+                <dd class="col-7">{{ destinationSite.businessName }}</dd>
+
+                <dt class="col-5">Address</dt>
+                <dd class="col-7 mb-0">
+                    {{ destinationSite.address }}<br />
+                    {{ destinationSite.cityStateZip }}
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <p class="fw-bold text-center my-3">
+        Confirm merge of source site with destination site.
+    </p>
+
+    <div class="d-flex justify-content-center">
+        <button type="button" class="btn btn-primary me-2 w-100" (click)="confirm()">
+            Confirm Transfer
+        </button>
+
+        <button type="button" class="btn btn-primary w-100" (click)="cancel()">
+            Cancel
+        </button>
+    </div>
+</div>

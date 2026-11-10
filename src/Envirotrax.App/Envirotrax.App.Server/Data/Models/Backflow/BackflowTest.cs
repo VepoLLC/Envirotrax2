@@ -96,7 +96,7 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public int? PropertyStateId { get; set; }
     public State? PropertyState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? PropertyZip { get; set; }
 
     // Mailing address
@@ -121,7 +121,7 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public int? MailingStateId { get; set; }
     public State? MailingState { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? MailingZip { get; set; }
 
     [StringLength(50)]
@@ -271,6 +271,10 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public bool ValidationSiteInformationChanged { get; set; }
     public bool ValidationUnknownSerialNumber { get; set; }
     public bool ValidationDeviceInformationChanged { get; set; }
+    public bool ValidationDeviceMoved { get; set; }
+    public bool ValidationHazardTypeChanged { get; set; }
+    public bool ValidationCreatedFromCsi { get; set; }
+    public bool ValidationOnHold { get; set; }
 
     [StringLength(255)]
     public string? ValidationNotes { get; set; }

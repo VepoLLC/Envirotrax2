@@ -51,7 +51,7 @@ export class CreateEditLicenseComponent implements OnInit {
             ]);
 
             this.license = license;
-            this._allLicenseTypes = licenseTypes.filter(l => l.data?.state?.id == professional.state?.id);
+            this._allLicenseTypes = this._licenseService.filterTypesByProfessionalState(licenseTypes, professional, license.licenseType?.id);
             this.licenseTypes = this._allLicenseTypes;
             this.professionalTypeOptions = this._licenseService.getProfessionalTypeOptions(this._allLicenseTypes);
         } finally {

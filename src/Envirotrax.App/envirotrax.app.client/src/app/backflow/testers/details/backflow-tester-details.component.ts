@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs";
 import { Professional } from "../../../shared/models/professionals/professional";
+import { ProfessionalType } from "../../../shared/models/professionals/licenses/professional-user-license";
 import { BackflowTesterManagementService } from "../../../shared/services/backflow/backflow-tester-management.service";
 
 @Component({
@@ -11,6 +12,8 @@ import { BackflowTesterManagementService } from "../../../shared/services/backfl
     templateUrl: './backflow-tester-details.component.html'
 })
 export class BackflowTesterDetailsComponent implements OnInit, OnDestroy {
+    public readonly ProfessionalType = ProfessionalType;
+
     public id: number | null = null;
     public isAccountLoading: boolean = false;
     public accountInfo: Professional | null = null;

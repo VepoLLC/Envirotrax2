@@ -14,6 +14,7 @@ import { DownloadService } from '../../../shared/services/download.service';
 import { PrintableTableService } from '../../../shared/services/printable-table.service';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { AppContainerHelperService } from '../../../shared/services/helpers/app-contaner-helper.service';
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../shared/models/page-info';
 
 @Component({
     standalone: false,
@@ -91,6 +92,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
             fileName: 'Backflow Tests',
             endpoint: this._backflowTestService.getAllForProfessionalEndpoint(),
             pdfEndpoint: this._backflowTestService.getAllForProfessionalPdfEndpoint(),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },
@@ -265,7 +267,7 @@ export class ProfessionalBackflowTestListComponent implements OnInit, OnDestroy 
         try {
             this.table.isLoading = true;
             const result = await this._backflowTestService.getAllForProfessional(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
             const startIndex = ((result.pageInfo.pageNumber ?? 1) - 1) * (result.pageInfo.pageSize ?? 10);

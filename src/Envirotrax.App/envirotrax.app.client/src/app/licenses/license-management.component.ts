@@ -11,6 +11,7 @@ import { PermissionAction, PermissionType } from '../shared/models/permission-ty
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { EditWaterSupplierLicenseComponent, WaterSupplierLicenseModalData } from './edit/edit-water-supplier-license.component';
+import { STANDALONE_GRID_PAGE_SIZE } from '../shared/models/page-info';
 
 @Component({
     templateUrl: './license-management.component.html',
@@ -117,7 +118,7 @@ export class LicenseManagementComponent implements OnInit {
             this.table.isLoading = true;
             this.table.items = await this._licenseService.getLicenses(
                 this.activeFilter,
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

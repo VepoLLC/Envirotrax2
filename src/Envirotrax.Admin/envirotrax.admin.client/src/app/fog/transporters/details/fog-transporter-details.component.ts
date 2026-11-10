@@ -1,0 +1,141 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
+import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
+import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
+import { State } from '../../../shared/models/lookup/state';
+import { ProfessionalType } from '../../../shared/models/professionals/licenses/professional-user-license';
+import { Professional } from '../../../shared/models/professionals/professional';
+import { FogTransporterService } from '../../../shared/services/fog/fog-transporter.service';
+import { LookupService } from '../../../shared/services/lookup/lookup.service';
+import { WindowReference } from '../../../window/window-config';
+import { ProfessionalNotesComponent } from '../../../shared/components/professional-notes/list/professional-notes.component';
+import { FogTransporterInsuranceListComponent } from './insurances/list/fog-transporter-insurance-list.component';
+import { FogTransporterLicenseListComponent } from './licenses/list/fog-transporter-license-list.component';
+import { FogTransporterUserListComponent } from './users/list/fog-transporter-user-list.component';
+import { FogTransporterVehicleListComponent } from './vehicles/list/fog-transporter-vehicle-list.component';
+import { FogTransporterWaterSupplierListComponent } from './water-suppliers/list/fog-transporter-water-supplier-list.component';
+
+@Component({
+    templateUrl: './fog-transporter-details.component.html',
+    imports: [
+        CommonModule,
+        FormsModule,
+        SharedComponentsModule,
+        FogTransporterWaterSupplierListComponent,
+        FogTransporterUserListComponent,
+        FogTransporterLicenseListComponent,
+        FogTransporterInsuranceListComponent,
+        FogTransporterVehicleListComponent,
+        ProfessionalNotesComponent
+    ],
+})
+export class FogTransporterDetailsComponent implements OnInit {
+    public professionalId: number = 0;
+
+    public readonly professionalType: ProfessionalType = ProfessionalType.FogTransporter;
+
+    public idPrefix: string = 'fog-transporter';
+
+    public professional: Professional = {};
+
+    public states: InputOption<State>[] = [];
+
+    public stateId: string = '';
+    public defaultStateId: string = '';
+
+    public isLoading: boolean = false;
+    public isSaving: boolean = false;
+    public validationErrors: string[] = [];
+
+    constructor(
+        private readonly _windowReference: WindowReference<Professional>,
+        private readonly _fogTransporterService: FogTransporterService,
+        private readonly _lookupService: LookupService,
+        private readonly _helper: HelperService,
+        private readonly _toastService: ToastService
+    ) {
+
+    }
+
+    public async ngOnInit(): Promise<void> {
+        this.professionalId = this._windowReference.config.model?.id ?? 0;
+        this.idPrefix = `fog-transporter-${this.professionalId}`;
+
+        await Promise.all([
+            this.loadStates(),
+            this.loadProfessional()
+        ]);
+    }
+
+    public onStateChange(value: string): void {
+        this.professional.state = this.states.find(option => option.id === value)?.data;
+    }
+
+    public onDefaultStateChange(value: string): void {
+        this.professional.defaultState = this.states.find(option => option.id === value)?.data;
+    }
+
+    public async save(detailsForm: NgForm): Promise<void> {
+        this.validationErrors = [];
+
+        if (!detailsForm.valid) {
+            return;
+        }
+
+        try {
+            this.isSaving = true;
+
+            this.professional = await this._fogTransporterService.update(this.normalizeContacts(this.professional));
+            this.setStateIds();
+
+            this._toastService.successfullySaved('FOG Transporter Account');
+        } catch (error) {
+            if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
+                throw error;
+            }
+
+            this._toastService.failedToSave('FOG Transporter Account');
+        } finally {
+            this.isSaving = false;
+        }
+    }
+
+    /**
+     * vp-input hands back the raw <input> string, so a cleared field arrives as ''. The DTO's [EmailAddress] and
+     * [Phone] accept null but reject '', so a cleared email or phone would fail validation instead of clearing.
+     * Sending undefined leaves the property out of the JSON, which the server binds as null.
+     */
+    private normalizeContacts(professional: Professional): Professional {
+        return {
+            ...professional,
+            companyEmail: professional.companyEmail || undefined,
+            phoneNumber: professional.phoneNumber || undefined,
+            cellPhoneNumber: professional.cellPhoneNumber || undefined,
+            faxNumber: professional.faxNumber || undefined
+        };
+    }
+
+    private async loadStates(): Promise<void> {
+        this.states = await this._lookupService.getStatesAsOptions(true);
+    }
+
+    private async loadProfessional(): Promise<void> {
+        if (!this.professionalId) {
+            return;
+        }
+
+        try {
+            this.isLoading = true;
+            this.professional = await this._fogTransporterService.get(this.professionalId);
+            this.setStateIds();
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    private setStateIds(): void {
+        this.stateId = this.professional.state?.id == null ? '' : String(this.professional.state.id);
+        this.defaultStateId = this.professional.defaultState?.id == null ? '' : String(this.professional.defaultState.id);
+    }
+}

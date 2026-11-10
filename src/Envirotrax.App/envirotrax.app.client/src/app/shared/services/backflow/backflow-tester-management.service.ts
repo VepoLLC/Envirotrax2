@@ -7,6 +7,7 @@ import { PageInfo } from "../../models/page-info";
 import { Query } from "../../models/query";
 import { PagedData } from "../../models/paged-data";
 import { Professional } from "../../models/professionals/professional";
+import { DownloadEndpoint } from "../../models/download-config";
 
 /**
  * Criteria that cannot ride the generic Query pipeline because each one matches a child collection
@@ -60,5 +61,21 @@ export class BackflowTesterManagementService {
         }
 
         return await lastValueFrom(this._http.get<PagedData<Professional>>(url, { params }));
+    }
+
+    public getSearchEndpoint(criteria: BackflowTesterSearchCriteria): DownloadEndpoint {
+        const additionalParams: { [key: string]: string } = {};
+
+        for (const [name, value] of Object.entries(criteria)) {
+            if (value) {
+                additionalParams[name] = value;
+            }
+        }
+
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/backflow/testers/search'),
+            additionalParams
+        };
     }
 }

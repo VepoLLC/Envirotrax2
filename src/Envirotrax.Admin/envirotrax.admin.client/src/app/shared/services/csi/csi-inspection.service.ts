@@ -57,6 +57,22 @@ export class CsiInspectionService {
         return await lastValueFrom(observable);
     }
 
+    public async updateValidationHold(id: number, waterSupplierId: number, onHold: boolean): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/validation-hold?waterSupplierId=${waterSupplierId}`);
+
+        const observable = this._http.put<CsiInspection>(url, onHold);
+
+        return await lastValueFrom(observable);
+    }
+
+    public async updateNeedsValidation(id: number, waterSupplierId: number, needsValidation: boolean): Promise<CsiInspection> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/needs-validation?waterSupplierId=${waterSupplierId}`);
+
+        const observable = this._http.put<CsiInspection>(url, needsValidation);
+
+        return await lastValueFrom(observable);
+    }
+
     public async getCounts(id: number): Promise<CsiInspectionCounts> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspections/${id}/counts`);
 

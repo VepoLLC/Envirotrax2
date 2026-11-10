@@ -1,0 +1,28 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <ng-container *ngIf="canAdd">
+        <p>
+            Select a template to load its search criteria into the search form.
+        </p>
+
+        <vp-table [columns]="columns"
+                  [data]="settings"
+                  [canAdd]="true"
+                  (add)="add()"
+                  [canSelect]="true"
+                  (select)="select($event)"
+                  [canEdit]="true"
+                  (edit)="edit($event)"
+                  [canDelete]="true"
+                  (delete)="delete($event)" />
+
+        <p *ngIf="settings?.length === 0" class="text-center text-muted py-2">
+            You don't have any saved search templates yet.
+        </p>
+    </ng-container>
+
+    <p *ngIf="canAdd === false" class="text-center text-muted py-2">
+        You aren't a user of this water supplier account, so you can't save search templates in it.
+    </p>
+</div>

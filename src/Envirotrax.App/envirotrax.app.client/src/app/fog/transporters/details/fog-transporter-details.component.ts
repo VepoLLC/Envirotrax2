@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs";
 import { Professional } from "../../../shared/models/professionals/professional";
+import { ProfessionalType } from "../../../shared/models/professionals/licenses/professional-user-license";
 import { FogTransporterAccountInfoService } from "../../../shared/services/fog/fog-transporter-account-info.service";
 
 @Component({
@@ -9,6 +10,8 @@ import { FogTransporterAccountInfoService } from "../../../shared/services/fog/f
     templateUrl: './fog-transporter-details.component.html'
 })
 export class FogTransporterDetailsComponent implements OnInit, OnDestroy {
+    public readonly ProfessionalType = ProfessionalType;
+
     public id: number | null = null;
     public accountInfo: Professional | null = null;
     public isAccountLoading: boolean = false;

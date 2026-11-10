@@ -23,8 +23,9 @@ public interface ISiteRepository : IRepository<Site>
     Task UpdateBackflowAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
     Task<IEnumerable<Site>> GetFogTripTicketComplianceAsync(PageInfo pageInfo, Query query, DateTime? dueDateFrom, DateTime? dueDateTo, bool sortDescending, CancellationToken cancellationToken);
     Task UpdateFogAssignmentAsync(int siteId, int? userId, DateTime? assignmentDate);
-    Task UpdateAccountNumberAsync(int siteId, string accountNumber);
     Task ClearNeedsRenewalCheckAsync(int siteId);
+    Task SetNeedsRenewalCheckAsync(int siteId);
+    Task<bool> HasRecordsAsync(int siteId, CancellationToken cancellationToken);
     Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds);
     Task UpdateLastTripTicketDatesAsync(IReadOnlyDictionary<int, DateTime> lastTripTicketDates);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);

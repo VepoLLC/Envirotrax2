@@ -469,15 +469,6 @@ public class SiteRepository : Repository<Site>, ISiteRepository
         return Entity.SingleOrDefaultAsync(s => s.Id == siteId && s.DeletedTime == null, cancellationToken);
     }
 
-    public async Task UpdateAccountNumberAsync(int siteId, string accountNumber)
-    {
-        await DbContext
-            .Sites
-            .Where(s => s.Id == siteId)
-            .ExecuteUpdateAsync(setter => setter
-                .SetProperty(s => s.AccountNumber, accountNumber));
-    }
-
     public async Task ClearNeedsRenewalCheckAsync(int siteId)
     {
         await DbContext
@@ -485,6 +476,26 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .Where(s => s.Id == siteId)
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(s => s.NeedsRenewalCheck, false));
+    }
+
+    public async Task SetNeedsRenewalCheckAsync(int siteId)
+    {
+        await DbContext
+            .Sites
+            .Where(site => site.Id == siteId)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(site => site.NeedsRenewalCheck, true));
+    }
+
+    public Task<bool> HasRecordsAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return Entity
+            .Where(site => site.Id == siteId)
+            .AnyAsync(site =>
+                DbContext.CsiInspections.Any(inspection => inspection.SiteId == site.Id && inspection.DeletedTime == null)
+                || DbContext.BackflowTests.Any(test => test.SiteId == site.Id && test.DeletedTime == null)
+                || DbContext.FogInspections.Any(inspection => inspection.SiteId == site.Id && inspection.DeletedTime == null)
+                || DbContext.FogTripTickets.Any(ticket => ticket.SiteId == site.Id && ticket.DeletedTime == null), cancellationToken);
     }
 
     public async Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds)

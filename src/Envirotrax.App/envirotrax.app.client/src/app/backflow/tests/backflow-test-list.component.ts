@@ -12,14 +12,18 @@ import { TableViewModel } from '../../shared/models/table-view-model';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
-import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, FilterPanelComponent, InputOption, MapMarker, MapPolygon, TableSettingsModalService } from '@envirotrax/common-ui';
 import { BackflowPaymentStatus, BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
+import { BackflowTestSearchFilters } from '../../shared/models/backflow/backflow-test-search-filters';
+import { TableSettingType } from '../../shared/enums/table-setting-type.enum';
+import { TableSettingService } from '../../shared/services/table-settings/table-setting.service';
 import { DownloadConfig } from '../../shared/models/download-config';
 import { DownloadService } from '../../shared/services/download.service';
 import { PrintableTableService } from '../../shared/services/printable-table.service';
 import { PropertyType } from '../../shared/enums/property-type.enum';
 import { BackflowComplianceParams } from '../../shared/models/backflow/backflow-compliance-params';
 import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
+import { STANDALONE_GRID_PAGE_SIZE } from '../../shared/models/page-info';
 
 @Component({
     standalone: false,
@@ -51,6 +55,9 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
 
     @ViewChild('printableSection')
     private _printableSection!: ElementRef;
+
+    @ViewChild(FilterPanelComponent, { static: true })
+    private _filterPanel!: FilterPanelComponent;
 
     public readonly BackflowTestResult = BackflowTestResult;
 
@@ -152,7 +159,9 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
         private readonly _options: BackflowTestOptionsService,
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _tableSettingService: TableSettingService,
+        private readonly _tableSettingsModal: TableSettingsModalService
     ) {
         this.testResultOptions = this._options.testResultOptions;
         this.paymentStatusOptions = this._options.paymentStatusOptions;
@@ -165,6 +174,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             fileName: 'Backflow Tests',
             endpoint: this._backflowTestService.getAllEndpoint(),
             pdfEndpoint: this._backflowTestService.getAllPdfEndpoint(),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', 'PDF'],
             categories: [
                 { name: 'property', caption: 'Property Information', isSelected: true },
@@ -395,7 +405,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
         try {
             this.table.isLoading = true;
             const result = await this._backflowTestService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query,
                 this.getPaymentStatus()
             );
@@ -414,6 +424,27 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties;
+    }
+
+    public showSearchTemplates(): void {
+        const currentFilters: BackflowTestSearchFilters = {
+            query: {
+                sort: this.table.query.sort,
+                filter: this._filterPanel.getFilter()
+            },
+            paymentStatus: this.paymentStatus
+        };
+
+        this._tableSettingsModal.showSearchTemplates(this._tableSettingService, TableSettingType.BackflowTests, currentFilters)
+            .subscribe(filters => this.applySearchTemplate(filters));
+    }
+
+    private applySearchTemplate(filters: BackflowTestSearchFilters): void {
+        this.table.query.sort = filters.query.sort ?? {};
+        this.paymentStatus = filters.paymentStatus ?? '';
+
+        // Fills the filter fields and emits the filter, which onFilterChange puts on the table query.
+        this._filterPanel.setFilter(filters.query.filter ?? []);
     }
 
     // Builds the preset filter for a Tab 2 (Current Compliance Status) View drill-down: the non-compliant

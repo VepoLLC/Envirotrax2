@@ -1,0 +1,34 @@
+<table class="table table-sm table-borderless mb-0">
+    <tbody>
+        <tr>
+            <th class="text-end text-nowrap">Notification Description:</th>
+            <td>{{ details.description }}</td>
+        </tr>
+        <tr>
+            <th class="text-end text-nowrap">User Account:</th>
+            <td>{{ details.userAccount }}</td>
+        </tr>
+        <tr>
+            <th class="text-end text-nowrap pt-3">Backflow Test Type:</th>
+            <td class="pt-3">{{ details.backflowTestType }}</td>
+        </tr>
+        <tr>
+            <th class="text-end text-nowrap">Property Type:</th>
+            <td>{{ details.propertyType }}</td>
+        </tr>
+        <tr>
+            <th class="text-end text-nowrap">Filter:</th>
+            <td>{{ details.filters }}</td>
+        </tr>
+        <tr>
+            <th class="text-end text-nowrap">Hazard Type:</th>
+            <td>{{ details.hazardTypes }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-center mt-2">
+    <button type="button" class="btn btn-primary vp-section-button" (click)="close()">
+        Close
+    </button>
+</div>

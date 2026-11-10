@@ -20,6 +20,10 @@ using Envirotrax.Admin.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Fog;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Letters;
 using Envirotrax.Admin.Server.Domain.Services.Implementations.Letters;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.Professionals;
+using Envirotrax.Admin.Server.Domain.Services.Implementations.Professionals;
+using Envirotrax.Admin.Server.Domain.Services.Definitions.Licenses;
+using Envirotrax.Admin.Server.Domain.Services.Implementations.Licenses;
 
 namespace Envirotrax.Admin.Server.Domain.Configuration;
 
@@ -50,13 +54,27 @@ public static class ServiceRegistration
                 services.AddTransient<IBackflowTesterLicenseService, BackflowTesterLicenseService>();
                 services.AddTransient<IBackflowTesterInsuranceService, BackflowTesterInsuranceService>();
                 services.AddTransient<IBackflowTesterGaugeService, BackflowTesterGaugeService>();
+                services.AddTransient<IBackflowGaugeService, BackflowGaugeService>();
                 services.AddTransient<IBackflowReplacementService, BackflowReplacementService>();
                 services.AddTransient<IFogInspectionService, FogInspectionService>();
                 services.AddTransient<IFogInspectorService, FogInspectorService>();
+                services.AddTransient<IFogInspectorWaterSupplierService, FogInspectorWaterSupplierService>();
+                services.AddTransient<IFogInspectorUserService, FogInspectorUserService>();
+                services.AddTransient<IFogInspectorLicenseService, FogInspectorLicenseService>();
+                services.AddTransient<IFogInspectorInsuranceService, FogInspectorInsuranceService>();
+                services.AddTransient<IFogTransporterService, FogTransporterService>();
+                services.AddTransient<IFogTransporterWaterSupplierService, FogTransporterWaterSupplierService>();
+                services.AddTransient<IFogTransporterUserService, FogTransporterUserService>();
+                services.AddTransient<IFogTransporterLicenseService, FogTransporterLicenseService>();
+                services.AddTransient<IFogTransporterInsuranceService, FogTransporterInsuranceService>();
+                services.AddTransient<IFogTransporterVehicleService, FogTransporterVehicleService>();
                 services.AddTransient<IFogTripTicketService, FogTripTicketService>();
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
                 services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
                 services.AddTransient<ILetterProcessService, LetterProcessService>();
+                services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();
+                services.AddTransient<ILicenseService, LicenseService>();
+                services.AddTransient<IInsuranceService, InsuranceService>();
 
                 return services;
         }

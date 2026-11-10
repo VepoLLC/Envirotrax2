@@ -13,6 +13,7 @@ import { AuthService } from '../../../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../../../shared/models/permission-type';
 import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
 import { EditFogVehiclePermitComponent, FogVehiclePermitModalData } from '../edit/edit-fog-vehicle-permit.component';
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../../shared/models/page-info';
 
 interface FogVehiclePermitRowVm extends FogVehiclePermitSearch {
     transporterName: string;
@@ -199,7 +200,7 @@ export class FogVehiclePermitListComponent implements OnInit {
             this.table.isLoading = true;
 
             const results = await this._permitService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
 

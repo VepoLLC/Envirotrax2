@@ -23,6 +23,10 @@ public interface IFogInspectionService : IService<FogInspection, FogInspectionDt
 
     Task<FogInspectionDto?> UpdateForAdminAsync(int id, FogInspectionAdminUpdateRequest request);
 
+    Task<FogInspectionDto?> UpdateValidationHoldAsync(int id, bool onHold, CancellationToken cancellationToken = default);
+
+    Task<FogInspectionDto?> UpdateNeedsValidationAsync(int id, bool needsValidation, CancellationToken cancellationToken = default);
+
     Task<FogInspectionDto?> UpdateImageForAdminAsync(int id, string imageType, Stream fileStream, string fileName);
 
     Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(

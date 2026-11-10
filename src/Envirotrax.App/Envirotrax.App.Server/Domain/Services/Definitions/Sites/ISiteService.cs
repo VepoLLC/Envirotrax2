@@ -17,6 +17,9 @@ public interface ISiteService : IService<Site, SiteDto>
     Task<bool> UpdateFromAdminAsync(int siteId, SiteDto dto, CancellationToken cancellationToken);
     Task UpdateAdditionalInformationAsync(int siteId, SiteAdditionalInformationDto dto);
     Task<bool> UpdateWaterSupplierAsync(int siteId, UpdateSiteWaterSupplierDto dto);
+    Task<bool> DeleteFromAdminAsync(int siteId);
+    Task<SiteDto?> CopyAsync(int siteId);
+    Task<bool> MergeAsync(int siteId, int sourceSiteId);
     Task<IPagedData<CsiComplianceSiteDto>> GetCsiComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IPagedData<FogComplianceSiteDto>> GetFogInspectionComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<IPagedData<FogPermitComplianceSiteDto>> GetFogPermitComplianceAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);

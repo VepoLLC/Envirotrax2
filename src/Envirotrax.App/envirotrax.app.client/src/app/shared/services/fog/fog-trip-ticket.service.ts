@@ -10,6 +10,7 @@ import { FogTripTicket } from "../../models/fog/fog-trip-ticket";
 import { ProfessionalCheckoutReceipt, ProfessionalCheckoutRequest } from "../../models/payments/professional-checkout";
 import { FogTripTicketImages } from "../../models/fog/fog-trip-ticket-images";
 import { InsuranceCheck } from "../../models/professionals/insurance-check";
+import { DownloadEndpoint } from "../../models/download-config";
 
 @Injectable({
     providedIn: 'root'
@@ -30,6 +31,40 @@ export class FogTripTicketService {
         const observable = this._http.get<PagedData<FogTripTicket>>(url, { params });
 
         return await lastValueFrom(observable);
+    }
+
+    public getAllEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/fog/trip-tickets')
+        };
+    }
+
+    public getAllPdfEndpoint(): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/fog/trip-tickets/pdf')
+        };
+    }
+
+    public getAllForProfessionalEndpoint(waterSupplierId?: number): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets'),
+            additionalParams: this.buildWaterSupplierParams(waterSupplierId)
+        };
+    }
+
+    public getAllPdfForProfessionalEndpoint(waterSupplierId?: number): DownloadEndpoint {
+        return {
+            method: 'GET',
+            url: this._urlResolver.resolveUrl('/api/professionals/fog/trip-tickets/pdf'),
+            additionalParams: this.buildWaterSupplierParams(waterSupplierId)
+        };
+    }
+
+    private buildWaterSupplierParams(waterSupplierId?: number): { [key: string]: string } {
+        return waterSupplierId != null ? { waterSupplierId: String(waterSupplierId) } : {};
     }
 
     public getById(id: number): Promise<FogTripTicket> {

@@ -48,6 +48,21 @@ public class SiteService : ISiteService
         return _apiClient.PutAsync<SiteWaterSupplierUpdateDto, object>(waterSupplierId, $"/api/admin/sites/{siteId}/water-supplier", dto, cancellationToken);
     }
 
+    public Task DeleteAsync(int siteId)
+    {
+        return _apiClient.DeleteAsync<object>($"/api/admin/sites/{siteId}", CancellationToken.None);
+    }
+
+    public Task<SiteDetailDto?> CopyAsync(int siteId, int waterSupplierId)
+    {
+        return _apiClient.PostAsync<object?, SiteDetailDto>(waterSupplierId, $"/api/admin/sites/{siteId}/copies", null, CancellationToken.None);
+    }
+
+    public Task MergeAsync(int siteId, int waterSupplierId, SiteMergeDto dto)
+    {
+        return _apiClient.PostAsync<SiteMergeDto, object>(waterSupplierId, $"/api/admin/sites/{siteId}/merges", dto, CancellationToken.None);
+    }
+
     public Task<List<RecordLogDto>?> GetLogsAsync(int siteId, CancellationToken cancellationToken)
     {
         return _apiClient.GetAsync<List<RecordLogDto>>($"/api/admin/sites/{siteId}/logs", cancellationToken);

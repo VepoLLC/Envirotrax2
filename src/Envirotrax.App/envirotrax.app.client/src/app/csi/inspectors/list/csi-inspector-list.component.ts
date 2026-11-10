@@ -7,6 +7,9 @@ import { TableViewModel } from "../../../shared/models/table-view-model";
 import { Professional } from "../../../shared/models/professionals/professional";
 import { CellTemplateData, ColumnType, TableColumn } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { DownloadConfig } from "../../../shared/models/download-config";
+import { DownloadService } from "../../../shared/services/download.service";
+import { STANDALONE_GRID_PAGE_SIZE } from '../../../shared/models/page-info';
 
 interface CsiInspectorLicenseSearchVm {
     inspectorLicenseNumber?: string;
@@ -38,14 +41,33 @@ export class CsiInspectorListComponent implements OnInit {
     @ViewChild('addressCell', { static: true })
     public addressCell?: TemplateRef<CellTemplateData<Professional>>;
 
+    public downloadConfig: DownloadConfig;
+
     private _licenseSearch: CsiInspectorLicenseSearchVm = {};
 
     constructor(
         private readonly _csiInspectoreManagementService: CsiInspectoreManagementService,
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
-        private readonly _containerHelper: AppContainerHelperService
+        private readonly _containerHelper: AppContainerHelperService,
+        private readonly _downloadService: DownloadService
     ) {
+        this.downloadConfig = {
+            fileName: 'CSI Inspectors',
+            endpoint: this._csiInspectoreManagementService.getAllEndpoint(),
+            suppoertedFormats: ['CSV', 'Excel'],
+            columns: [
+                { field: 'name', caption: 'CompanyName' },
+                { field: 'companyEmail', caption: 'CompanyEmail' },
+                { field: 'address', caption: 'Address' },
+                { field: 'city', caption: 'City' },
+                { field: 'state.code', caption: 'State' },
+                { field: 'zipCode', caption: 'ZIP' },
+                { field: 'phoneNumber', caption: 'WorkNumber' },
+                { field: 'faxNumber', caption: 'FaxNumber' },
+                { field: 'webSiteUrl', caption: 'WebsiteUrl' }
+            ]
+        };
     }
 
     public async ngOnInit(): Promise<void> {
@@ -81,7 +103,7 @@ export class CsiInspectorListComponent implements OnInit {
     public async getInspectors(): Promise<void> {
         try {
             this.table.isLoading = true;
-            const pageInfo = this.table.items?.pageInfo || {};
+            const pageInfo = this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE };
             const { inspectorLicenseNumber, insurancePolicyNumber } = this._licenseSearch;
 
             this.table.items = (inspectorLicenseNumber || insurancePolicyNumber)
@@ -109,6 +131,16 @@ export class CsiInspectorListComponent implements OnInit {
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
         this.table.query.filter = queryProperties
+    }
+
+    public showDownloadManager(): void {
+        const { inspectorLicenseNumber, insurancePolicyNumber } = this._licenseSearch;
+
+        this.downloadConfig.endpoint = (inspectorLicenseNumber || insurancePolicyNumber)
+            ? this._csiInspectoreManagementService.getSearchEndpoint(inspectorLicenseNumber, insurancePolicyNumber)
+            : this._csiInspectoreManagementService.getAllEndpoint();
+
+        this._downloadService.showDownloadManager(this.downloadConfig, this.table.query);
     }
 
     public openDetails(row: any): void {

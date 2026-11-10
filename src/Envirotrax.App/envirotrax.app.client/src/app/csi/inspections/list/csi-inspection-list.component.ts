@@ -11,6 +11,7 @@ import { DownloadService } from "../../../shared/services/download.service";
 import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
 import { PrintableTableService } from "../../../shared/services/printable-table.service";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
+import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 @Component({
     standalone: false,
@@ -88,6 +89,7 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
             fileName: 'CSI Inspections',
             endpoint: this._csiInspectionService.getAllEndpoint(),
             pdfEndpoint: this._csiInspectionService.getAllPdfEndpoint(),
+            openPdfInNewWindow: true,
             suppoertedFormats: ['CSV', 'Excel', "PDF"],
             columns: [
                 { field: 'inspectionDate', caption: 'InspectionDate' },
@@ -223,7 +225,7 @@ export class CsiInspectionListComponent implements OnInit, OnDestroy {
         try {
             this.table.isLoading = true;
             this.table.items = await this._csiInspectionService.getAll(
-                this.table.items?.pageInfo || {},
+                this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE },
                 this.table.query
             );
         } finally {

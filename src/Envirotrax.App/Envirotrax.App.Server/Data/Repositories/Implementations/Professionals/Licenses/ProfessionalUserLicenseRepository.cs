@@ -28,6 +28,20 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
             .Include(license => license.LicenseType);
     }
 
+    protected override void UpdateEntity(ProfessionalUserLicense model)
+    {
+        base.UpdateEntity(model);
+
+        DbContext.Entry(model).Property(license => license.LastCheckDate).IsModified = false;
+    }
+
+    public Task<int> UpdateLastCheckDateAsync(int id, DateTime lastCheckDate)
+    {
+        return DbContext.ProfessionalUserLicenses
+            .Where(license => license.Id == id)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(license => license.LastCheckDate, lastCheckDate));
+    }
+
     public async Task<IEnumerable<ProfessionalUserLicense>> GetAllAsync(int userId, PageInfo pageInfo, Query query)
     {
         var paginated = await GetListQuery()
@@ -56,6 +70,19 @@ public class ProfessionalUserLicenseRepository : Repository<ProfessionalUserLice
             .PaginateAsync(pageInfo, cancellationToken);
 
         return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public Task<bool> ExistsForProfessionalAsync(int professionalId, int licenseId, CancellationToken cancellationToken, ProfessionalType? professionalType = null)
+    {
+        var q = DbContext.ProfessionalUserLicenses
+            .Where(l => l.Id == licenseId && l.ProfessionalId == professionalId);
+
+        if (professionalType != null)
+        {
+            q = q.Where(l => l.ProfessionalType == professionalType);
+        }
+
+        return q.AnyAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<ProfessionalUserLicense>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, ProfessionalType professionalType, CancellationToken cancellationToken)

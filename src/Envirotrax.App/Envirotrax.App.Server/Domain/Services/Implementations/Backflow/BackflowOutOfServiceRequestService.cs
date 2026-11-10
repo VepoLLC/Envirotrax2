@@ -35,7 +35,7 @@ public class BackflowOutOfServiceRequestService : Service<BackflowOutOfServiceRe
     {
         dto.Id = 0;
         dto.Professional = new ReferencedProfessionalDto { Id = _authService.ProfessionalId };
-        dto.BpatId = _authService.UserId;
+        dto.BpatId = _authService.ActingAsUserId;
 
         if (dto.Type != OutOfServiceType.Replaced && dto.Type != OutOfServiceType.Removed)
         {

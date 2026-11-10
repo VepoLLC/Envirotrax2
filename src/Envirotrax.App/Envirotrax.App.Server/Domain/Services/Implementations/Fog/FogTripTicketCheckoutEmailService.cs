@@ -40,12 +40,12 @@ public class FogTripTicketCheckoutEmailService : IFogTripTicketCheckoutEmailServ
             return [];
         }
 
-        var payer = await _professionalUserRepository.GetAsync(_authService.UserId, CancellationToken.None);
+        var payer = await _professionalUserRepository.GetAsync(_authService.ActingAsUserId, CancellationToken.None);
         var recipient = payer?.User?.Email;
 
         if (string.IsNullOrWhiteSpace(recipient))
         {
-            _logger.LogWarning("Payment {TransactionId} has trip tickets to email, but user {UserId} has no email address.", transactionId, _authService.UserId);
+            _logger.LogWarning("Payment {TransactionId} has trip tickets to email, but user {UserId} has no email address.", transactionId, _authService.ActingAsUserId);
             return [];
         }
 

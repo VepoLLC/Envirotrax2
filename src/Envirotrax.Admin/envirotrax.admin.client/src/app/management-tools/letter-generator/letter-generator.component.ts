@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { LetterHistoryComponent } from './letter-history/letter-history.component';
 import { ProcessLettersComponent } from './process-letters/process-letters.component';
 
 type LetterGeneratorTab = 'processLetters' | 'letterHistory';
@@ -7,7 +8,8 @@ type LetterGeneratorTab = 'processLetters' | 'letterHistory';
 @Component({
     imports: [
         CommonModule,
-        ProcessLettersComponent
+        ProcessLettersComponent,
+        LetterHistoryComponent
     ],
     templateUrl: './letter-generator.component.html'
 })

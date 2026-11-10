@@ -14,32 +14,66 @@ const LOADING_WINDOW_STYLES = `
     <style>
         body {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            color: #555;
+            color: #212529;
         }
 
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #ddd;
-            border-top-color: #0084c3;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .vp-loader-container {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 250px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 28px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
+        .vp-loader-container p {
+            margin: 0 1rem 0 0;
+            font-size: 18px;
+        }
+
+        .vp-loader {
+            width: 55px;
+            aspect-ratio: 1;
+            display: grid;
+            -webkit-mask: conic-gradient(from 15deg, #0000, #000);
+            animation: l26 1s infinite steps(12);
+        }
+
+        .vp-loader,
+        .vp-loader:before,
+        .vp-loader:after {
+            background:
+                radial-gradient(closest-side at 50% 12.5%, #008fd4 96%, #0000) 50% 0/20% 80% repeat-y,
+                radial-gradient(closest-side at 12.5% 50%, #008fd4 96%, #0000) 0 50%/80% 20% repeat-x;
+        }
+
+        .vp-loader:before,
+        .vp-loader:after {
+            content: "";
+            grid-area: 1/1;
+            transform: rotate(30deg);
+        }
+
+        .vp-loader:after {
+            transform: rotate(60deg);
+        }
+
+        @keyframes l26 {
+            100% {
+                transform: rotate(1turn);
             }
         }
     </style>`;
 
-const LOADING_WINDOW_BODY = '<div class="spinner"></div><p>Loading...</p>';
+const LOADING_WINDOW_BODY = '<div class="vp-loader-container"><div class="vp-loader"></div><p>Loading Data...</p></div>';
 
 @Injectable({
     providedIn: 'root'
@@ -81,19 +115,6 @@ export class DownloadService {
         }, 5000);
     }
 
-    public downloadFileFromBase64(base64: string, contentType: string, fileName?: string): void {
-        const binary = atob(base64);
-        const bytes = new Uint8Array(binary.length);
-
-        for (let index = 0; index < binary.length; index++) {
-            bytes[index] = binary.charCodeAt(index);
-        }
-
-        const blob = new Blob([bytes], { type: contentType });
-
-        this.downloadFileFromBlob(blob, fileName);
-    }
-
     public async openBlobInNewWindow(loadBlob: () => Promise<Blob>): Promise<void> {
         const newWindow = window.open('', '_blank');
 
@@ -118,6 +139,32 @@ export class DownloadService {
             window.setTimeout(function () {
                 URL.revokeObjectURL(objectUrl);
             }, 5000);
+        } finally {
+            if (!isOpened) {
+                newWindow.close();
+            }
+        }
+    }
+
+    public async openUrlInNewWindow(loadUrl: () => Promise<string>): Promise<void> {
+        const newWindow = window.open('', '_blank');
+
+        if (!newWindow) {
+            this.downloadFileFromUrl(await loadUrl());
+            return;
+        }
+
+        newWindow.document.title = LOADING_WINDOW_TITLE;
+        newWindow.document.head.innerHTML = LOADING_WINDOW_STYLES;
+        newWindow.document.body.innerHTML = LOADING_WINDOW_BODY;
+
+        let isOpened = false;
+
+        try {
+            const url = await loadUrl();
+
+            newWindow.location.href = url;
+            isOpened = true;
         } finally {
             if (!isOpened) {
                 newWindow.close();

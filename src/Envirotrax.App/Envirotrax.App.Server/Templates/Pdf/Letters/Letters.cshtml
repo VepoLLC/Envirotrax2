@@ -221,7 +221,7 @@
         {
             var optInUrl = $"{ViewBag.BaseUrl}/renewal-opt-in/{letter.SiteId}";
 
-            <div class="letter-page">
+            <div class="letter-page" data-site-id="@letter.SiteId">
                 <div class="letter-title" style="@titleStyle">@content.Title</div>
 
                 <div class="letter-return-address">

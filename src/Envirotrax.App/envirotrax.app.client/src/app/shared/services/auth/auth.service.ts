@@ -188,7 +188,7 @@ export class AuthService {
         }
     }
 
-    private createUserManager(waterSupplierId?: number, professionalId?: number): UserManager {
+    private createUserManager(waterSupplierId?: number, professionalId?: number, impersonatedUserId?: number): UserManager {
         let acrValues = '';
 
         if (waterSupplierId) {
@@ -197,6 +197,10 @@ export class AuthService {
 
         if (professionalId) {
             acrValues += `professionalId:${professionalId} `;
+        }
+
+        if (impersonatedUserId) {
+            acrValues += `impersonatedUserId:${impersonatedUserId} `;
         }
 
         return new UserManager({
@@ -214,13 +218,24 @@ export class AuthService {
     }
 
     public async signOut(): Promise<void> {
+        const impersonatedUserName = await this.getImpersonatedUserName();
+
         await this._userManager.removeUser();
+
+        if (impersonatedUserName) {
+            this.setLoggedIn(false);
+
+            window.close();
+            window.location.replace('/auth/sign-out');
+
+            return;
+        }
 
         this._userManager.signoutRedirect();
         this.setLoggedIn(false);
     }
 
-    public async signIn(waterSupplierId?: number, professionalId?: number, returnUrl?: string, isolateTab: boolean = false): Promise<void> {
+    public async signIn(waterSupplierId?: number, professionalId?: number, returnUrl?: string, isolateTab: boolean = false, impersonatedUserId?: number): Promise<void> {
         if (isolateTab) {
             sessionStorage.setItem(TAB_ISOLATED_KEY, '1');
         }
@@ -234,7 +249,7 @@ export class AuthService {
         }
 
         if (waterSupplierId || professionalId) {
-            this.attachUserManager(this.createUserManager(waterSupplierId, professionalId));
+            this.attachUserManager(this.createUserManager(waterSupplierId, professionalId, impersonatedUserId));
         }
 
         return this._userManager.signinRedirect({
@@ -288,6 +303,10 @@ export class AuthService {
 
     public getProfessionalId(): Promise<number | undefined> {
         return this.getProfileInteger("prfId");
+    }
+
+    public getImpersonatedUserName(): Promise<string | undefined> {
+        return this.getProfileField("impUsrName");
     }
 
     public async isAuthenticated(checkTenantOrProfessional: boolean): Promise<boolean> {

@@ -15,7 +15,7 @@ var newV2DatabaseConnection = @"Server=(localdb)\mssqllocaldb;Database=Envirotra
 // The storage account is REAL and SHARED - there is no local stand-in for it - and DefaultAzureCredential
 // signs in as you, so your Azure login needs write access to it. See the README before running.
 var legacyFileServerAddress = "https://iofiles.envirotrax.com";
-var legacyLettersFolder = @"C:\Users\User\Documents\Envirotrax2\Vepo-Letter-Generator\bin\PDF Files";
+var legacyLettersFolder = "";
 var azureStorageAccountName = "envirotrax2dev";
 var azureStorageContainerName = "default";
 

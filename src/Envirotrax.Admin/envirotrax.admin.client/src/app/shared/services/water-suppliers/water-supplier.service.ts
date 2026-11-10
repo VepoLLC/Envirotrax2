@@ -44,10 +44,10 @@ export class WaterSupplierService {
         return await lastValueFrom(this._http.get<WaterSupplierLetterSettings[]>(url));
     }
 
-    public async generateLetters(id: number): Promise<GeneratedLetters> {
+    public async generateLetters(id: number, processDate?: string): Promise<GeneratedLetters> {
         const url = this._urlResolver.resolveUrl(`/api/water-suppliers/${id}/letters`);
 
-        return await lastValueFrom(this._http.post<GeneratedLetters>(url, null));
+        return await lastValueFrom(this._http.post<GeneratedLetters>(url, { processDate }));
     }
 
     public async getDetails(id: number): Promise<WaterSupplierDetails> {

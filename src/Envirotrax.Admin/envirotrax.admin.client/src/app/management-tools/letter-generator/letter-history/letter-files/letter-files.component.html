@@ -1,0 +1,29 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered table-hover align-middle text-nowrap mb-0">
+            <thead>
+                <tr class="vp-table-header">
+                    <th class="w-100">File Name</th>
+                    <th>Letters</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let file of files">
+                    <td>
+                        <button type="button" class="btn btn-link p-0" (click)="viewFile(file)">
+                            <i class="fa-solid fa-file-pdf me-1"></i>
+                            {{ file.fileName }}
+                        </button>
+                    </td>
+                    <td>{{ file.letterCount }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-end mt-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="close()">Close</button>
+    </div>
+</div>

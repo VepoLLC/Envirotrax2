@@ -1,0 +1,69 @@
+using Envirotrax.App.Server.Data.Models.Sites;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
+using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Letters;
+using Microsoft.EntityFrameworkCore;
+
+namespace Envirotrax.App.Server.Data.Repositories.Implementations.Sites;
+
+public class SiteLetterLogRepository : Repository<SiteLetterLog>, ISiteLetterLogRepository
+{
+    public SiteLetterLogRepository(IDbContextSelector dbContextSelector)
+        : base(dbContextSelector)
+    {
+    }
+
+    public async Task AddRangeAsync(List<SiteLetterLog> letterLogs)
+    {
+        Entity.AddRange(letterLogs);
+
+        await DbContext.SaveChangesAsync();
+    }
+
+    public async Task<List<DateTime>> GetProcessDatesAsync(CancellationToken cancellationToken)
+    {
+        return await Entity
+            .Select(letterLog => letterLog.ProcessDate)
+            .Distinct()
+            .OrderByDescending(processDate => processDate)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<LetterFileDto>> GetFilesAsync(DateTime processDate, CancellationToken cancellationToken)
+    {
+        return await Entity
+            .Where(letterLog => letterLog.ProcessDate == processDate)
+            .GroupBy(letterLog => letterLog.FileName)
+            .OrderBy(group => group.Key)
+            .Select(group => new LetterFileDto
+            {
+                FileName = group.Key,
+                LetterCount = group.Count()
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<string?> GetFilePathAsync(DateTime processDate, string fileName, CancellationToken cancellationToken)
+    {
+        return await Entity
+            .Where(letterLog => letterLog.ProcessDate == processDate && letterLog.FileName == fileName)
+            .Select(letterLog => letterLog.FilePath)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<List<string>> GetFilePathsAsync(DateTime processDate, CancellationToken cancellationToken)
+    {
+        return await Entity
+            .Where(letterLog => letterLog.ProcessDate == processDate)
+            .Select(letterLog => letterLog.FilePath)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> DeleteByProcessDateAsync(DateTime processDate)
+    {
+        return await Entity
+            .Where(letterLog => letterLog.ProcessDate == processDate)
+            .ExecuteDeleteAsync();
+    }
+}

@@ -141,6 +141,7 @@ public class LetterRepository : ILetterRepository
         return query.Select(site => new LetterSiteDto
         {
             Id = site.Id,
+            WaterSupplierId = site.WaterSupplierId,
             AccountNumber = site.AccountNumber,
             WaterSupplierAccountNumber = site.WaterSupplierAccountNumber,
             PropertyType = site.PropertyType,

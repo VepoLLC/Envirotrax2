@@ -16,8 +16,7 @@ export class LetterCounts {
 }
 
 export class GeneratedLetters {
+    processDate: string = '';
     counts: LetterCounts = new LetterCounts();
     emailCount: number = 0;
-    fileName?: string | null;
-    fileContent?: string | null;
 }

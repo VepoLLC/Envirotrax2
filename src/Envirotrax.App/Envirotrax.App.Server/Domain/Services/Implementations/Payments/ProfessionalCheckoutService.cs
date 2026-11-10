@@ -178,7 +178,7 @@ public abstract class ProfessionalCheckoutService<TItem, TItemDto> : IProfession
         {
             TransactionDate = DateTime.UtcNow,
             ProfessionalId = AuthService.ProfessionalId,
-            UserId = AuthService.UserId,
+            UserId = AuthService.ActingAsUserId,
             TransactionId = request.TransactionId,
             TransactionType = TransactionType,
             BalanceAdjustment = -amounts.FromBalance,

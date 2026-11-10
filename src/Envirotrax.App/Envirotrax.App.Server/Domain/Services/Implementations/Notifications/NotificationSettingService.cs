@@ -70,6 +70,6 @@ public class NotificationSettingService : Service<NotificationSetting, Notificat
 
     private void SetLoggedInUserWhenNotSpecified(NotificationSettingDto dto)
     {
-        dto.UserId ??= _tenantProvider.UserId;
+        dto.UserId ??= _tenantProvider.ActingAsUserId;
     }
 }

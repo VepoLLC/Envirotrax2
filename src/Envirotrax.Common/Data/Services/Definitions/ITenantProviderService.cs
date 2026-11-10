@@ -13,6 +13,10 @@ namespace Envirotrax.Common.Data.Services.Definitions
 
         int UserId { get; }
 
+        int ImpersonatedUserId { get; }
+
+        int ActingAsUserId { get; }
+
         int ProfessionalId { get; }
 
         int ParentProfessionalId { get; }
@@ -28,6 +32,8 @@ namespace Envirotrax.Common.Data.Services.Definitions
         void SetParentWaterSupplier(ClaimsPrincipal principal, int supplierId);
 
         void SetProfessional(ClaimsPrincipal principal, int professionalId);
+
+        void SetImpersonatedUser(ClaimsPrincipal principal, int userId, string userName);
 
         void SetDomain(ClaimsPrincipal principal, string domain);
 

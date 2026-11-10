@@ -50,6 +50,14 @@ export class LoginRedirectComponent {
             return;
         }
 
+        const professionalIdParam = params.get('professionalId');
+        const impersonatedUserIdParam = params.get('impersonatedUserId');
+
+        if (professionalIdParam && impersonatedUserIdParam && !isOidcCallback) {
+            await this.initiateImpersonation(Number(professionalIdParam), Number(impersonatedUserIdParam));
+            return;
+        }
+
         try {
             this.isLoading = true;
 
@@ -82,6 +90,15 @@ export class LoginRedirectComponent {
         try {
             this.isLoading = true;
             await this._authService.signIn(targetWaterSupplierId, undefined, returnUrl, true);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    private async initiateImpersonation(professionalId: number, impersonatedUserId: number): Promise<void> {
+        try {
+            this.isLoading = true;
+            await this._authService.signIn(undefined, professionalId, '/', true, impersonatedUserId);
         } finally {
             this.isLoading = false;
         }

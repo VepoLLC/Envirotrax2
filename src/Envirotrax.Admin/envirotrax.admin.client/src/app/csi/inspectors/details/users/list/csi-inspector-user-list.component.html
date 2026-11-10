@@ -12,6 +12,7 @@
                   (edit)="editUser($event)"
                   [canDelete]="true"
                   (delete)="deleteUser($event)"
+                  [customActions]="customActions"
                   [(pageInfo)]="table.items.pageInfo"
                   (pageInfoChange)="getUsers()"
                   [(query)]="table.query"

@@ -69,6 +69,21 @@
     </nav>
 </header>
 
+<div *ngIf="isAuthenticated" class="container-fluid">
+    <div class="d-flex justify-content-end">
+        <div class="col-auto text-nowrap mt-1">
+            <button *ngIf="userEmail" type="button"
+                    class="login-box left border shadow bg-white text-body px-2 ms-1">
+                <i class="text-primary fa-solid fa-user me-1"></i>{{userEmail}}
+            </button>
+            <button type="button" class="login-box right border shadow bg-white text-body px-2 ms-1"
+                    (click)="signOut()">
+                <i class="text-primary fa-solid fa-right-from-bracket me-1"></i>Logout
+            </button>
+        </div>
+    </div>
+</div>
+
 <vp-toast-container />
 
 <div id="main-content" class="container-fluid d-flex flex-fill py-2 min-h-0 flex-column">

@@ -28,7 +28,7 @@ public class SiteScheduleService : Service<SiteSchedule, SiteScheduleDto>, ISite
 
     public async Task<IEnumerable<SiteScheduleDto>> GetMyBySiteIdsAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken)
     {
-        var schedules = await _scheduleRepository.GetMyBySiteIdsAsync(siteIds, _authService.UserId, cancellationToken);
+        var schedules = await _scheduleRepository.GetMyBySiteIdsAsync(siteIds, _authService.ActingAsUserId, cancellationToken);
 
         return schedules.Select(s => MapToDto(s)!);
     }
@@ -44,7 +44,7 @@ public class SiteScheduleService : Service<SiteSchedule, SiteScheduleDto>, ISite
 
         schedule.Id = 0;
         schedule.SiteId = siteId;
-        schedule.UserId = _authService.UserId;
+        schedule.UserId = _authService.ActingAsUserId;
 
         var saved = await _scheduleRepository.SetAsync(schedule);
 
@@ -53,6 +53,6 @@ public class SiteScheduleService : Service<SiteSchedule, SiteScheduleDto>, ISite
 
     public Task<bool> ClearMyAsync(int siteId, ProfessionalType professionalType)
     {
-        return _scheduleRepository.ClearAsync(siteId, _authService.UserId, professionalType);
+        return _scheduleRepository.ClearAsync(siteId, _authService.ActingAsUserId, professionalType);
     }
 }

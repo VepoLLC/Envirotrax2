@@ -71,10 +71,10 @@ public static class ServiceRegistration
                 services.AddTransient<IFogTripTicketService, FogTripTicketService>();
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
                 services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
-                services.AddTransient<ILetterProcessService, LetterProcessService>();
                 services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();
                 services.AddTransient<ILicenseService, LicenseService>();
                 services.AddTransient<IInsuranceService, InsuranceService>();
+                services.AddTransient<ILetterProcessService, LetterProcessService>();
 
                 return services;
         }

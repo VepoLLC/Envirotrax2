@@ -8,6 +8,7 @@ using Envirotrax.Auth.Domain.DataTransferObjects;
 using Envirotrax.Auth.Domain.Services.Definitions;
 using Envirotrax.Common;
 using Envirotrax.Common.Data.Services.Implementations;
+using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 
 namespace Envirotrax.Auth.Domain.Services.Implementations;
@@ -17,22 +18,25 @@ public class AuthService : TenantProviderService, IAuthService
     private readonly IWaterSupplierUserRepository _supplierUserRepository;
     private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IFeatureRepository _featureRepository;
+    private readonly UserManager<AppUser> _userManager;
 
     public AuthService(
         IHttpContextAccessor contextAccessor,
         IWaterSupplierUserRepository supplierUserRepository,
         IProfessionalUserRepository professionalUserRepository,
-        IFeatureRepository featureRepository)
+        IFeatureRepository featureRepository,
+        UserManager<AppUser> userManager)
         : base(contextAccessor)
     {
         _supplierUserRepository = supplierUserRepository;
         _professionalUserRepository = professionalUserRepository;
         _featureRepository = featureRepository;
+        _userManager = userManager;
     }
 
-    public async Task SetSecurityPropertiesAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? professionalId)
+    public async Task SetSecurityPropertiesAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? professionalId, int? impersonatedUserId)
     {
-        var userAccess = await GetAccessSettingsAsync(userId, waterSupplierId, professionalId);
+        var userAccess = await GetAccessSettingsAsync(userId, waterSupplierId, professionalId, impersonatedUserId);
 
         if (userAccess.WaterSupplierId.HasValue && userAccess.WaterSupplierIdRequested.HasValue)
         {
@@ -44,9 +48,53 @@ public class AuthService : TenantProviderService, IAuthService
             SetProfessionalClaims(principal, userAccess);
         }
 
+        if (userAccess.ImpersonatedUserId.HasValue)
+        {
+            SetImpersonatedUser(principal, userAccess.ImpersonatedUserId.Value, userAccess.ImpersonatedUserName!);
+        }
+
         var features = await _featureRepository.GetAllAsync(userAccess.WaterSupplierId, userAccess.WaterSupplierIdRequested, userAccess.ProfessionalIdRequested);
 
         AddClaim(principal, "fts", string.Join(',', features.Select(f => (int)f)));
+    }
+
+    public async Task ValidateImpersonationAsync(ClaimsPrincipal principal, int userId)
+    {
+        var impersonatedUserIdClaim = principal.FindFirstValue(ImpersonatedUserIdClaim);
+
+        if (string.IsNullOrWhiteSpace(impersonatedUserIdClaim))
+        {
+            return;
+        }
+
+        var impersonatedUserId = int.Parse(impersonatedUserIdClaim);
+        var professionalId = int.Parse(principal.FindFirstValue("prfId")!);
+
+        await GetAccessSettingsAsync(userId, null, professionalId, impersonatedUserId);
+    }
+
+    private async Task<AppUser> GetImpersonatedUserAsync(int userId, int impersonatedUserId, int? waterSupplierId, int? professionalId)
+    {
+        if (waterSupplierId.HasValue || !professionalId.HasValue)
+        {
+            throw new ValidationException("Users can be impersonated only within a registered professional.");
+        }
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null || !user.IsSuperUser)
+        {
+            throw new ValidationException("User doesn't have access to impersonate other users.");
+        }
+
+        var impersonatedUser = await _userManager.FindByIdAsync(impersonatedUserId.ToString()) ?? throw new ValidationException("The user to impersonate doesn't exist.");
+
+        if (impersonatedUser.IsSuperUser)
+        {
+            throw new ValidationException("Super users can't be impersonated.");
+        }
+
+        return impersonatedUser;
     }
 
     private async Task SetWaterSupplierClaimsAsync(ClaimsPrincipal principal, int userId, UserAccessDto userAccess)
@@ -78,9 +126,20 @@ public class AuthService : TenantProviderService, IAuthService
         }
     }
 
-    private async Task<UserAccessDto> GetAccessSettingsAsync(int userId, int? waterSupplierId, int? professionalid)
+    private async Task<UserAccessDto> GetAccessSettingsAsync(int userId, int? waterSupplierId, int? professionalid, int? impersonatedUserId)
     {
         var accessDto = new UserAccessDto();
+        var professionalUserId = userId;
+
+        if (impersonatedUserId.HasValue)
+        {
+            var impersonatedUser = await GetImpersonatedUserAsync(userId, impersonatedUserId.Value, waterSupplierId, professionalid);
+
+            accessDto.ImpersonatedUserId = impersonatedUser.Id;
+            accessDto.ImpersonatedUserName = impersonatedUser.UserName;
+
+            professionalUserId = impersonatedUser.Id;
+        }
 
         if (waterSupplierId.HasValue)
         {
@@ -92,7 +151,7 @@ public class AuthService : TenantProviderService, IAuthService
 
         if (professionalid.HasValue)
         {
-            var professionalUser = await _professionalUserRepository.GetAsync(professionalid.Value, userId) ?? throw new ValidationException("User doesn't have access to this registered professional.");
+            var professionalUser = await _professionalUserRepository.GetAsync(professionalid.Value, professionalUserId) ?? throw new ValidationException("User doesn't have access to this registered professional.");
 
             accessDto.ProfessionalId = professionalUser.ProfessionalId;
             accessDto.ProfessionalIdRequested = professionalid;

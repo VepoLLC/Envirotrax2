@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { ColumnType, ModalHelperService, TableColumn, TableViewModel, ToastService, ToastType } from '@envirotrax/common-ui';
+import { ColumnType, ModalHelperService, TableColumn, TableCustomAction, TableViewModel, ToastService, ToastType } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../../../shared/components/shared.components.module';
 import { ProfessionalUser } from '../../../../../shared/models/professionals/professional';
+import { AuthService } from '../../../../../shared/services/auth/auth.service';
 import { CsiInspectorUserService } from '../../../../../shared/services/csi/csi-inspector-user.service';
 import { AddEditCsiInspectorUserComponent, CsiInspectorUserModalData } from '../edit/add-edit-csi-inspector-user.component';
 
@@ -26,10 +27,19 @@ export class CsiInspectorUserListComponent implements OnInit {
         }
     };
 
+    public readonly customActions: TableCustomAction<ProfessionalUser>[] = [
+        {
+            text: 'Login',
+            iconClass: 'fa-solid fa-right-to-bracket',
+            action: user => this.loginAsUser(user)
+        }
+    ];
+
     constructor(
         private readonly _userService: CsiInspectorUserService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _authService: AuthService
     ) {
 
     }
@@ -59,6 +69,10 @@ export class CsiInspectorUserListComponent implements OnInit {
 
     public editUser(user: ProfessionalUser): void {
         this.showEditor('Edit User Account', user);
+    }
+
+    public loginAsUser(user: ProfessionalUser): void {
+        this._authService.loginAsProfessionalUser(this.professionalId, user.id!);
     }
 
     public deleteUser(user: ProfessionalUser): void {

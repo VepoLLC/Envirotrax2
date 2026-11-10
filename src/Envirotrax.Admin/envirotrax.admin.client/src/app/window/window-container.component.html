@@ -1,10 +1,14 @@
-<div class="d-flex gap-1">
+<div class="clearfix">
+    <div class="vp-window-bar-end ms-2 mb-2">
+        <ng-content />
+    </div>
+
     <ng-container *ngFor="let window of windows">
-        <div *ngIf="window.isMinimized" class="mb-2">
+        <div *ngIf="window.isMinimized" class="d-inline-block align-top mw-100 me-1 mb-2">
             <div class="align-items-center d-flex gap-3 justify-content-between py-1 px-2 rounded text-nowrap"
                  [class]="window.colors.contrast.text"
                  [style.background-color]="window.colors.background">
-                <div>
+                <div class="text-truncate">
                     {{window.config.title}}
                 </div>
 

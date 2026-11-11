@@ -11,6 +11,8 @@ public interface ISiteLetterLogRepository : IRepository<SiteLetterLog>
 
     Task<List<LetterFileDto>> GetFilesAsync(DateTime processDate, CancellationToken cancellationToken);
 
+    Task<List<LetterEmailDto>> GetEmailsAsync(DateTime processDate, CancellationToken cancellationToken);
+
     Task<string?> GetFilePathAsync(DateTime processDate, string fileName, CancellationToken cancellationToken);
 
     Task<List<string>> GetFilePathsAsync(DateTime processDate, CancellationToken cancellationToken);

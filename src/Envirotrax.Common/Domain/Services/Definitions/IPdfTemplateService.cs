@@ -6,5 +6,5 @@ public interface IPdfTemplateService
 {
     Task<byte[]> GenerateAsync<T>(string pageName, T model);
 
-    Task<List<GeneratedPdfDto<TScriptResult>>> GenerateManyAsync<T, TScriptResult>(string pageName, List<T> models, string resultScript);
+    IAsyncEnumerable<GeneratedPdfDto<TScriptResult>> GenerateManyAsync<T, TScriptResult>(string pageName, List<List<T>> documents, string resultScript);
 }

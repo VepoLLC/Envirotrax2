@@ -20,6 +20,8 @@ public class AppDbContext : TenantDbContextBase<WaterSupplier>
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<WaterSupplierUser> WaterSupplierUsers { get; set; }
     public DbSet<SiteLog> SiteLogs { get; set; }
+    public DbSet<SiteLetterLog> SiteLetterLogs { get; set; }
+    public DbSet<PendingSiteLetterLog> MigrationPendingSiteLetterLogs { get; set; }
     public DbSet<ProfessionalInsurance> ProfessionalInsurances { get; set; }
     public DbSet<BackflowGauge> BackflowGauges { get; set; }
     public DbSet<BackflowTest> BackflowTests { get; set; }

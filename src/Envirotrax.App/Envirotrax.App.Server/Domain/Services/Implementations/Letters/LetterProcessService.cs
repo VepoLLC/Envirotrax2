@@ -43,6 +43,16 @@ public class LetterProcessService : ILetterProcessService
         return await _siteLetterLogRepository.GetFilesAsync(processDate, cancellationToken);
     }
 
+    public async Task<List<LetterEmailDto>?> GetEmailsAsync(string processId, CancellationToken cancellationToken)
+    {
+        if (!LetterProcessId.TryGetProcessDate(processId, out var processDate))
+        {
+            return null;
+        }
+
+        return await _siteLetterLogRepository.GetEmailsAsync(processDate, cancellationToken);
+    }
+
     public async Task<Uri?> GenerateFileUrlAsync(string processId, string fileName, CancellationToken cancellationToken)
     {
         if (!LetterProcessId.TryGetProcessDate(processId, out var processDate))

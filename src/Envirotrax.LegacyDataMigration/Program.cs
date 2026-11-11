@@ -15,6 +15,7 @@ var newV2DatabaseConnection = @"Server=(localdb)\mssqllocaldb;Database=Envirotra
 // The storage account is REAL and SHARED - there is no local stand-in for it - and DefaultAzureCredential
 // signs in as you, so your Azure login needs write access to it. See the README before running.
 var legacyFileServerAddress = "https://iofiles.envirotrax.com";
+var legacyLettersFolder = "";
 var azureStorageAccountName = "envirotrax2dev";
 var azureStorageContainerName = "default";
 
@@ -52,6 +53,7 @@ Log.Logger = new LoggerConfiguration()
 services.AddLogging(builder => builder.AddSerilog(Log.Logger, dispose: true));
 
 services.AddSingleton(new LegacyFileServerService(legacyFileServerAddress));
+services.AddSingleton(new LegacyLetterFolderService(legacyLettersFolder));
 services.AddSingleton(new BlobStorageService(azureStorageAccountName, azureStorageContainerName));
 
 services.AddTransient<UserService>();
@@ -65,6 +67,7 @@ services.AddTransient<ProfessionalNoteService>();
 services.AddTransient<GisAreaService>();
 services.AddTransient<SiteService>();
 services.AddTransient<SiteLogService>();
+services.AddTransient<SiteLetterLogService>();
 services.AddTransient<RenewalEmailVerificationService>();
 services.AddTransient<BackflowGaugeService>();
 services.AddTransient<BackflowTestService>();
@@ -123,6 +126,9 @@ await renewalEmailVerificationService.MigrateAsync();
 
 var siteLogService = provider.GetRequiredService<SiteLogService>();
 await siteLogService.MigrateAsync();
+
+var siteLetterLogService = provider.GetRequiredService<SiteLetterLogService>();
+await siteLetterLogService.MigrateAsync();
 
 // After the professionals: a gauge hangs off the company, and it is resolved through the staging table
 // that the professional migration builds.

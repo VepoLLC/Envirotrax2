@@ -25,6 +25,11 @@ public class LetterProcessService : ILetterProcessService
         return _apiClient.GetAsync<List<LetterFileDto>>($"{BaseUrl}/{Uri.EscapeDataString(processId)}/files", cancellationToken);
     }
 
+    public Task<List<LetterEmailDto>?> GetEmailsAsync(string processId, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<List<LetterEmailDto>>($"{BaseUrl}/{Uri.EscapeDataString(processId)}/emails", cancellationToken);
+    }
+
     public Task<string?> GetFileUrlAsync(string processId, string fileName, CancellationToken cancellationToken)
     {
         return _apiClient.GetAsync<string>($"{BaseUrl}/{Uri.EscapeDataString(processId)}/file-url?fileName={Uri.EscapeDataString(fileName)}", cancellationToken);

@@ -188,6 +188,11 @@ main {
     #header .navbar-nav .dropdown:hover>.dropdown-menu {
         display: block;
     }
+
+    #header .navbar-nav .nav-link-login+.dropdown-menu {
+        right: 0;
+        left: auto;
+    }
 }
 
 @media (max-width: 991.98px) {

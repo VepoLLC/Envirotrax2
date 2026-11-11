@@ -32,13 +32,28 @@ public class SiteLetterLogRepository : Repository<SiteLetterLog>, ISiteLetterLog
     public async Task<List<LetterFileDto>> GetFilesAsync(DateTime processDate, CancellationToken cancellationToken)
     {
         return await Entity
-            .Where(letterLog => letterLog.ProcessDate == processDate)
+            .Where(letterLog => letterLog.ProcessDate == processDate && letterLog.Page != SiteLetterLog.EmailPage)
             .GroupBy(letterLog => letterLog.FileName)
             .OrderBy(group => group.Key)
             .Select(group => new LetterFileDto
             {
                 FileName = group.Key,
                 LetterCount = group.Count()
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<LetterEmailDto>> GetEmailsAsync(DateTime processDate, CancellationToken cancellationToken)
+    {
+        return await Entity
+            .Where(letterLog => letterLog.ProcessDate == processDate && letterLog.Page == SiteLetterLog.EmailPage)
+            .OrderBy(letterLog => letterLog.FileName)
+            .Select(letterLog => new LetterEmailDto
+            {
+                FileName = letterLog.FileName,
+                AccountNumber = letterLog.Site!.AccountNumber,
+                StreetNumber = letterLog.Site.StreetNumber,
+                StreetName = letterLog.Site.StreetName
             })
             .ToListAsync(cancellationToken);
     }

@@ -35,6 +35,19 @@ public class LetterProcessController : AdminBaseController
         return Ok(files);
     }
 
+    [HttpGet("{processId}/emails")]
+    public async Task<IActionResult> GetEmailsAsync(string processId, CancellationToken cancellationToken)
+    {
+        var emails = await _letterProcessService.GetEmailsAsync(processId, cancellationToken);
+
+        if (emails == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(emails);
+    }
+
     [HttpGet("{processId}/file-url")]
     public async Task<IActionResult> GetFileUrlAsync(string processId, [FromQuery, Required] string fileName, CancellationToken cancellationToken)
     {

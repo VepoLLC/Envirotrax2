@@ -13,19 +13,24 @@ import {
 } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { BackflowGauge } from '../../../shared/models/backflow/backflow-gauge';
+import { WaterSupplierGauge } from '../../../shared/models/backflow/water-supplier-gauge';
 import {
     ExpirationType,
     expirationTypeCssClasses,
+    ProfessionalType,
     unvalidatedExpirationCssClass
 } from '../../../shared/models/professionals/licenses/professional-user-license';
 import { BackflowGaugeService } from '../../../shared/services/backflow/backflow-gauge.service';
+import { ProfessionalAccountWindowService } from '../../professional-account-window.service';
 
 const POTABLE = 'potable';
 const NON_POTABLE = 'nonPotable';
 
-interface GaugeVm extends BackflowGauge {
+interface GaugeVm extends WaterSupplierGauge {
+    professionalType: ProfessionalType;
     waterSystemType: string;
     expirationCssClass: string;
+    canViewAccount: boolean;
     isSelected: boolean;
     isSaved: boolean;
 }
@@ -40,6 +45,9 @@ interface GaugeVm extends BackflowGauge {
     ],
 })
 export class GaugeListComponent implements OnInit {
+    @ViewChild('accountCell', { static: true })
+    public accountCell?: TemplateRef<CellTemplateData<GaugeVm>>;
+
     @ViewChild('manufacturerCell', { static: true })
     public manufacturerCell?: TemplateRef<CellTemplateData<GaugeVm>>;
 
@@ -72,6 +80,7 @@ export class GaugeListComponent implements OnInit {
 
     constructor(
         private readonly _gaugeService: BackflowGaugeService,
+        private readonly _accountWindowService: ProfessionalAccountWindowService,
         private readonly _downloadService: DownloadService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
@@ -129,6 +138,10 @@ export class GaugeListComponent implements OnInit {
         }
     }
 
+    public viewAccount(gauge: GaugeVm): void {
+        this._accountWindowService.open(gauge);
+    }
+
     public async viewCertificate(gauge: GaugeVm): Promise<void> {
         try {
             this.table.isLoading = true;
@@ -152,7 +165,7 @@ export class GaugeListComponent implements OnInit {
         };
     }
 
-    private toViewModel(gauge: BackflowGauge): GaugeVm {
+    private toViewModel(gauge: WaterSupplierGauge): GaugeVm {
         let waterSystemType = NON_POTABLE;
 
         if (gauge.isPortable) {
@@ -161,8 +174,10 @@ export class GaugeListComponent implements OnInit {
 
         return {
             ...gauge,
+            professionalType: ProfessionalType.Bpat,
             waterSystemType,
-            expirationCssClass: this.getExpirationCssClass(gauge.lastCalibrationDate, gauge.expirationType),
+            expirationCssClass: unvalidatedExpirationCssClass,
+            canViewAccount: this._accountWindowService.canOpen(ProfessionalType.Bpat),
             isSelected: false,
             isSaved: false
         };
@@ -178,6 +193,8 @@ export class GaugeListComponent implements OnInit {
 
     private getColumns(): TableColumn<GaugeVm>[] {
         return [
+            { field: 'userEmail', caption: 'User ID', type: ColumnType.text },
+            { field: 'companyName', caption: 'Account', type: ColumnType.text, cellTemplate: this.accountCell },
             { field: 'manufacturer', caption: 'Manufacturer', type: ColumnType.text, cellTemplate: this.manufacturerCell },
             { field: 'model', caption: 'Model', type: ColumnType.text, cellTemplate: this.modelCell },
             { field: 'isPortable', caption: 'Type', type: ColumnType.other, cellTemplate: this.waterSystemCell },

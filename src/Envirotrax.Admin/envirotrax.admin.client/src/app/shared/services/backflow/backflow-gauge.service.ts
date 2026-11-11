@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
 import { BackflowGauge } from "../../models/backflow/backflow-gauge";
+import { WaterSupplierGauge } from "../../models/backflow/water-supplier-gauge";
 
 @Injectable({
     providedIn: 'root'
@@ -16,10 +17,10 @@ export class BackflowGaugeService {
 
     }
 
-    public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowGauge>> {
+    public getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<WaterSupplierGauge>> {
         const url = this._urlResolver.resolveUrl('/api/backflow/gauges');
 
-        return lastValueFrom(this._http.get<PagedData<BackflowGauge>>(url, {
+        return lastValueFrom(this._http.get<PagedData<WaterSupplierGauge>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }

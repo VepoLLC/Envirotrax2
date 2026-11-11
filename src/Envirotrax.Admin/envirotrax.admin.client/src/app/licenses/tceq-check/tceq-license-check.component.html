@@ -18,9 +18,10 @@
                     <label for="tceq-check-envirotrax-expiration" class="col-form-label">Expiration Date</label>
 
                     <div class="border border-3 border-white rounded">
-                        <vp-input [(ngModel)]="license.expirationDate"
+                        <vp-input [ngModel]="expirationDate"
                                   [id]="'tceq-check-envirotrax-expiration'"
-                                  type="date" />
+                                  type="date"
+                                  [readonly]="true" />
                     </div>
                 </div>
             </div>

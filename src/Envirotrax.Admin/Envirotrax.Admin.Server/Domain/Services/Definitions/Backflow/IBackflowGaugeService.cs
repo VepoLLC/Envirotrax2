@@ -5,7 +5,7 @@ namespace Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
 
 public interface IBackflowGaugeService
 {
-    Task<IPagedData<BackflowGaugeDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IPagedData<WaterSupplierGaugeDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
     Task<BackflowGaugeDto?> UpdateAsync(int id, BackflowGaugeDto gauge);
 

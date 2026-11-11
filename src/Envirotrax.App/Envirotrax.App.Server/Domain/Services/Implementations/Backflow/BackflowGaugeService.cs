@@ -125,13 +125,30 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return deleted;
     }
 
-    public async Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<BackflowGauge, WaterSupplierGaugeDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<BackflowGauge, WaterSupplierGaugeDto>(Mapper);
 
-        var items = (await _gaugeRepository.GetUnverifiedByWaterSupplierAsync(pageInfo, query, cancellationToken)).ToList();
-        var professionalIds = items.Select(g => g.ProfessionalId).Distinct().ToList();
+        var items = (await _gaugeRepository.GetUnverifiedAsync(pageInfo, query, cancellationToken)).ToList();
+        var dtos = await MapToWaterSupplierDtosAsync(items, cancellationToken);
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public Task<int> CountUnverifiedAsync(CancellationToken cancellationToken)
+    {
+        return _gaugeRepository.CountUnverifiedAsync(cancellationToken);
+    }
+
+    private async Task<IEnumerable<WaterSupplierGaugeDto>> MapToWaterSupplierDtosAsync(List<BackflowGauge> gauges, CancellationToken cancellationToken)
+    {
+        if (gauges.Count == 0)
+        {
+            return [];
+        }
+
+        var professionalIds = gauges.Select(g => g.ProfessionalId).Distinct().ToList();
 
         var professionalUsers = (await _gaugeRepository.GetProfessionalUsersAsync(professionalIds, cancellationToken)).ToList();
         var byAccount = professionalUsers.ToDictionary(pu => (pu.ProfessionalId, pu.UserId));
@@ -140,40 +157,16 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
             .GroupBy(pu => pu.ProfessionalId)
             .ToDictionary(group => group.Key, group => group.First());
 
-        var dtos = items.Select(g => new WaterSupplierGaugeDto
+        // The profile maps every column, so UserEmail is the CreatedBy email that sorting and filtering also use.
+        return gauges.Select(g =>
         {
-            Id = g.Id,
-            ProfessionalId = g.ProfessionalId,
-            SubmittedOn = g.CreatedTime,
-            UserEmail = g.CreatedBy?.Email ?? ResolveSubmitter(g, byAccount, admins)?.User?.Email,
-            CompanyName = g.Professional?.Name,
-            Manufacturer = g.Manufacturer,
-            Model = g.Model,
-            SerialNumber = g.SerialNumber,
-            IsPortable = g.IsPortable
-        });
+            var dto = Mapper.Map<WaterSupplierGaugeDto>(g);
 
-        return dtos.ToPagedData(pageInfo);
-    }
+            dto.ContactName = ResolveSubmitter(g, byAccount, admins)?.ContactName;
+            dto.HasFile = !string.IsNullOrWhiteSpace(g.FilePath);
 
-    public Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken)
-    {
-        return _gaugeRepository.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
-    }
-
-    public async Task<IPagedData<BackflowGaugeDto>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
-
-        var gauges = await _gaugeRepository.GetUnverifiedForAdminAsync(pageInfo, query, cancellationToken);
-
-        return gauges.Select(gauge => MapToDto(gauge)!).ToPagedData(pageInfo);
-    }
-
-    public Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken)
-    {
-        return _gaugeRepository.CountUnverifiedForAdminAsync(cancellationToken);
+            return dto;
+        }).ToList();
     }
 
     private static ProfessionalUser? ResolveSubmitter(

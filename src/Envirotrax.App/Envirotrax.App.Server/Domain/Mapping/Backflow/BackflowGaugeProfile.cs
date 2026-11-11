@@ -28,6 +28,8 @@ public class BackflowGaugeProfile : Profile
         CreateMap<BackflowGauge, WaterSupplierGaugeDto>()
             .ForMember(dto => dto.SubmittedOn, opt => opt.MapFrom(g => g.CreatedTime))
             .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(g => g.CreatedBy!.Email))
-            .ForMember(dto => dto.CompanyName, opt => opt.MapFrom(g => g.Professional!.Name));
+            .ForMember(dto => dto.CompanyName, opt => opt.MapFrom(g => g.Professional!.Name))
+            .ForMember(dto => dto.ContactName, opt => opt.Ignore())
+            .ForMember(dto => dto.HasFile, opt => opt.Ignore());
     }
 }

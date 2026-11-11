@@ -18,7 +18,7 @@ public class BackflowGaugeController : AdminBaseController
     [HttpGet]
     public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var gauges = await _gaugeService.GetUnverifiedForAdminAsync(pageInfo, query, cancellationToken);
+        var gauges = await _gaugeService.GetUnverifiedAsync(pageInfo, query, cancellationToken);
 
         return Ok(gauges);
     }

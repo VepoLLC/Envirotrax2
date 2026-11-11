@@ -5,15 +5,20 @@ using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 
 public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGaugeRepository
 {
-    public BackflowGaugeRepository(IDbContextSelector dbContextSelector)
+    private readonly ITenantProvidersService _tenantProvider;
+
+    public BackflowGaugeRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
         : base(dbContextSelector)
     {
+        _tenantProvider = tenantProvider;
     }
 
     public async Task<IEnumerable<BackflowGauge>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -49,18 +54,21 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
         return gauge;
     }
 
-    private IQueryable<BackflowGauge> ScopedToWaterSupplier()
+    // V1 rule: a gauge waits for verification until it gets a calibration date, unless V1's Manage button dismissed it.
+    // A water supplier sees the gauges of testers registered with it for backflow testing; an admin sees every gauge
+    // (AdminDbContext has no tenant filters, so the registration check would otherwise mean "with any supplier").
+    private IQueryable<BackflowGauge> GetUnverifiedQuery()
     {
         return DbContext.BackflowGauges
             .AsNoTracking()
-            .Where(g => DbContext.ProfessionalWaterSuppliers.Any(pws =>
+            .Where(g => g.LastCalibrationDate == null && !g.IsManaged)
+            .WhereIf(!_tenantProvider.HasScope(ScopeDefinitions.AdminInternal), g => DbContext.ProfessionalWaterSuppliers.Any(pws =>
                 pws.ProfessionalId == g.ProfessionalId && pws.HasBackflowTesting));
     }
 
-    public async Task<IEnumerable<BackflowGauge>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IEnumerable<BackflowGauge>> GetUnverifiedAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var baseQuery = ScopedToWaterSupplier()
-            .Where(g => g.LastCalibrationDate == null && !g.IsManaged)
+        var baseQuery = GetUnverifiedQuery()
             .Include(g => g.Professional)
             .Include(g => g.CreatedBy);
 
@@ -77,32 +85,9 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
         return await paginated.ToListAsync(cancellationToken);
     }
 
-    public async Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken)
+    public Task<int> CountUnverifiedAsync(CancellationToken cancellationToken)
     {
-        return await ScopedToWaterSupplier()
-            .CountAsync(g => g.LastCalibrationDate == null && !g.IsManaged, cancellationToken);
-    }
-
-    public async Task<IEnumerable<BackflowGauge>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        if (query.Sort.IsNullOrEmpty())
-        {
-            query.Sort[nameof(BackflowGauge.Id)] = SortOperator.Asc;
-        }
-
-        var paginated = await DbContext.BackflowGauges
-            .AsNoTracking()
-            .Where(gauge => gauge.LastCalibrationDate == null)
-            .Where(query.Filter)
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
-    }
-
-    public Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken)
-    {
-        return DbContext.BackflowGauges.CountAsync(gauge => gauge.LastCalibrationDate == null, cancellationToken);
+        return GetUnverifiedQuery().CountAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<ProfessionalUser>> GetProfessionalUsersAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken)

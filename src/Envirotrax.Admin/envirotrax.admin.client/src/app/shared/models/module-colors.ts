@@ -8,7 +8,7 @@ export const MODULE_COLORS = {
     LICENSES: '#9b369b'
 } as const;
 
-export const DEFAULT_WINDOW_COLOR = '#d3d3d3';
+export const DEFAULT_WINDOW_COLOR = '#f0f0f0';
 export const NAVBAR_COLOR = '#f0f0f0';
 
 export interface ContrastClasses {

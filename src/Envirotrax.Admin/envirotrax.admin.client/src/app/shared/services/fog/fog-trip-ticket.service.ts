@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
+import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
 import { FogTripTicket, FogTripTicketUpdateRequest } from "../../models/fog/fog-trip-ticket";
 
@@ -62,5 +62,11 @@ export class FogTripTicketService {
         const observable = this._http.put<FogTripTicket>(url, needsValidation);
 
         return await lastValueFrom(observable);
+    }
+
+    public async getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/trip-tickets/${id}/logs`);
+
+        return await lastValueFrom(this._http.get<RecordLog[]>(url));
     }
 }

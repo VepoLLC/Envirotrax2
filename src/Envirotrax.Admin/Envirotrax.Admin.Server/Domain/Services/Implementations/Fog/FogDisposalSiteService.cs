@@ -1,6 +1,7 @@
 
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Logs;
 using Envirotrax.Admin.Server.Domain.Services.Definitions;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Fog;
 
@@ -36,5 +37,10 @@ public class FogDisposalSiteService : IFogDisposalSiteService
     public Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
         return _apiClient.DeleteAsync<object>($"{BaseUrl}/{id}", cancellationToken);
+    }
+
+    public Task<List<RecordLogDto>?> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<List<RecordLogDto>>($"{BaseUrl}/{id}/logs", cancellationToken);
     }
 }

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
+import { HelperService, InputOption, RecordLog, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { FogTripTicket, FogTripTicketUpdateRequest } from '../../../shared/models/fog/fog-trip-ticket';
 import { State } from '../../../shared/models/lookup/state';
@@ -35,15 +35,18 @@ export class FogTripTicketDetailsComponent implements OnInit {
     public id: number = 0;
 
     public isLoading: boolean = false;
+    public isLoadingRecordLogs: boolean = false;
     public isSaving: boolean = false;
 
     public ticket: FogTripTicket = {};
+    public recordLogs: RecordLog[] = [];
     public stateOptions: InputOption<State>[] = [];
     public validationErrors: string[] = [];
 
     // Display values, computed once after load - never called from the template.
     public waterSupplierHeader: string = 'Water Supplier';
     public waterSupplierCityStateZip: string = '';
+    public recordLogTitle: string = 'Record Log';
 
     constructor(
         private readonly _windowReference: WindowReference<{ id?: number }>,
@@ -61,7 +64,8 @@ export class FogTripTicketDetailsComponent implements OnInit {
 
         await Promise.all([
             this.loadTicket(),
-            this.loadStates()
+            this.loadStates(),
+            this.loadRecordLogs()
         ]);
     }
 
@@ -84,6 +88,8 @@ export class FogTripTicketDetailsComponent implements OnInit {
             detailsForm.form.markAsPristine();
 
             this._toastService.successfullySaved('FOG Trip Ticket');
+
+            await this.loadRecordLogs();
         } catch (error) {
             if (!this._helper.parseValidationErrors(error, this.validationErrors)) {
                 throw error;
@@ -166,6 +172,20 @@ export class FogTripTicketDetailsComponent implements OnInit {
             this.setDisplayValues(this.ticket);
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    private async loadRecordLogs(): Promise<void> {
+        if (!this.id) {
+            return;
+        }
+
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._tripTicketService.getLogs(this.id);
+            this.recordLogTitle = `Record Log (${this.recordLogs.length})`;
+        } finally {
+            this.isLoadingRecordLogs = false;
         }
     }
 

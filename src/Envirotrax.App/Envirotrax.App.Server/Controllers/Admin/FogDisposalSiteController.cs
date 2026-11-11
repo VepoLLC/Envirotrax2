@@ -1,7 +1,9 @@
 
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Admin;
@@ -17,10 +19,12 @@ namespace Envirotrax.App.Server.Controllers.Admin;
 public class FogDisposalSiteController : AdminBaseController
 {
     private readonly IFogDisposalSiteService _disposalSiteService;
+    private readonly IRecordLogService _recordLogService;
 
-    public FogDisposalSiteController(IFogDisposalSiteService disposalSiteService)
+    public FogDisposalSiteController(IFogDisposalSiteService disposalSiteService, IRecordLogService recordLogService)
     {
         _disposalSiteService = disposalSiteService;
+        _recordLogService = recordLogService;
     }
 
     [HttpGet]
@@ -63,5 +67,13 @@ public class FogDisposalSiteController : AdminBaseController
         var deleted = await _disposalSiteService.DeleteAsync(id);
 
         return deleted == null ? NotFound() : Ok();
+    }
+
+    [HttpGet("{id}/logs")]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.FogDisposalSites, id, cancellationToken);
+
+        return Ok(logs);
     }
 }

@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Logs;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.Admin.Server.Domain.Services.Definitions;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Licenses;
@@ -29,5 +30,10 @@ public class InsuranceService : IInsuranceService
     public Task<string?> GetFileUrlAsync(int id, CancellationToken cancellationToken)
     {
         return _apiClient.GetAsync<string>($"{BaseUrl}/{id}/file-url", cancellationToken);
+    }
+
+    public Task<List<RecordLogDto>?> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<List<RecordLogDto>>($"{BaseUrl}/{id}/logs", cancellationToken);
     }
 }

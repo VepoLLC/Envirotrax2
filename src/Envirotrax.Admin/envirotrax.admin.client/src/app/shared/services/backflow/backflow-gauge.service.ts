@@ -33,6 +33,6 @@ export class BackflowGaugeService {
     public getFileUrl(id: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/gauges/${id}/file-url`);
 
-        return lastValueFrom(this._http.get<string>(url));
+        return lastValueFrom(this._http.get(url, { responseType: 'text' }));
     }
 }

@@ -1,3 +1,4 @@
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Letters;
 using Envirotrax.Admin.Server.Domain.Services.Definitions.Letters;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,9 +15,9 @@ public class WaterSupplierLetterController : AdminBaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> GenerateAsync(int waterSupplierId)
+    public async Task<IActionResult> GenerateAsync(int waterSupplierId, [FromBody] GenerateLettersDto generateLetters)
     {
-        var letters = await _letterGeneratorService.GenerateAsync(waterSupplierId);
+        var letters = await _letterGeneratorService.GenerateAsync(waterSupplierId, generateLetters);
 
         if (letters == null)
         {

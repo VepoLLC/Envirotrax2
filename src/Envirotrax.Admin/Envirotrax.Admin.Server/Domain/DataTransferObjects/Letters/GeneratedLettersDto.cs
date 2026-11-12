@@ -2,12 +2,11 @@ namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Letters;
 
 public class GeneratedLettersDto
 {
+    public DateTime ProcessDate { get; set; }
+
     public LetterCountsDto Counts { get; set; } = new();
 
     public int EmailCount { get; set; }
-
-    public string? FileName { get; set; }
-    public byte[]? FileContent { get; set; }
 }
 
 public class LetterCountsDto

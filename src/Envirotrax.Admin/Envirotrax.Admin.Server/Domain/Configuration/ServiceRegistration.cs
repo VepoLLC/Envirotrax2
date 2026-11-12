@@ -74,6 +74,7 @@ public static class ServiceRegistration
                 services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();
                 services.AddTransient<ILicenseService, LicenseService>();
                 services.AddTransient<IInsuranceService, InsuranceService>();
+                services.AddTransient<ILetterProcessService, LetterProcessService>();
 
                 return services;
         }

@@ -164,6 +164,6 @@ public class BackflowCheckoutService
 
     private int? GetBpatId()
     {
-        return AuthService.HasAnyRole(RoleDefinitions.Professionals.Admin) ? null : AuthService.UserId;
+        return AuthService.HasAnyRole(RoleDefinitions.Professionals.Admin) ? null : AuthService.ActingAsUserId;
     }
 }

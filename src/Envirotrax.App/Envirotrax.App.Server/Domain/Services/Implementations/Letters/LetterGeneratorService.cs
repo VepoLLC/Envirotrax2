@@ -1,14 +1,16 @@
 using System.Globalization;
-using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Letters;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Letters;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Lookup;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
+using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Letters;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Templates.Emails.Letters;
@@ -22,6 +24,7 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Letters;
 public class LetterGeneratorService : ILetterGeneratorService
 {
     private const int LettersPerFile = 1000;
+    private const int LettersPerChunk = 100;
     private const int OptInCodeLength = 6;
     private const int OptInCodeValidDays = 30;
     private const int UnknownAssembliesWaitDays = 15;
@@ -29,7 +32,10 @@ public class LetterGeneratorService : ILetterGeneratorService
 
     private const string BackflowFilePrefix = "BF";
     private const string CsiFilePrefix = "CSI";
+    private const string LettersFolder = "letters";
+    private const string EmailsFolder = "Emails";
     private const string PdfTemplateName = "Letters.Letters";
+    private const string PageSiteIdsScript = "Array.from(document.querySelectorAll('.letter-page'), page => Number(page.dataset.siteId))";
     private const string EmailTemplateName = "Letters.Letter";
     private const string EmailSubject = "Important Notice from Your Water Supplier – Action May Be Required";
 
@@ -49,31 +55,41 @@ public class LetterGeneratorService : ILetterGeneratorService
 
     private static readonly TimeZoneInfo CentralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
     private static readonly Regex StyleTagRegex = new(@"(\[/?[biu]\])", RegexOptions.IgnoreCase);
+    private static readonly char[] InvalidFileNameChars = Path.GetInvalidFileNameChars();
 
     private readonly ILetterRepository _letterRepository;
+    private readonly ISiteLetterLogRepository _siteLetterLogRepository;
     private readonly IWaterSupplierService _waterSupplierService;
     private readonly IBackflowRenewalRequirementService _renewalRequirementService;
     private readonly IPdfTemplateService _pdfTemplateService;
+    private readonly IFileStorageService _fileStorageService;
     private readonly IEmailService _emailService;
+    private readonly IHtmlTemplateService _htmlTemplateService;
     private readonly PdfTemplateOptions _pdfTemplateOptions;
 
     public LetterGeneratorService(
         ILetterRepository letterRepository,
+        ISiteLetterLogRepository siteLetterLogRepository,
         IWaterSupplierService waterSupplierService,
         IBackflowRenewalRequirementService renewalRequirementService,
         IPdfTemplateService pdfTemplateService,
+        IFileStorageService fileStorageService,
         IEmailService emailService,
+        IHtmlTemplateService htmlTemplateService,
         IOptions<PdfTemplateOptions> pdfTemplateOptions)
     {
         _letterRepository = letterRepository;
+        _siteLetterLogRepository = siteLetterLogRepository;
         _waterSupplierService = waterSupplierService;
         _renewalRequirementService = renewalRequirementService;
         _pdfTemplateService = pdfTemplateService;
+        _fileStorageService = fileStorageService;
         _emailService = emailService;
+        _htmlTemplateService = htmlTemplateService;
         _pdfTemplateOptions = pdfTemplateOptions.Value;
     }
 
-    public async Task<GeneratedLettersDto?> GenerateAsync(int waterSupplierId)
+    public async Task<GeneratedLettersDto?> GenerateAsync(int waterSupplierId, GenerateLettersDto generateLetters)
     {
         var details = await _waterSupplierService.GetDetailsAsync(waterSupplierId, CancellationToken.None);
 
@@ -83,12 +99,14 @@ public class LetterGeneratorService : ILetterGeneratorService
         }
 
         var renewalRequirements = await _renewalRequirementService.GetAllByWaterSupplierIdAsync(waterSupplierId, CancellationToken.None);
+        var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, CentralTimeZone);
 
         var context = new GenerationContext
         {
             Details = details,
             RenewalRequirements = renewalRequirements.ToList(),
-            Now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, CentralTimeZone),
+            Now = now,
+            ProcessDate = GetProcessDate(generateLetters, now),
             OptInCodeExpirationDate = DateTime.UtcNow.AddDays(OptInCodeValidDays)
         };
 
@@ -101,19 +119,24 @@ public class LetterGeneratorService : ILetterGeneratorService
         await SendLetterEmailsAsync(context);
         await AddPdfFilesAsync(context);
 
-        var result = new GeneratedLettersDto
+        return new GeneratedLettersDto
         {
+            ProcessDate = context.ProcessDate,
             Counts = context.Counts,
             EmailCount = context.Emails.Count
         };
+    }
 
-        if (context.Files.Count > 0)
+    private static DateTime GetProcessDate(GenerateLettersDto generateLetters, DateTime now)
+    {
+        var processDate = now;
+
+        if (generateLetters.ProcessDate != null)
         {
-            result.FileName = $"{details.WaterSupplier.Id} - {details.WaterSupplier.Name}.zip";
-            result.FileContent = CreateZip(context.Files);
+            processDate = generateLetters.ProcessDate.Value;
         }
 
-        return result;
+        return new DateTime(processDate.Year, processDate.Month, processDate.Day, processDate.Hour, processDate.Minute, processDate.Second);
     }
 
     private async Task GenerateBackflowLettersAsync(GenerationContext context)
@@ -468,7 +491,9 @@ public class LetterGeneratorService : ILetterGeneratorService
 
             if (emailAddresses.Count > 0)
             {
-                context.Emails.Add(new LetterEmail(emailAddresses, content, letter));
+                var emailFileName = $"{context.Details.WaterSupplier.Id} - {fileTypeName} - {site.Id}.html";
+
+                context.Emails.Add(new LetterEmail(emailAddresses, content, letter, emailFileName));
             }
             else
             {
@@ -554,21 +579,59 @@ public class LetterGeneratorService : ILetterGeneratorService
 
     private async Task SendLetterEmailsAsync(GenerationContext context)
     {
+        if (context.Emails.Count == 0)
+        {
+            return;
+        }
+
+        var folderPath = $"{GetFolderPath(context)}/{EmailsFolder}";
+        var letterLogs = new List<SiteLetterLog>();
+
         foreach (var email in context.Emails)
         {
+            letterLogs.Add(CreateEmailLetterLog(context, email, folderPath));
+        }
+
+        await _siteLetterLogRepository.AddRangeAsync(letterLogs);
+
+        for (var index = 0; index < context.Emails.Count; index++)
+        {
+            var email = context.Emails[index];
+
+            var templateData = new LetterEmailVm
+            {
+                BaseUrl = _pdfTemplateOptions.BaseUrl,
+                Content = email.Content,
+                Letter = email.Letter
+            };
+
+            var html = await _htmlTemplateService.ParseEmailAsync(EmailTemplateName, templateData);
+
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(html));
+
+            await _fileStorageService.UploadAsync(letterLogs[index].FilePath, stream);
+
             await _emailService.SendAsync(new EmailDto<LetterEmailVm>
             {
                 Recipients = email.Recipients,
                 Subject = EmailSubject,
                 TemplateId = EmailTemplateName,
-                TemplateData = new LetterEmailVm
-                {
-                    BaseUrl = _pdfTemplateOptions.BaseUrl,
-                    Content = email.Content,
-                    Letter = email.Letter
-                }
+                TemplateData = templateData
             });
         }
+    }
+
+    private static SiteLetterLog CreateEmailLetterLog(GenerationContext context, LetterEmail email, string folderPath)
+    {
+        return new SiteLetterLog
+        {
+            WaterSupplierId = email.Letter.WaterSupplierId,
+            SiteId = email.Letter.SiteId,
+            ProcessDate = context.ProcessDate,
+            FileName = email.FileName,
+            Page = SiteLetterLog.EmailPage,
+            FilePath = $"{folderPath}/{email.FileName}"
+        };
     }
 
     private async Task AddPdfFilesAsync(GenerationContext context)
@@ -578,19 +641,106 @@ public class LetterGeneratorService : ILetterGeneratorService
             return;
         }
 
-        var documents = new List<LetterDocumentDto>();
+        var documents = new List<List<LetterDocumentDto>>();
 
         foreach (var pdfDocument in context.PdfDocuments)
         {
-            documents.Add(pdfDocument.Document);
+            documents.Add(SplitIntoChunks(pdfDocument.Document));
         }
 
-        var pdfs = await _pdfTemplateService.GenerateManyAsync(PdfTemplateName, documents);
+        var folderPath = GetFolderPath(context);
+        var index = 0;
 
-        for (var index = 0; index < pdfs.Count; index++)
+        await foreach (var pdf in _pdfTemplateService.GenerateManyAsync<LetterDocumentDto, int[]>(PdfTemplateName, documents, PageSiteIdsScript))
         {
-            context.Files.Add(new LetterFile(context.PdfDocuments[index].FileName, pdfs[index]));
+            var pdfDocument = context.PdfDocuments[index];
+            var filePath = $"{folderPath}/{pdfDocument.FileName}";
+
+            var letterLogs = CreateLetterLogs(context, pdfDocument, pdf.ScriptResults, filePath);
+
+            await _siteLetterLogRepository.AddRangeAsync(letterLogs);
+
+            using var stream = new MemoryStream(pdf.Content);
+
+            await _fileStorageService.UploadAsync(filePath, stream);
+
+            index++;
         }
+    }
+
+    private static List<LetterDocumentDto> SplitIntoChunks(LetterDocumentDto document)
+    {
+        var chunks = new List<LetterDocumentDto>();
+
+        for (var index = 0; index < document.Letters.Count; index += LettersPerChunk)
+        {
+            var letterCount = Math.Min(LettersPerChunk, document.Letters.Count - index);
+
+            chunks.Add(new LetterDocumentDto
+            {
+                Content = document.Content,
+                Letters = document.Letters.GetRange(index, letterCount)
+            });
+        }
+
+        return chunks;
+    }
+
+    private static string GetFolderPath(GenerationContext context)
+    {
+        var waterSupplier = context.Details.WaterSupplier;
+        var processId = LetterProcessId.FromProcessDate(context.ProcessDate);
+        var waterSupplierFolder = RemoveInvalidFileNameChars($"{waterSupplier.Id} - {waterSupplier.Name}");
+
+        return $"{LettersFolder}/{processId}/{waterSupplierFolder}";
+    }
+
+    private static string RemoveInvalidFileNameChars(string name)
+    {
+        var result = new StringBuilder();
+
+        foreach (var character in name)
+        {
+            if (!InvalidFileNameChars.Contains(character))
+            {
+                result.Append(character);
+            }
+        }
+
+        return result.ToString();
+    }
+
+    private static List<SiteLetterLog> CreateLetterLogs(GenerationContext context, LetterPdfDocument pdfDocument, List<int[]> chunkPageSiteIds, string filePath)
+    {
+        var firstPages = new Dictionary<int, int>();
+        var pageNumber = 0;
+
+        foreach (var pageSiteIds in chunkPageSiteIds)
+        {
+            foreach (var siteId in pageSiteIds)
+            {
+                pageNumber++;
+
+                firstPages.TryAdd(siteId, pageNumber);
+            }
+        }
+
+        var letterLogs = new List<SiteLetterLog>();
+
+        foreach (var letter in pdfDocument.Document.Letters)
+        {
+            letterLogs.Add(new SiteLetterLog
+            {
+                WaterSupplierId = letter.WaterSupplierId,
+                SiteId = letter.SiteId,
+                ProcessDate = context.ProcessDate,
+                FileName = pdfDocument.FileName,
+                Page = firstPages[letter.SiteId],
+                FilePath = filePath
+            });
+        }
+
+        return letterLogs;
     }
 
     private static List<string> GetEmailAddresses(LetterSiteDto site)
@@ -771,6 +921,7 @@ public class LetterGeneratorService : ILetterGeneratorService
         var letter = new LetterDto
         {
             SiteId = site.Id,
+            WaterSupplierId = site.WaterSupplierId,
             AccountNumber = GetDisplayAccountNumber(context, site),
             OptInCode = optInCode.Code,
             OptInExpirationDate = FormatDate(context.OptInCodeExpirationDate)
@@ -933,30 +1084,12 @@ public class LetterGeneratorService : ILetterGeneratorService
         return FormatDate(date.Value);
     }
 
-    private static byte[] CreateZip(List<LetterFile> files)
-    {
-        using var stream = new MemoryStream();
-
-        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
-        {
-            foreach (var file in files)
-            {
-                var entry = archive.CreateEntry(file.Name);
-
-                using var entryStream = entry.Open();
-
-                entryStream.Write(file.Content);
-            }
-        }
-
-        return stream.ToArray();
-    }
-
     private class GenerationContext
     {
         public WaterSupplierDetailsDto Details { get; set; } = null!;
         public List<BackflowRenewalRequirementDto> RenewalRequirements { get; set; } = [];
         public DateTime Now { get; set; }
+        public DateTime ProcessDate { get; set; }
         public DateTime OptInCodeExpirationDate { get; set; }
 
         public LetterCountsDto Counts { get; } = new();
@@ -966,14 +1099,11 @@ public class LetterGeneratorService : ILetterGeneratorService
 
         public List<LetterEmail> Emails { get; } = [];
         public List<LetterPdfDocument> PdfDocuments { get; } = [];
-        public List<LetterFile> Files { get; } = [];
     }
 
     private record OptInCode(string Code, string CodeHash);
 
-    private record LetterEmail(List<string> Recipients, LetterContentDto Content, LetterDto Letter);
+    private record LetterEmail(List<string> Recipients, LetterContentDto Content, LetterDto Letter, string FileName);
 
     private record LetterPdfDocument(string FileName, LetterDocumentDto Document);
-
-    private record LetterFile(string Name, byte[] Content);
 }

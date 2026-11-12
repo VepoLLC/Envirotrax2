@@ -141,6 +141,7 @@ public static class ServiceRegistration
         services.AddTransient<IWaterSupplierDashboardService, WaterSupplierDashboardService>();
 
         services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
+        services.AddTransient<ILetterProcessService, LetterProcessService>();
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();

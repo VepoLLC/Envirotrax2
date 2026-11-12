@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { DownloadService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
+import { InputOption, ModalHelperService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { LetterCounts } from '../../../shared/models/water-suppliers/generated-letters';
 import { WaterSupplierLetterSettings, WaterSupplierLetterSettingsRow } from '../../../shared/models/water-suppliers/water-supplier-letter-settings';
@@ -44,8 +44,7 @@ export class ProcessLettersComponent implements OnInit, OnDestroy {
 
     constructor(
         private readonly _waterSupplierService: WaterSupplierService,
-        private readonly _modalHelper: ModalHelperService,
-        private readonly _downloadService: DownloadService
+        private readonly _modalHelper: ModalHelperService
     ) {
 
     }
@@ -125,6 +124,7 @@ export class ProcessLettersComponent implements OnInit, OnDestroy {
             }
         }
 
+        let processDate: string | undefined;
         let letterCount = 0;
         let emailCount = 0;
 
@@ -144,15 +144,13 @@ export class ProcessLettersComponent implements OnInit, OnDestroy {
                 this.currentWaterSupplierId = waterSupplier.id;
                 this.status = `Generating water supplier letters (${index + 1}/${waterSuppliersToProcess.length})`;
 
-                const letters = await this._waterSupplierService.generateLetters(waterSupplier.id!);
+                const letters = await this._waterSupplierService.generateLetters(waterSupplier.id!, processDate);
+
+                processDate = letters.processDate;
 
                 waterSupplier.letterCounts = letters.counts;
                 letterCount += this.getTotalLetterCount(letters.counts);
                 emailCount += letters.emailCount;
-
-                if (letters.fileName && letters.fileContent) {
-                    this._downloadService.downloadFileFromBase64(letters.fileContent, 'application/zip', letters.fileName);
-                }
             }
         } finally {
             this.status = `Total Letters: ${letterCount}`;

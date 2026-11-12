@@ -27,6 +27,8 @@ public class BlobStorageService
         [".tiff"] = "image/tiff",
         [".pdf"] = "application/pdf",
         [".txt"] = "text/plain",
+        [".htm"] = "text/html",
+        [".html"] = "text/html",
         [".doc"] = "application/msword",
         [".docx"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         [".xls"] = "application/vnd.ms-excel",

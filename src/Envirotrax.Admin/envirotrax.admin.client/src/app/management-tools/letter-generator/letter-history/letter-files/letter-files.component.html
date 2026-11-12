@@ -1,0 +1,72 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap mb-3">
+        <li class="nav-item">
+            <a class="nav-link" role="button"
+               [class.active]="activeTab === 'files'"
+               (click)="setActiveTab('files')">Files</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" role="button"
+               [class.active]="activeTab === 'emails'"
+               (click)="setActiveTab('emails')">Emails</a>
+        </li>
+    </ul>
+
+    <div class="table-responsive" *ngIf="activeTab === 'files'">
+        <table class="table table-sm table-bordered table-hover align-middle text-nowrap mb-0">
+            <thead>
+                <tr class="vp-table-header">
+                    <th class="w-100">File Name</th>
+                    <th>Letters</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let file of files">
+                    <td>
+                        <button type="button" class="btn btn-link p-0" (click)="viewFile(file.fileName!)">
+                            <i class="fa-solid fa-file-pdf me-1"></i>
+                            {{ file.fileName }}
+                        </button>
+                    </td>
+                    <td>{{ file.letterCount }}</td>
+                </tr>
+                <tr *ngIf="!isLoading && files.length === 0">
+                    <td colspan="2">No letters were printed.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive" *ngIf="activeTab === 'emails'">
+        <table class="table table-sm table-bordered table-hover align-middle text-nowrap mb-0">
+            <thead>
+                <tr class="vp-table-header">
+                    <th class="w-100">File Name</th>
+                    <th>Account Number</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let email of emails">
+                    <td>
+                        <button type="button" class="btn btn-link p-0" (click)="viewFile(email.fileName!)">
+                            <i class="fa-solid fa-envelope me-1"></i>
+                            {{ email.fileName }}
+                        </button>
+                    </td>
+                    <td>{{ email.accountNumber }}</td>
+                    <td>{{ email.streetNumber }} {{ email.streetName }}</td>
+                </tr>
+                <tr *ngIf="!isLoading && emails.length === 0">
+                    <td colspan="3">No letters were sent by email.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-end mt-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="close()">Close</button>
+    </div>
+</div>

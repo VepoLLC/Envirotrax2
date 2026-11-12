@@ -91,7 +91,7 @@ public class ProfessionalPaymentService : IProfessionalPaymentService
 
     public async Task SaveBillingInfoAsync(CreditCardPaymentDto card, CancellationToken cancellationToken)
     {
-        var professionalUser = await _professionalUserRepository.GetTrackedForUpdateAsync(_authService.UserId, cancellationToken)
+        var professionalUser = await _professionalUserRepository.GetTrackedForUpdateAsync(_authService.ActingAsUserId, cancellationToken)
             ?? throw new InvalidOperationException("Professional user not found.");
 
         professionalUser.BillingFirstName = card.BillingFirstName;

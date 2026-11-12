@@ -17,5 +17,6 @@
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="$(UmbracoAppLocalIcuVersion)" />
     <PackageVersion Include="Umbraco.StorageProviders.AzureBlob" Version="18.0.0" />
     <PackageVersion Include="Umbraco.StorageProviders.AzureBlob.ImageSharp" Version="18.0.0" />
+    <PackageVersion Include="uSync" Version="18.3.1" />
   </ItemGroup>
 </Project>

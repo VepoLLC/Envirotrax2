@@ -293,7 +293,8 @@ export class App implements OnInit {
 
   public showFogTransporterSearch(): void {
     this._windowService.addWindow(FogTransporterListComponent, {
-      title: 'FOG Transporter Search'
+      title: 'FOG Transporter Search',
+      color: MODULE_COLORS.FOG
     });
   }
 

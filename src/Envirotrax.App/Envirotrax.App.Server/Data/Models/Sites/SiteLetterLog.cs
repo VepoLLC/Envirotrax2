@@ -9,6 +9,8 @@ namespace Envirotrax.App.Server.Data.Models.Sites;
 
 public class SiteLetterLog : TenantModel<WaterSupplier>
 {
+    public const int EmailPage = 0;
+
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 

@@ -4,5 +4,5 @@ public class GeneratedPdfDto<TScriptResult>
 {
     public byte[] Content { get; set; } = null!;
 
-    public TScriptResult ScriptResult { get; set; } = default!;
+    public List<TScriptResult> ScriptResults { get; set; } = [];
 }

@@ -8,6 +8,8 @@ public interface ILetterProcessService
 
     Task<List<LetterFileDto>?> GetFilesAsync(string processId, CancellationToken cancellationToken);
 
+    Task<List<LetterEmailDto>?> GetEmailsAsync(string processId, CancellationToken cancellationToken);
+
     Task<string?> GetFileUrlAsync(string processId, string fileName, CancellationToken cancellationToken);
 
     Task DeleteAsync(string processId);

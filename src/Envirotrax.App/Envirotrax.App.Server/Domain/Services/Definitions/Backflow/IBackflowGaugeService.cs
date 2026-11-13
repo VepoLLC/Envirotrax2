@@ -10,9 +10,6 @@ public interface IBackflowGaugeService : IService<BackflowGaugeDto>
     Task<IPagedData<BackflowGaugeDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken);
 
-    Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken);
-
-    Task<IPagedData<BackflowGaugeDto>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken);
+    Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<int> CountUnverifiedAsync(CancellationToken cancellationToken);
 }

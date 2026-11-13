@@ -35,7 +35,7 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
         stats.ExpiredLicenseCount = licenseCounts.ExpiredCount;
         stats.ExpiringLicenseCount = licenseCounts.ExpiringCount;
 
-        stats.TestGaugeCount = await _gaugeService.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
+        stats.TestGaugeCount = await _gaugeService.CountUnverifiedAsync(cancellationToken);
         stats.TransporterRegistrationCount = await _licenseService.CountUnverifiedRegistrationsAsync(cancellationToken);
 
         return stats;

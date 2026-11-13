@@ -25,12 +25,15 @@ export class TceqLicenseCheckComponent {
     public isTceqDateNewer: boolean = false;
     public tceqExpirationBorderClass: string = 'border-danger';
 
-    private readonly _originalExpirationDate?: string;
+    // Read-only copy of the Envirotrax date; the arrow only previews the TCEQ date in it. The dialog never touches the
+    // grid row: Update & Save returns the TCEQ date through closeSuccess, so Cancel, Esc, the close button and a
+    // backdrop click (they call ModalReference.cancel() directly) change nothing.
+    public expirationDate?: string;
 
-    constructor(private readonly _modalReference: ModalReference<TceqLicenseCheckModalData, void>) {
+    constructor(private readonly _modalReference: ModalReference<TceqLicenseCheckModalData, string>) {
         this.license = this._modalReference.config.model!.license;
         this.tceqLicense = this._modalReference.config.model!.tceqLicense;
-        this._originalExpirationDate = this.license.expirationDate;
+        this.expirationDate = this.license.expirationDate;
 
         this.isTceqDateNewer = this.isNewerThanEnvirotraxDate(this.tceqLicense.expirationDate);
 
@@ -40,18 +43,14 @@ export class TceqLicenseCheckComponent {
     }
 
     public copyExpirationDate(): void {
-        this.license.expirationDate = this.tceqLicense.expirationDate;
+        this.expirationDate = this.tceqLicense.expirationDate;
     }
 
     public updateAndSave(): void {
-        this.license.expirationDate = this.tceqLicense.expirationDate;
-
-        this._modalReference.closeSuccess();
+        this._modalReference.closeSuccess(this.tceqLicense.expirationDate);
     }
 
     public cancel(): void {
-        this.license.expirationDate = this._originalExpirationDate;
-
         this._modalReference.cancel();
     }
 

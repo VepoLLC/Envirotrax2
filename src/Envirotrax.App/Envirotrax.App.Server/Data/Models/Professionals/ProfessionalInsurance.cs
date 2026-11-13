@@ -24,6 +24,8 @@ public class ProfessionalInsurance : IProfessionalModel, ICreateAuditableModel<A
     [Precision(19, 4)]
     public decimal? CoverageAmount { get; set; }
 
+    public bool IsManaged { get; set; }
+
     [Required]
     public string FilePath { get; set; } = null!;
 

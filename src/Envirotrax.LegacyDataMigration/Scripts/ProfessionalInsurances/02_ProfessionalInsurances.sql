@@ -45,18 +45,20 @@ BEGIN TRY
         FROM MigrationLegacyProfessionalAccounts AS accounts
     )
     INSERT INTO ProfessionalInsurances
-        (LegacyRecordId, ProfessionalId, InsuranceNumber, ExpirationDate, CoverageAmount, FilePath, LegacyFilePath, CreatedById, CreatedTime)
+        (LegacyRecordId, ProfessionalId, InsuranceNumber, ExpirationDate, CoverageAmount, IsManaged, FilePath, LegacyFilePath, CreatedById, CreatedTime)
     SELECT
         licenses.ID,
         professionals.Id,
         -- V2 requires the number, V1 does not always hold one. An empty string keeps the policy itself,
         -- with the expiration date that compliance is actually checked against.
-        LEFT(ISNULL(licenses.Number, ''), 50),
+        ISNULL(licenses.Number, ''),
         licenses.ExpirationDate,
         -- Not every V1 page writes InsuranceCoverage when a policy is added, so zero there means the
         -- amount was never filled in rather than a policy that covers nothing. It becomes NULL, which
         -- is how V2 tells 'unknown' from an amount that really is below what the water supplier asks.
         NULLIF(licenses.InsuranceCoverage, 0),
+        -- V1's Manage button dismissed an unverified policy from the verification lists.
+        ISNULL(licenses.IsManaged, 0),
         '',
         -- V1 stored policy files in folders derived from the record id: licenses/<ID rounded down to 10000>/<ID>.<pdf|jpg>.
         CASE

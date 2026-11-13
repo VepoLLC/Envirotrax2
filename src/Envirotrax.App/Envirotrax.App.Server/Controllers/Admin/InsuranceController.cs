@@ -18,7 +18,7 @@ public class InsuranceController : AdminBaseController
     [HttpGet]
     public async Task<IActionResult> GetAllAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var insurances = await _insuranceService.GetUnverifiedForAdminAsync(pageInfo, query, cancellationToken);
+        var insurances = await _insuranceService.GetUnverifiedAsync(pageInfo, query, cancellationToken);
 
         return Ok(insurances);
     }
@@ -26,17 +26,12 @@ public class InsuranceController : AdminBaseController
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAsync(int id, [FromBody] ProfessionalInsuranceDto insurance)
     {
-        var existing = await _insuranceService.GetAsync(id, CancellationToken.None);
+        var updated = await _insuranceService.UpdateForAdminAsync(id, insurance);
 
-        if (existing == null)
+        if (updated == null)
         {
             return NotFound();
         }
-
-        insurance.Id = id;
-        insurance.Professional = existing.Professional;
-
-        var updated = await _insuranceService.UpdateAsync(insurance);
 
         return Ok(updated);
     }

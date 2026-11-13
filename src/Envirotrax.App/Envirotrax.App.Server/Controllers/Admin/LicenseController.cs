@@ -25,7 +25,7 @@ public class LicenseController : AdminBaseController
     [HttpGet]
     public async Task<IActionResult> GetAllAsync([FromQuery] string? licenseFilter, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
     {
-        var licenses = await _waterSupplierLicenseService.GetAllForAdminAsync(licenseFilter, pageInfo, query, cancellationToken);
+        var licenses = await _waterSupplierLicenseService.GetAllAsync(licenseFilter, pageInfo, query, cancellationToken);
 
         return Ok(licenses);
     }

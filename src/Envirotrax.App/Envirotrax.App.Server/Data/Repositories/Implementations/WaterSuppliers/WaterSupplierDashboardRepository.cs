@@ -31,10 +31,7 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
             CsiInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsCsiInspector, cancellationToken),
             BpatCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsBackflowTester, cancellationToken),
             FogTransporterCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogTransporter, cancellationToken),
-            FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogInspector, cancellationToken),
-
-            InsurancePolicyCount = await _context.ProfessionalInsurances.CountAsync(i => i.ExpirationDate == null
-                && _context.ProfessionalWaterSuppliers.Any(pws => pws.ProfessionalId == i.ProfessionalId), cancellationToken)
+            FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogInspector, cancellationToken)
         };
     }
 

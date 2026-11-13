@@ -112,6 +112,7 @@ public static class ServiceRegistrations
     {
         return services
             .AddHttpClient()
+            .AddHttpContextAccessor()
             .Configure<TOptions>(configuration)
             .AddTransient<IInternalApiClientService<TOptions>, InternalApiClientService<TOptions>>();
     }
@@ -120,6 +121,7 @@ public static class ServiceRegistrations
     {
         return services
             .AddHttpClient()
+            .AddHttpContextAccessor()
             .Configure<InternalApiOptions>(configuration)
             .AddTransient<IInternalApiClientService, InternalApiClientService>();
     }

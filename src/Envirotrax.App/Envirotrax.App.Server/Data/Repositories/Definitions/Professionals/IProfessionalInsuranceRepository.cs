@@ -14,9 +14,8 @@ public interface IProfessionalInsuranceRepository : IRepository<ProfessionalInsu
     Task<ProfessionalInsurance?> GetCurrentForProfessionalAsync(int professionalId, CancellationToken cancellationToken);
     Task<ProfessionalInsurance?> GetForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken);
 
-    Task<IEnumerable<ProfessionalInsurance>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<IEnumerable<ProfessionalInsurance>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<ProfessionalInsurance>> GetUnverifiedAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<int> CountUnverifiedAsync(CancellationToken cancellationToken);
     Task<Dictionary<int, ProfessionalType?>> GetProfessionalTypesAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);
     Task<IEnumerable<ProfessionalUser>> GetProfessionalUsersAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);
 }

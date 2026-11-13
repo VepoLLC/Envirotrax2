@@ -49,12 +49,6 @@ public static class FeatureSeedData
             Id = FeatureType.BackflowTestForceRenewal,
             Name = "Backflow Test Force Renewal",
             Description = "Allows forcing renewal of backflow tests."
-        },
-        new()
-        {
-            Id = FeatureType.ManagePaymentBypass,
-            Name = "Manage Payment Bypass",
-            Description = "Allows turning payment bypass On or Off for professional users, so they can check out without paying."
         }
     ];
 }

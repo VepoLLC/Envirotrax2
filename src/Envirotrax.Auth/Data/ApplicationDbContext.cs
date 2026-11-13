@@ -19,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<int>
     public DbSet<ProfessionalUser> ProfessionalUsers { get; set; }
 
     public DbSet<UserInvitation> UserInvitations { get; set; }
+    public DbSet<UserImpersonationRequest> UserImpersonationRequests { get; set; }
 
     public DbSet<Role> AppRoles { get; set; }
     public DbSet<UserRole> AppUserRoles { get; set; }

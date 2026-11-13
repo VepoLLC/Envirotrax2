@@ -14,7 +14,6 @@ import { RouterModule } from "@angular/router";
 import { CsiInspectionAssemblyTableComponent } from "./csi/csi-inspection-assembly-table.component";
 import { ProfessionalNotesComponent } from "./professional-notes/list/professional-notes.component";
 import { AddEditProfessionalNoteComponent } from "./professional-notes/edit/add-edit-professional-note.component";
-import { ProfessionalPaymentBypassComponent } from "./professional-payment-bypass/professional-payment-bypass.component";
 
 @NgModule({
     declarations: [
@@ -28,8 +27,7 @@ import { ProfessionalPaymentBypassComponent } from "./professional-payment-bypas
         CreditCardPaymentComponent,
         CsiInspectionAssemblyTableComponent,
         ProfessionalNotesComponent,
-        AddEditProfessionalNoteComponent,
-        ProfessionalPaymentBypassComponent
+        AddEditProfessionalNoteComponent
     ],
     imports: [
         EnvirotraxComponentsModule,
@@ -45,8 +43,7 @@ import { ProfessionalPaymentBypassComponent } from "./professional-payment-bypas
         WaterSupplierUserLookupComponent,
         CreditCardPaymentComponent,
         CsiInspectionAssemblyTableComponent,
-        ProfessionalNotesComponent,
-        ProfessionalPaymentBypassComponent
+        ProfessionalNotesComponent
     ]
 })
 export class SharedComponentsModule {

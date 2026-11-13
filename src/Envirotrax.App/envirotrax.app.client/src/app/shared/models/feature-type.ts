@@ -13,6 +13,5 @@ export enum FeatureType {
 
     ManageGisAreas = 10,
     ManageProfessionalUsers = 11,
-    BackflowTestForceRenewal = 12,
-    ManagePaymentBypass = 13
+    BackflowTestForceRenewal = 12
 }

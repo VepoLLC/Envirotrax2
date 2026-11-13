@@ -1,9 +1,8 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
-import { ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { BackflowTesterUserService } from "../../../../../shared/services/backflow/backflow-tester-user.service";
-import { CellTemplateData, ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
 import { FeatureType } from "../../../../../shared/models/feature-type";
@@ -18,13 +17,7 @@ import { AddEditBackflowTesterUserComponent, BackflowUserModalData } from "../ed
 export class BackflowTesterUsersComponent implements OnInit {
     @Input() public testerId!: number;
 
-    @ViewChild('paymentBypassTemplate', { static: true })
-    public paymentBypassTemplate!: TemplateRef<CellTemplateData<ProfessionalUser>>;
-
-    public readonly professionalType = ProfessionalType.Bpat;
-
     public canManage: boolean = false;
-    public canManagePaymentBypass: boolean = false;
 
     public table: TableViewModel<ProfessionalUser> = {
         columns: [],
@@ -47,11 +40,10 @@ export class BackflowTesterUsersComponent implements OnInit {
     private async setPermissions(): Promise<void> {
         const canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
         this.canManage = canEdit && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalUsers);
-        this.canManagePaymentBypass = canEdit && await this._authService.hasAnyFeatures(FeatureType.ManagePaymentBypass);
     }
 
     private getColumns(): TableColumn<ProfessionalUser>[] {
-        const columns: TableColumn<ProfessionalUser>[] = [
+        return [
             {
                 field: 'emailAddress',
                 caption: 'Email Address',
@@ -68,18 +60,6 @@ export class BackflowTesterUsersComponent implements OnInit {
                 type: ColumnType.text
             }
         ];
-
-        if (this.canManagePaymentBypass) {
-            columns.push({
-                field: '',
-                caption: 'Payment Bypass',
-                type: ColumnType.other,
-                queryColumnExcluded: true,
-                cellTemplate: this.paymentBypassTemplate
-            });
-        }
-
-        return columns;
     }
 
     public addUser(): void {

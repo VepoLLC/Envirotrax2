@@ -13,6 +13,11 @@
               (queryReset)="getGauges()" />
 </div>
 
+<ng-template #accountCell let-rowData="rowData">
+    <div>{{ rowData.companyName }}</div>
+    <div>{{ rowData.contactName }}</div>
+</ng-template>
+
 <ng-template #manufacturerCell let-rowData="rowData">
     <vp-input [(ngModel)]="rowData.manufacturer"
               [maxLength]="100" />
@@ -44,7 +49,16 @@
 
 <ng-template #actionsCell let-rowData="rowData">
     <div class="d-flex gap-1">
-        <button *ngIf="rowData.filePath"
+        <button *ngIf="rowData.canViewAccount"
+                type="button"
+                class="btn btn-primary btn-sm"
+                title="View Account"
+                aria-label="View Account"
+                (click)="viewAccount(rowData)">
+            <i class="fa-solid fa-user"></i>
+        </button>
+
+        <button *ngIf="rowData.hasFile"
                 type="button"
                 class="btn btn-primary btn-sm"
                 title="View Certificate"

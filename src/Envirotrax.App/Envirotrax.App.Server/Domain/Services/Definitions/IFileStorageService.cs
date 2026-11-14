@@ -14,4 +14,6 @@ public interface IFileStorageService
     Task<Uri> GenerateSasUrlAsync(UserDelegationKey delegationKey, string blobName);
 
     Task<bool> DeleteAsync(string blobName);
+
+    Task<Dictionary<string, long>> GetFileSizesAsync(string folderPath, CancellationToken cancellationToken);
 }

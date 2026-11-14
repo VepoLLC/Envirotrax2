@@ -142,6 +142,7 @@ public static class ServiceRegistration
 
         services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
         services.AddTransient<ILetterProcessService, LetterProcessService>();
+        services.AddTransient<ILetterHistoryService, LetterHistoryService>();
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();

@@ -77,6 +77,7 @@ export interface BackflowTest {
     testResult?: BackflowTestResult;
     properlyInstalled?: boolean;
     nonPotable?: boolean;
+    gaugeId?: number;
     gaugeManufacturer?: string;
     gaugeModel?: string;
     gaugeSerialNumber?: string;

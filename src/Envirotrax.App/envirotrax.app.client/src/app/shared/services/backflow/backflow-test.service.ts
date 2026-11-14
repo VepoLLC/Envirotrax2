@@ -314,11 +314,7 @@ function buildBackflowTestFormData(test: BackflowTest): FormData {
     append('nonPotable', test.nonPotable);
 
     // Gauge
-    append('gaugeManufacturer', test.gaugeManufacturer);
-    append('gaugeModel', test.gaugeModel);
-    append('gaugeSerialNumber', test.gaugeSerialNumber);
-    append('gaugeLastCalibrationDate', test.gaugeLastCalibrationDate);
-    append('gaugeNonPotable', test.gaugeNonPotable);
+    append('gaugeId', test.gaugeId);
 
     // Meter
     append('meterNumber', test.meterNumber);

@@ -1,4 +1,5 @@
 
+using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.DbContexts;
@@ -52,9 +53,38 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
         return query.WhereIf(isTesterWithoutAdminRights, gauge => gauge.ProfessionalUserId == _authService.ActingAsUserId);
     }
 
+    private static Expression<Func<BackflowGauge, bool>> IsCompanyOrUserGauge(int userId)
+    {
+        return gauge => gauge.ProfessionalUserId == null || gauge.ProfessionalUserId == userId;
+    }
+
     public Task<int> CountCompanyAndUserGaugesAsync(int userId, CancellationToken cancellationToken)
     {
-        return Entity.CountAsync(gauge => gauge.ProfessionalUserId == null || gauge.ProfessionalUserId == userId, cancellationToken);
+        return Entity.CountAsync(IsCompanyOrUserGauge(userId), cancellationToken);
+    }
+
+    public async Task<IEnumerable<BackflowGauge>> GetCompanyAndUserGaugesAsync(int userId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        if (query.Sort.IsNullOrEmpty())
+        {
+            query.Sort[nameof(BackflowGauge.Id)] = SortOperator.Asc;
+        }
+
+        var paginated = await IncludeAssignedUser(Entity.AsNoTracking())
+            .Where(IsCompanyOrUserGauge(userId))
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    public Task<BackflowGauge?> GetCompanyOrUserGaugeAsync(int gaugeId, int userId, CancellationToken cancellationToken)
+    {
+        return Entity
+            .AsNoTracking()
+            .Where(IsCompanyOrUserGauge(userId))
+            .SingleOrDefaultAsync(gauge => gauge.Id == gaugeId, cancellationToken);
     }
 
     public async Task<IEnumerable<BackflowGauge>> DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken)

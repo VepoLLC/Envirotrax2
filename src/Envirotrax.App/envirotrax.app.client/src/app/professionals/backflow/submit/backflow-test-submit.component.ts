@@ -70,10 +70,12 @@ export class BackflowTestSubmitComponent implements OnInit {
     public isVerificationPassed = false;
     public verificationChecks: VerificationCheck[] = [];
     public selectedGaugeText = '';
+    public noValidGaugeReasons: string[] = [];
 
     private _bpats: ProfessionalUser[] = [];
     private _waterSuppliers: ProfessionalWaterSupplier[] = [];
     private _gauges: BackflowGauge[] = [];
+    private _validGauges: BackflowGauge[] = [];
 
     public bpatOptions: InputOption[] = [];
     public waterSupplierOptions: InputOption[] = [];
@@ -617,7 +619,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.isLoading = true;
 
         try {
-            await this.loadLicenseCheck();
+            await Promise.all([this.loadLicenseCheck(), this.loadGauges()]);
             this.updateVerification();
         } finally {
             this.isLoading = false;
@@ -806,10 +808,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             site: this.editingTestId
                 ? (this.model.site?.id ? { id: this.model.site.id } : undefined)
                 : (this.previousTest?.site ? { id: this.previousTest.site.id } : (this._siteId > 0 ? { id: this._siteId } : undefined)),
-            gaugeManufacturer: this.selectedGauge?.manufacturer,
-            gaugeModel: this.selectedGauge?.model,
-            gaugeSerialNumber: this.selectedGauge?.serialNumber,
-            gaugeLastCalibrationDate: this.selectedGauge?.lastCalibrationDate as string | undefined
+            gaugeId: this.selectedGaugeId
         };
 
         this.isLoading = true;
@@ -843,16 +842,14 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadData(fromTestId: number | null): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, usersPage, gaugesPage, stateOptions] = await Promise.all([
+            const [professional, bpats, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
-                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this.getSelectableBpats(),
                 this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
-            this._bpats = usersPage.data ?? [];
-            this._gauges = gaugesPage.data ?? [];
+            this._bpats = bpats;
             this.stateOptions = stateOptions;
 
             const suppliersPage = await this._supplierService.getAllMy({ hasBackflowTesting: true });
@@ -881,6 +878,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             this.model.submissionId = crypto.randomUUID();
 
             await this.setDefaults();
+            await this.loadGauges();
 
             if (this.site) {
                 await this.applySiteWaterSupplier(this.site);
@@ -892,12 +890,66 @@ export class BackflowTestSubmitComponent implements OnInit {
         }
     }
 
+    // V1 parity: a tester without admin rights submits only under their own BPAT account.
+    private async getSelectableBpats(): Promise<ProfessionalUser[]> {
+        const [myUser, testersPage] = await Promise.all([
+            this._userService.getMyData(),
+            this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] })
+        ]);
+
+        const testers = testersPage.data ?? [];
+
+        if (myUser.isAdmin) {
+            return testers;
+        }
+
+        return testers.filter(tester => tester.id === myUser.id);
+    }
+
     private buildOptions(): void {
         this.bpatOptions = this._bpats.map(u => ({ id: u.id, text: u.contactName ?? `User ${u.id}` }));
         this.waterSupplierOptions = this._waterSuppliers.map(ws => ({ id: ws.waterSupplier?.id, text: ws.waterSupplier?.name ?? '' }));
-        this.gaugeOptions = this._gauges
-            .filter(g => g.expirationType !== GaugeExpirationType.Expired)
-            .map(g => ({ id: g.id, text: this.buildGaugeText(g) }));
+    }
+
+    // V1 parity (loadGauges): the company's gauges plus the selected BPAT's own, verified and not expired.
+    private async loadGauges(): Promise<void> {
+        this._gauges = [];
+
+        if (this.selectedBpatId) {
+            const gaugesPage = await this._gaugeService.getUsableByBpat(this.selectedBpatId, { pageSize: MAX_PAGE_SIZE }, {});
+            this._gauges = gaugesPage.data ?? [];
+        }
+
+        this._validGauges = this._gauges.filter(gauge => gauge.lastCalibrationDate && gauge.expirationType !== GaugeExpirationType.Expired);
+        this.gaugeOptions = this._validGauges.map(gauge => ({ id: gauge.id, text: this.buildGaugeText(gauge) }));
+
+        if (!this._validGauges.some(gauge => gauge.id === this.selectedGaugeId)) {
+            this.selectedGaugeId = undefined;
+            this.selectedGauge = undefined;
+        }
+
+        this.noValidGaugeReasons = this._validGauges.length > 0 ? [] : [
+            ...this.describeGaugeProblems(this._gauges.filter(gauge => !gauge.professionalUser), 'The company'),
+            ...this.describeGaugeProblems(this._gauges.filter(gauge => !!gauge.professionalUser), 'The selected BPAT')
+        ];
+    }
+
+    private describeGaugeProblems(gauges: BackflowGauge[], owner: string): string[] {
+        if (gauges.length === 0) {
+            return [`${owner} does not have any registered gauges.`];
+        }
+
+        const problems: string[] = [];
+
+        if (gauges.some(gauge => !gauge.lastCalibrationDate)) {
+            problems.push(`${owner} has gauges that are awaiting verification.`);
+        }
+
+        if (gauges.some(gauge => gauge.expirationType === GaugeExpirationType.Expired)) {
+            problems.push(`${owner} has expired gauges.`);
+        }
+
+        return problems;
     }
 
     private buildGaugeText(gauge: BackflowGauge): string {
@@ -991,6 +1043,7 @@ export class BackflowTestSubmitComponent implements OnInit {
             && !!this.model.hazardType
             && !!this.licenseCheck
             && !!this.insuranceCheck
+            && this.noValidGaugeReasons.length === 0
             && this.verificationChecks.every(check => check.valid);
     }
 
@@ -1041,16 +1094,14 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadForEdit(testId: number): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, usersPage, gaugesPage, stateOptions] = await Promise.all([
+            const [professional, bpats, stateOptions] = await Promise.all([
                 this._professionalService.getLoggedInProfessional(),
-                this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
-                this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
+                this.getSelectableBpats(),
                 this._lookupService.getAllStatesAsOptions(false)
             ]);
 
             this.professional = professional;
-            this._bpats = usersPage.data ?? [];
-            this._gauges = gaugesPage.data ?? [];
+            this._bpats = bpats;
             this.stateOptions = stateOptions;
 
             const suppliersPage = await this._supplierService.getAllMy({ hasBackflowTesting: true });
@@ -1093,7 +1144,9 @@ export class BackflowTestSubmitComponent implements OnInit {
             this.buildSiteWaterSupplierOptions();
         }
 
-        this.selectedGauge = this._gauges.find(g =>
+        await this.loadGauges();
+
+        this.selectedGauge = this._validGauges.find(g =>
             g.manufacturer === test.gaugeManufacturer &&
             g.model === test.gaugeModel &&
             g.serialNumber === test.gaugeSerialNumber);

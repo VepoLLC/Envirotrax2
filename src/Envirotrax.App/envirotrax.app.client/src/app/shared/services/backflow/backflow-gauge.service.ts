@@ -29,6 +29,16 @@ export class BackflowGaugeService {
         return lastValueFrom(observable);
     }
 
+    public getUsableByBpat(bpatUserId: number, pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowGauge>> {
+        const url = this._urlResolver.resolveUrl(`/api/professionals/backflow/gauges/for-bpat/${bpatUserId}`);
+
+        const observable = this._http.get<PagedData<BackflowGauge>>(url, {
+            params: this._queryHelper.buildQuery(pageInfo, query)
+        });
+
+        return lastValueFrom(observable);
+    }
+
     public add(gauge: BackflowGauge, file: File): Promise<BackflowGauge> {
         const url = this._urlResolver.resolveUrl('/api/professionals/backflow/gauges');
         const formData = new FormData();
@@ -37,6 +47,7 @@ export class BackflowGaugeService {
         if (gauge.model) formData.append('model', gauge.model);
         if (gauge.serialNumber) formData.append('serialNumber', gauge.serialNumber);
         formData.append('isPortable', gauge.isPortable ? 'true' : 'false');
+        if (gauge.professionalUser?.id) formData.append('professionalUser.id', String(gauge.professionalUser.id));
         return lastValueFrom(this._http.post<BackflowGauge>(url, formData));
     }
 

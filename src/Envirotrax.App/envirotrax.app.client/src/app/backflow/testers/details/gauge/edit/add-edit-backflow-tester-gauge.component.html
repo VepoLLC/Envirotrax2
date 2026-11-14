@@ -2,6 +2,16 @@
     <dp-loading-spinner *ngIf="isLoading" />
 
     <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="mb-3" *ngIf="assignedToOptions.length > 0">
+            <vp-input type="select"
+                      name="assignedUserId"
+                      label="Assigned To:"
+                      [(ngModel)]="assignedUserId"
+                      [options]="assignedToOptions"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
         <div class="mb-3">
             <vp-input name="manufacturer"
                       label="Manufacturer:"

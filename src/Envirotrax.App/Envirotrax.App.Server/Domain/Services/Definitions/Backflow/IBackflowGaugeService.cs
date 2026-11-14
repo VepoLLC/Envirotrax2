@@ -9,6 +9,8 @@ public interface IBackflowGaugeService : IService<BackflowGaugeDto>
     Task<BackflowGaugeDto> AddWithFileAsync(Stream fileStream, string originalFileName, BackflowGaugeDto dto);
     Task<IPagedData<BackflowGaugeDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken);
+    Task<IPagedData<BackflowGaugeDto>> GetUsableByBpatAsync(int bpatUserId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<BackflowGaugeDto> GetValidGaugeForBpatAsync(int gaugeId, int bpatUserId, CancellationToken cancellationToken);
     Task<int> CountUsableByCurrentUserAsync(CancellationToken cancellationToken);
     Task DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken);
 

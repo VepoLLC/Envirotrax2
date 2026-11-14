@@ -34,6 +34,9 @@ export class BackflowTesterGaugeService {
         formData.append('model', gauge.model ?? '');
         formData.append('serialNumber', gauge.serialNumber ?? '');
         formData.append('isPortable', (gauge.isPortable ?? false).toString());
+        if (gauge.professionalUser?.id) {
+            formData.append('professionalUser.id', gauge.professionalUser.id.toString());
+        }
         if (gauge.lastCalibrationDate) {
             formData.append('lastCalibrationDate', gauge.lastCalibrationDate.toString());
         }

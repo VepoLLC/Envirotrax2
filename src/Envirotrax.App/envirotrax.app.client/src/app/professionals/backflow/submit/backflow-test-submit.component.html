@@ -91,6 +91,22 @@
             </div>
         </vp-section>
 
+        <!-- No valid gauges, as V1's divNoGauges -->
+        <div class="mt-3" *ngIf="noValidGaugeReasons.length > 0">
+            <vp-section header="No Valid Test Gauges Found">
+                <div class="text-center">
+                    <ul class="list-unstyled text-danger mb-3">
+                        <li *ngFor="let reason of noValidGaugeReasons">{{ reason }}</li>
+                    </ul>
+                    <p>
+                        Click the button below to access the Gauge Management section. You may also access the Gauge
+                        Management section at anytime through the Backflow Management menu at the top of the page.
+                    </p>
+                    <a class="btn btn-primary" routerLink="/professionals/backflow/gauges">Gauge Management</a>
+                </div>
+            </vp-section>
+        </div>
+
         <!-- Water Supplier Information -->
         <div class="mt-3" *ngIf="isVerificationPassed && selectedWaterSupplier">
             <vp-section header="Water Supplier Information">

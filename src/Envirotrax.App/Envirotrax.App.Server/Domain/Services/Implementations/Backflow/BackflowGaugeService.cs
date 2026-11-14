@@ -146,6 +146,40 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return IsSignedInAsProfessional() && !_authService.HasAnyRole(RoleDefinitions.Professionals.Admin);
     }
 
+    public async Task<IPagedData<BackflowGaugeDto>> GetUsableByBpatAsync(int bpatUserId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        EnsureCanActAsBpat(bpatUserId);
+
+        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+
+        var gauges = await _gaugeRepository.GetCompanyAndUserGaugesAsync(bpatUserId, pageInfo, query, cancellationToken);
+
+        return gauges.Select(gauge => MapToDto(gauge)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<BackflowGaugeDto> GetValidGaugeForBpatAsync(int gaugeId, int bpatUserId, CancellationToken cancellationToken)
+    {
+        EnsureCanActAsBpat(bpatUserId);
+
+        var gauge = MapToDto(await _gaugeRepository.GetCompanyOrUserGaugeAsync(gaugeId, bpatUserId, cancellationToken));
+
+        if (gauge?.LastCalibrationDate == null || gauge.ExpirationType == GaugeExpirationType.Expired)
+        {
+            throw new AppValidationException("Please select a valid test gauge.");
+        }
+
+        return gauge;
+    }
+
+    private void EnsureCanActAsBpat(int bpatUserId)
+    {
+        if (IsTesterWithoutAdminRights() && bpatUserId != _authService.ActingAsUserId)
+        {
+            throw new AppValidationException("You can only use the gauges available to your own BPAT account.");
+        }
+    }
+
     public async Task<int> CountUsableByCurrentUserAsync(CancellationToken cancellationToken)
     {
         if (IsTesterWithoutAdminRights())

@@ -26,6 +26,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
+using Envirotrax.Common;
 using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
@@ -58,6 +59,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
     private readonly IProfessionalUserLicenseService _licenseService;
     private readonly IMailingInfoRedactionService _mailingInfoRedactionService;
     private readonly ISubmissionWaterSupplierService _submissionSupplierService;
+    private readonly IBackflowGaugeService _gaugeService;
     private readonly ILogger<BackflowTestService> _logger;
 
     public BackflowTestService(
@@ -80,6 +82,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         IProfessionalUserLicenseService licenseService,
         IMailingInfoRedactionService mailingInfoRedactionService,
         ISubmissionWaterSupplierService submissionSupplierService,
+        IBackflowGaugeService gaugeService,
         ILogger<BackflowTestService> logger)
         : base(mapper, repository)
     {
@@ -101,6 +104,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         _licenseService = licenseService;
         _mailingInfoRedactionService = mailingInfoRedactionService;
         _submissionSupplierService = submissionSupplierService;
+        _gaugeService = gaugeService;
         _logger = logger;
     }
 
@@ -290,6 +294,38 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
                 dto.BpatCellNumber = bpatUser.User?.PhoneNumber;
             }
         }
+    }
+
+    private void EnsureCanSubmitForBpat(BackflowTestDto dto)
+    {
+        var isTesterWithoutAdminRights = !_authService.HasAnyRole(RoleDefinitions.Professionals.Admin);
+
+        if (isTesterWithoutAdminRights && dto.Bpat?.Id != _authService.ActingAsUserId)
+        {
+            throw new AppValidationException("You can only submit tests under your own BPAT account.");
+        }
+    }
+
+    // V1 parity: the gauge fields are read from the selected gauge on the server, never taken from the request.
+    private async Task ApplyGaugeAsync(BackflowTestDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.DeviceType == nameof(BackflowDeviceType.AG))
+        {
+            return;
+        }
+
+        if (dto.GaugeId is not int gaugeId || dto.Bpat?.Id is not int bpatUserId)
+        {
+            throw new AppValidationException("Please select a test gauge.");
+        }
+
+        var gauge = await _gaugeService.GetValidGaugeForBpatAsync(gaugeId, bpatUserId, cancellationToken);
+
+        dto.GaugeManufacturer = gauge.Manufacturer;
+        dto.GaugeModel = gauge.Model;
+        dto.GaugeSerialNumber = gauge.SerialNumber;
+        dto.GaugeLastCalibrationDate = gauge.LastCalibrationDate;
+        dto.GaugeNonPotable = !gauge.IsPortable;
     }
 
     // TestDate is the derived "overall test date" (mirrors V1's submit behavior): air-gap tests store
@@ -731,6 +767,9 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         await ApplyWaterSupplierAsync(dto, cancellationToken);
 
+        EnsureCanSubmitForBpat(dto);
+        await ApplyGaugeAsync(dto, cancellationToken);
+
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);
 
@@ -879,6 +918,9 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         // is checked, and redaction decided, against the test's own ones rather than the request's.
         dto.Site = existing.SiteId == null ? null : new ReferencedSiteDto { Id = existing.SiteId };
         dto.WaterSupplier = new ReferencedWaterSupplierDto { Id = existing.WaterSupplierId };
+
+        EnsureCanSubmitForBpat(dto);
+        await ApplyGaugeAsync(dto, cancellationToken);
 
         await PopulateBpatSnapshotAsync(dto);
         DeriveTestDate(dto);

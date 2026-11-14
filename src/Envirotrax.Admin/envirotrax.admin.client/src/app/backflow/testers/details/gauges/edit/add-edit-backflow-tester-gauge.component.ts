@@ -2,13 +2,17 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalReference } from '@developer-partners/ngx-modal-dialog';
-import { HelperService, ToastService } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../../../shared/components/shared.components.module';
 import { BackflowGauge } from '../../../../../shared/models/backflow/backflow-gauge';
 import { BackflowTesterGaugeService } from '../../../../../shared/services/backflow/backflow-tester-gauge.service';
+import { BackflowTesterUserService } from '../../../../../shared/services/backflow/backflow-tester-user.service';
+
+const COMPANY_OPTION_ID = 0;
 
 export interface BackflowTesterGaugeModalData {
     professionalId: number;
+    companyName: string;
     gauge: BackflowGauge;
 }
 
@@ -25,6 +29,8 @@ export class AddEditBackflowTesterGaugeComponent {
     public calibrationFile: File | null = null;
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
+    public assignedToOptions: InputOption[] = [];
+    public assignedUserId = COMPANY_OPTION_ID;
 
     public readonly isEditMode: boolean;
 
@@ -34,6 +40,7 @@ export class AddEditBackflowTesterGaugeComponent {
     constructor(
         private readonly _modalReference: ModalReference<BackflowTesterGaugeModalData, BackflowGauge>,
         private readonly _gaugeService: BackflowTesterGaugeService,
+        private readonly _userService: BackflowTesterUserService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
@@ -44,6 +51,25 @@ export class AddEditBackflowTesterGaugeComponent {
         this.gauge = { ...gauge };
         this.isEditMode = !!gauge.id;
         this.idPrefix = `backflow-tester-${professionalId}-gauge-${gauge.id ?? 'new'}`;
+
+        if (!this.isEditMode) {
+            this.loadAssignedToOptions();
+        }
+    }
+
+    // V1 parity: a gauge is registered for the company or for one of its testers, and stays with it.
+    private async loadAssignedToOptions(): Promise<void> {
+        const { professionalId, companyName } = this._modalReference.config.model!;
+
+        try {
+            this.isLoading = true;
+
+            const testerOptions = await this._userService.getAllAsOptions(professionalId);
+
+            this.assignedToOptions = [{ id: COMPANY_OPTION_ID, text: companyName }, ...testerOptions];
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async save(form: NgForm): Promise<void> {
@@ -57,6 +83,10 @@ export class AddEditBackflowTesterGaugeComponent {
             this.isLoading = true;
 
             const { professionalId } = this._modalReference.config.model!;
+
+            if (!this.isEditMode) {
+                this.gauge.professionalUser = this.assignedUserId !== COMPANY_OPTION_ID ? { id: this.assignedUserId } : null;
+            }
 
             // The certificate is stored once at creation; editing only revises the gauge details.
             const saved = this.isEditMode

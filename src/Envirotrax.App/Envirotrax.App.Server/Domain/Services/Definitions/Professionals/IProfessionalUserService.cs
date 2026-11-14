@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 
 namespace Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
@@ -17,5 +18,6 @@ public interface IProfessionalUserService : IService<ProfessionalUser, Professio
     Task<IPagedData<ProfessionalUserDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null);
     Task<ProfessionalUserDto> AddForProfessionalAsync(int professionalId, ProfessionalUserDto dto, CancellationToken cancellationToken);
     Task<ProfessionalUserDto?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle);
+    Task<ProfessionalUserDto?> UpdatePaymentBypassAsync(int professionalId, int userId, ProfessionalType professionalType, bool isPaymentBypassed);
     Task<ProfessionalUserDto?> DeleteForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken);
 }

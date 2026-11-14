@@ -60,6 +60,7 @@ public class ProfessionalReceiptService : IProfessionalReceiptService
             CardCharge = transaction.CardCharge,
             BalanceAdjustment = transaction.BalanceAdjustment,
             Total = transaction.Amount,
+            IsPaymentBypassed = transaction.IsPaymentBypassed,
             ShowCreditCard = transaction.CardCharge != 0,
             ShowBalanceAdjustment = transaction.BalanceAdjustment != 0,
             ShowTotal = transaction.TransactionType != ProfessionalTransactionType.BalanceAdjustment

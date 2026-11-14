@@ -14,14 +14,21 @@
                 <span>Total submission fee:</span>
                 <span>{{ receipt.amount | currency }}</span>
             </div>
-            <div class="d-flex justify-content-between">
-                <span>Deducted from account balance:</span>
-                <span>{{ -receipt.balanceAdjustment | currency }}</span>
-            </div>
-            <div class="d-flex justify-content-between">
-                <span>Charged to credit card:</span>
-                <span>{{ receipt.cardCharge | currency }}</span>
-            </div>
+            @if (receipt.isPaymentBypassed) {
+                <div class="d-flex justify-content-between">
+                    <span>Payment:</span>
+                    <span>Bypassed</span>
+                </div>
+            } @else {
+                <div class="d-flex justify-content-between">
+                    <span>Deducted from account balance:</span>
+                    <span>{{ -receipt.balanceAdjustment | currency }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Charged to credit card:</span>
+                    <span>{{ receipt.cardCharge | currency }}</span>
+                </div>
+            }
             @if (receipt.cardCharge > 0) {
                 <div class="d-flex justify-content-between">
                     <span>Card:</span>

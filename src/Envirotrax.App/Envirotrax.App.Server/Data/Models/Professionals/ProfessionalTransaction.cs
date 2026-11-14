@@ -46,6 +46,8 @@ public class ProfessionalTransaction : IProfessionalModel
 
     [StringLength(25)]
     public string? CardNumber { get; set; }
+
+    public bool IsPaymentBypassed { get; set; }
 }
 
 public class ProfessionalTransactionConfiguration : IEntityTypeConfiguration<ProfessionalTransaction>

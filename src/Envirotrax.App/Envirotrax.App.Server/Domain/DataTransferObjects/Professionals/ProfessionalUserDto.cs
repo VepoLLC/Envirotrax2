@@ -33,6 +33,11 @@ public class ProfessionalUserDto : IDto
     public bool IsFogInspector { get; set; }
     public bool IsFogTransporter { get; set; }
 
+    public bool IsBackflowTestingPaymentBypassed { get; set; }
+    public bool IsCsiInspectionPaymentBypassed { get; set; }
+    public bool IsFogInspectionPaymentBypassed { get; set; }
+    public bool IsFogTransportationPaymentBypassed { get; set; }
+
     public string? BpatLicenseNumber { get; set; }
     public string? BpatLicenseTypeName { get; set; }
     public DateTime? BpatLicenseExpirationDate { get; set; }

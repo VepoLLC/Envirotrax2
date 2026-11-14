@@ -30,17 +30,23 @@ public class BackflowCheckoutService
         IAuthService authService,
         IBackflowTestRepository testRepository,
         IProfessionalRepository professionalRepository,
+        IProfessionalUserRepository professionalUserRepository,
         IProfessionalTransactionRepository transactionRepository,
         IProfessionalPaymentService paymentService,
         IBackflowTestNotificationService notificationService,
         IBackflowCheckoutEmailService checkoutEmailService,
         IMailingInfoRedactionService mailingInfoRedactionService)
-        : base(authService, professionalRepository, transactionRepository, paymentService, mailingInfoRedactionService)
+        : base(authService, professionalRepository, professionalUserRepository, transactionRepository, paymentService, mailingInfoRedactionService)
     {
         _mapper = mapper;
         _testRepository = testRepository;
         _notificationService = notificationService;
         _checkoutEmailService = checkoutEmailService;
+    }
+
+    protected override bool IsPaymentBypassed(ProfessionalUser payer)
+    {
+        return payer.IsBackflowTestingPaymentBypassed;
     }
 
     protected override Task<List<BackflowTest>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)

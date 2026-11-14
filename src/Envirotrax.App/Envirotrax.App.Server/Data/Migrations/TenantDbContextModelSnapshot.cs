@@ -3065,6 +3065,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
+                    b.Property<bool>("IsPaymentBypassed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NameOnCard")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -3141,10 +3144,22 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsBackflowTester")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsBackflowTestingPaymentBypassed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCsiInspectionPaymentBypassed")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsCsiInspector")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsFogInspectionPaymentBypassed")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsFogInspector")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFogTransportationPaymentBypassed")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsFogTransporter")

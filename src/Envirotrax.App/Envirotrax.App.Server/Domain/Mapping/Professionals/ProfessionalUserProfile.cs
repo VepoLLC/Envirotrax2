@@ -28,7 +28,11 @@ public class ProfessionalUserProfile : Profile
             .ForMember(proUser => proUser.User, opt => opt.Ignore())
             .ForMember(proUser => proUser.UserId, opt => opt.MapFrom(proUser => proUser.Id))
             .ForMember(proUser => proUser.BillingState, opt => opt.Ignore())
-            .ForMember(proUser => proUser.BillingStateId, opt => opt.MapFrom(proUser => proUser.BillingState!.Id));
+            .ForMember(proUser => proUser.BillingStateId, opt => opt.MapFrom(proUser => proUser.BillingState!.Id))
+            .ForMember(proUser => proUser.IsBackflowTestingPaymentBypassed, opt => opt.Ignore())
+            .ForMember(proUser => proUser.IsCsiInspectionPaymentBypassed, opt => opt.Ignore())
+            .ForMember(proUser => proUser.IsFogInspectionPaymentBypassed, opt => opt.Ignore())
+            .ForMember(proUser => proUser.IsFogTransportationPaymentBypassed, opt => opt.Ignore());
 
         CreateMap<AppUser, ReferencedProfessionalUserDto>()
                .ForMember(d => d.EmailAddress, opt => opt.MapFrom(s => s.Email))

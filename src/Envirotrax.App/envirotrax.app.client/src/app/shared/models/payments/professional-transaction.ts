@@ -24,4 +24,5 @@ export interface ProfessionalTransaction {
     balanceAdjustment: number;
     cardCharge: number;
     amount: number;
+    isPaymentBypassed: boolean;
 }

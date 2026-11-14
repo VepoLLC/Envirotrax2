@@ -18,6 +18,7 @@ public class AuthService : TenantProviderService, IAuthService
     private readonly IWaterSupplierUserRepository _supplierUserRepository;
     private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IFeatureRepository _featureRepository;
+    private readonly IUserImpersonationRequestRepository _impersonationRequestRepository;
     private readonly UserManager<AppUser> _userManager;
 
     public AuthService(
@@ -25,12 +26,14 @@ public class AuthService : TenantProviderService, IAuthService
         IWaterSupplierUserRepository supplierUserRepository,
         IProfessionalUserRepository professionalUserRepository,
         IFeatureRepository featureRepository,
+        IUserImpersonationRequestRepository impersonationRequestRepository,
         UserManager<AppUser> userManager)
         : base(contextAccessor)
     {
         _supplierUserRepository = supplierUserRepository;
         _professionalUserRepository = professionalUserRepository;
         _featureRepository = featureRepository;
+        _impersonationRequestRepository = impersonationRequestRepository;
         _userManager = userManager;
     }
 
@@ -50,7 +53,10 @@ public class AuthService : TenantProviderService, IAuthService
 
         if (userAccess.ImpersonatedUserId.HasValue)
         {
+            RemoveSuperUserRole(principal);
             SetImpersonatedUser(principal, userAccess.ImpersonatedUserId.Value, userAccess.ImpersonatedUserName!);
+
+            await _impersonationRequestRepository.AddAsync(userId, userAccess.ImpersonatedUserId.Value);
         }
 
         var features = await _featureRepository.GetAllAsync(userAccess.WaterSupplierId, userAccess.WaterSupplierIdRequested, userAccess.ProfessionalIdRequested);
@@ -58,28 +64,40 @@ public class AuthService : TenantProviderService, IAuthService
         AddClaim(principal, "fts", string.Join(',', features.Select(f => (int)f)));
     }
 
-    public async Task ValidateImpersonationAsync(ClaimsPrincipal principal, int userId)
+    public async Task ValidateImpersonationAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? professionalId, int? impersonatedUserId)
     {
         var impersonatedUserIdClaim = principal.FindFirstValue(ImpersonatedUserIdClaim);
 
         if (string.IsNullOrWhiteSpace(impersonatedUserIdClaim))
         {
+            if (impersonatedUserId.HasValue)
+            {
+                throw new ValidationException("Users can be impersonated only when signing in.");
+            }
+
             return;
         }
 
-        var impersonatedUserId = int.Parse(impersonatedUserIdClaim);
-        var professionalId = int.Parse(principal.FindFirstValue("prfId")!);
-
-        await GetAccessSettingsAsync(userId, null, professionalId, impersonatedUserId);
-    }
-
-    private async Task<AppUser> GetImpersonatedUserAsync(int userId, int impersonatedUserId, int? waterSupplierId, int? professionalId)
-    {
-        if (waterSupplierId.HasValue || !professionalId.HasValue)
+        if (waterSupplierId.HasValue || professionalId.HasValue || impersonatedUserId.HasValue)
         {
-            throw new ValidationException("Users can be impersonated only within a registered professional.");
+            throw new ValidationException("The account can't be changed while impersonating another user.");
         }
 
+        var currentImpersonatedUserId = int.Parse(impersonatedUserIdClaim);
+        var currentProfessionalId = int.Parse(principal.FindFirstValue("prfId")!);
+
+        await GetImpersonatedUserAsync(userId, currentImpersonatedUserId);
+
+        var professionalUser = await _professionalUserRepository.GetAsync(currentProfessionalId, currentImpersonatedUserId);
+
+        if (professionalUser == null)
+        {
+            throw new ValidationException("User doesn't have access to this registered professional.");
+        }
+    }
+
+    private async Task<AppUser> GetImpersonatedUserAsync(int userId, int impersonatedUserId)
+    {
         var user = await _userManager.FindByIdAsync(userId.ToString());
 
         if (user == null || !user.IsSuperUser)
@@ -127,6 +145,21 @@ public class AuthService : TenantProviderService, IAuthService
         }
     }
 
+    private void RemoveSuperUserRole(ClaimsPrincipal principal)
+    {
+        if (principal.Identity is ClaimsIdentity claimsIdentity)
+        {
+            var superUserClaims = claimsIdentity
+                .FindAll(claim => claim.Type == OpenIddictConstants.Claims.Role && claim.Value == RoleDefinitions.SuperUser)
+                .ToList();
+
+            foreach (var claim in superUserClaims)
+            {
+                claimsIdentity.RemoveClaim(claim);
+            }
+        }
+    }
+
     private async Task<UserAccessDto> GetAccessSettingsAsync(int userId, int? waterSupplierId, int? professionalid, int? impersonatedUserId)
     {
         var accessDto = new UserAccessDto();
@@ -134,7 +167,12 @@ public class AuthService : TenantProviderService, IAuthService
 
         if (impersonatedUserId.HasValue)
         {
-            var impersonatedUser = await GetImpersonatedUserAsync(userId, impersonatedUserId.Value, waterSupplierId, professionalid);
+            if (waterSupplierId.HasValue || !professionalid.HasValue)
+            {
+                throw new ValidationException("Users can be impersonated only within a registered professional.");
+            }
+
+            var impersonatedUser = await GetImpersonatedUserAsync(userId, impersonatedUserId.Value);
 
             accessDto.ImpersonatedUserId = impersonatedUser.Id;
             accessDto.ImpersonatedUserName = impersonatedUser.UserName;

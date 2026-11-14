@@ -304,6 +304,17 @@ dp-loading-spinner.vp-spinner-overlay .dp-spinner-container {
     bottom: 0 !important;
 }
 
+/* Allow scrolling during section loading, but preserve
+   the window scroll lock while other spinners are active. */
+.vp-window-body:has(dp-loading-spinner.vp-section-spinner:not([hidden])):not(:has(dp-loading-spinner:not(.vp-section-spinner):not([hidden]))) {
+    overflow: auto !important;
+}
+
+dp-loading-spinner.vp-section-spinner .dp-spinner-container {
+    top: 0 !important;
+    bottom: 0 !important;
+}
+
 .input-group .vp-input-container .form-control {
     margin-left: calc(-1 * var(--bs-border-width));
     border-top-left-radius: 0px;

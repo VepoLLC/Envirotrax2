@@ -1,6 +1,6 @@
 <vp-section [header]="'Insurance Policies (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
     <div dp-spinner-parent>
-        <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+        <dp-loading-spinner *ngIf="table.isLoading" class="vp-section-spinner"></dp-loading-spinner>
 
         <vp-table *ngIf="table.items"
                   [columns]="table.columns!"

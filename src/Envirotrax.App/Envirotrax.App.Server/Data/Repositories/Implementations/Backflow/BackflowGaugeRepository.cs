@@ -1,25 +1,77 @@
 
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
+using Envirotrax.App.Server.Data.DbContexts;
 using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 using Envirotrax.App.Server.Data.Services.Definitions;
+using Envirotrax.Common;
+using Envirotrax.Common.Domain.Services.Defintions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow;
 
 public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGaugeRepository
 {
-    public BackflowGaugeRepository(IDbContextSelector dbContextSelector)
+    private readonly IAuthService _authService;
+
+    public BackflowGaugeRepository(IDbContextSelector dbContextSelector, IAuthService authService)
         : base(dbContextSelector)
     {
+        _authService = authService;
+    }
+
+    protected override IQueryable<BackflowGauge> GetListQuery()
+    {
+        return IncludeAssignedUser(OnlyOwnGaugesForTesterWithoutAdminRights(base.GetListQuery()));
+    }
+
+    protected override IQueryable<BackflowGauge> GetDetailsQuery()
+    {
+        return IncludeAssignedUser(OnlyOwnGaugesForTesterWithoutAdminRights(base.GetDetailsQuery()));
+    }
+
+    public override async Task<BackflowGauge?> GetTrackedForUpdateAsync(int id, CancellationToken cancellationToken)
+    {
+        return await OnlyOwnGaugesForTesterWithoutAdminRights(Entity).SingleOrDefaultAsync(gauge => gauge.Id == id, cancellationToken);
+    }
+
+    private static IQueryable<BackflowGauge> IncludeAssignedUser(IQueryable<BackflowGauge> query)
+    {
+        return query
+            .Include(gauge => gauge.ProfessionalUser)
+            .ThenInclude(user => user!.User);
+    }
+
+    private IQueryable<BackflowGauge> OnlyOwnGaugesForTesterWithoutAdminRights(IQueryable<BackflowGauge> query)
+    {
+        var isTesterWithoutAdminRights = DbContext is ProfessionalDbContext
+            && !_authService.HasAnyRole(RoleDefinitions.Professionals.Admin);
+
+        return query.WhereIf(isTesterWithoutAdminRights, gauge => gauge.ProfessionalUserId == _authService.ActingAsUserId);
+    }
+
+    public Task<int> CountCompanyAndUserGaugesAsync(int userId, CancellationToken cancellationToken)
+    {
+        return Entity.CountAsync(gauge => gauge.ProfessionalUserId == null || gauge.ProfessionalUserId == userId, cancellationToken);
+    }
+
+    public async Task<IEnumerable<BackflowGauge>> DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        var gauges = await Entity
+            .Where(gauge => gauge.ProfessionalId == professionalId && gauge.ProfessionalUserId == userId)
+            .ToListAsync(cancellationToken);
+
+        Entity.RemoveRange(gauges);
+        await DbContext.SaveChangesAsync(cancellationToken);
+
+        return gauges;
     }
 
     public async Task<IEnumerable<BackflowGauge>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        var paginated = await DbContext.BackflowGauges
-            .AsNoTracking()
+        var paginated = await IncludeAssignedUser(DbContext.BackflowGauges.AsNoTracking())
             .Where(g => g.ProfessionalId == professionalId)
             .Where(query.Filter)
             .OrderBy(query.Sort)

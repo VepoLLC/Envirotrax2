@@ -130,6 +130,11 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId, cancellationToken);
     }
 
+    public Task<bool> IsBackflowTesterAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId && pu.IsBackflowTester, cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken)
     {
         var dbQuery = DbContext.ProfessionalUsers

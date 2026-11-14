@@ -65,7 +65,7 @@ public class ProfessionalDashboardController : ProfessionalProtectedController
 
         if (canAccessGauges)
         {
-            dto.GaugeCount = await _gaugeService.CountAsync(cancellationToken);
+            dto.GaugeCount = await _gaugeService.CountUsableByCurrentUserAsync(cancellationToken);
         }
 
         if (canAccessTransportation)

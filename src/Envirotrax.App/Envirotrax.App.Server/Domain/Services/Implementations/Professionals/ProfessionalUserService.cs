@@ -13,6 +13,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses
 using Envirotrax.App.Server.Domain.Configuration;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
+using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
@@ -32,6 +33,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IFileStorageService _fileStorageService;
     private readonly IRecordLogService _recordLogService;
+    private readonly IBackflowGaugeService _gaugeService;
 
     public ProfessionalUserService(
         IMapper mapper,
@@ -42,7 +44,8 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         IProfessionalUserLicenseRepository licenseRepository,
         ITimeZoneHelperService timeZoneHelper,
         IFileStorageService fileStorageService,
-        IRecordLogService recordLogService)
+        IRecordLogService recordLogService,
+        IBackflowGaugeService gaugeService)
         : base(mapper, repository)
     {
         _professionalUserRepository = repository;
@@ -53,6 +56,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         _timeZoneHelper = timeZoneHelper;
         _fileStorageService = fileStorageService;
         _recordLogService = recordLogService;
+        _gaugeService = gaugeService;
     }
 
     public override async Task<IPagedData<ProfessionalUserDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -177,7 +181,19 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         await _authApiClient.DeleteAsync<object>(_authService.UserId, $"/api/users/{id}/invitations", CancellationToken.None);
 
-        var deleted = await base.DeleteAsync(id);
+        ProfessionalUserDto? deleted;
+
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            if (user != null)
+            {
+                await _gaugeService.DeleteAssignedToUserAsync(user.ProfessionalId, user.UserId, CancellationToken.None);
+            }
+
+            deleted = await base.DeleteAsync(id);
+
+            scope.Complete();
+        }
 
         if (deleted != null && user != null)
         {

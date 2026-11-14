@@ -156,6 +156,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("ProfessionalId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProfessionalUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -165,7 +168,7 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("ProfessionalId");
+                    b.HasIndex("ProfessionalId", "ProfessionalUserId");
 
                     b.ToTable("BackflowGauges");
                 });
@@ -4754,9 +4757,16 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "ProfessionalUser")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalId", "ProfessionalUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Professional");
+
+                    b.Navigation("ProfessionalUser");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Backflow.BackflowOutOfServiceRequest", b =>

@@ -34,7 +34,7 @@ export class InsuranceService {
     public getFileUrl(insuranceId: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/insurances/${insuranceId}/file-url`);
 
-        return lastValueFrom(this._http.get<string>(url));
+        return lastValueFrom(this._http.get(url, { responseType: 'text' }));
     }
 
     public getLogs(insuranceId: number): Promise<RecordLog[]> {

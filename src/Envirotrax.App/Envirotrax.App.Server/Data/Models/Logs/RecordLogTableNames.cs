@@ -16,4 +16,7 @@ public static class RecordLogTableNames
     public const string WaterSupplierUserAccounts = "WaterSupplierUserAccounts";
     public const string ProfessionalWaterSupplierRegistrations = "ProfessionalWaterSupplierRegistrations";
     public const string FogInspections = "FogInspections";
+    public const string FogTripTickets = "FogTripTickets";
+    public const string FogDisposalSites = "FogDisposalSites";
+    public const string ProfessionalInsurances = "ProfessionalInsurances";
 }

@@ -81,6 +81,7 @@ services.AddTransient<NotificationService>();
 services.AddTransient<ApiAccountService>();
 services.AddTransient<BackflowRenewalRequirementService>();
 services.AddTransient<SiteScheduleService>();
+services.AddTransient<RecordLogService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -185,3 +186,6 @@ await backflowRenewalRequirementService.MigrateAsync();
 
 var siteScheduleService = provider.GetRequiredService<SiteScheduleService>();
 await siteScheduleService.MigrateAsync();
+
+var recordLogService = provider.GetRequiredService<RecordLogService>();
+await recordLogService.MigrateAsync();

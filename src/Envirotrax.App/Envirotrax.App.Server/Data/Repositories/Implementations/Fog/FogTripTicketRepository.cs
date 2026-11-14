@@ -171,7 +171,7 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         ticket.ReceiverWasteDeliveredDate = request.ReceiverWasteDeliveredDate;
         ticket.Comments = request.Comments;
 
-        await DbContext.SaveChangesAsync(cancellationToken);
+        await SaveChangesAsync(logData: true, cancellationToken);
 
         return ticket;
     }
@@ -194,7 +194,7 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
             ticket.ApprovedById = approvedById;
         }
 
-        await DbContext.SaveChangesAsync();
+        await SaveChangesAsync(logData: true);
 
         return ticket;
     }
@@ -211,7 +211,7 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
 
         ticket.ValidationOnHold = onHold;
 
-        await DbContext.SaveChangesAsync(cancellationToken);
+        await SaveChangesAsync(logData: true, cancellationToken);
 
         return ticket;
     }
@@ -229,7 +229,7 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
         ticket.NeedsValidation = needsValidation;
         ticket.ValidationClearedDate = needsValidation ? null : DateTime.UtcNow;
 
-        await DbContext.SaveChangesAsync(cancellationToken);
+        await SaveChangesAsync(logData: true, cancellationToken);
 
         return ticket;
     }

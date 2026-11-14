@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Users;
 using Envirotrax.Common.Data.Attributes;
 using Envirotrax.Common.Data.Models;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Models.Professionals;
 
+[RecordLogged(RecordLogTableNames.ProfessionalInsurances, WaterSupplierSource = RecordLogIdSource.Ambient, ProfessionalSource = RecordLogIdSource.Entity)]
 public class ProfessionalInsurance : IProfessionalModel, ICreateAuditableModel<AppUser>
 {
     [AppPrimaryKey(true)]

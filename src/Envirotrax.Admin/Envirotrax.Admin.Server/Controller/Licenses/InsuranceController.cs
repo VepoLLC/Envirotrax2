@@ -48,4 +48,12 @@ public class InsuranceController : AdminBaseController
 
         return Ok(url);
     }
+
+    [HttpGet("{id}/logs")]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var logs = await _insuranceService.GetLogsAsync(id, cancellationToken);
+
+        return Ok(logs);
+    }
 }

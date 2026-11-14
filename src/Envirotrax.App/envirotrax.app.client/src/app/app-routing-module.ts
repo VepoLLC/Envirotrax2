@@ -100,6 +100,15 @@ const routes: Routes = [
         data: {
           roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
         }
+      },
+      {
+        path: 'letter-history',
+        loadChildren: () => import('./letter-history/letter-history.module').then(m => m.LetterHistoryModule),
+        canActivate: [FeatureGuard, RoleGuard],
+        data: {
+          features: [FeatureType.BackflowTesting, FeatureType.CsiInspection],
+          roles: [ROLE_DEFINITIONS.WATER_SUPPLIER]
+        }
       }
     ]
   },

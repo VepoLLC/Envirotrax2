@@ -18,4 +18,8 @@ public interface ISiteLetterLogRepository : IRepository<SiteLetterLog>
     Task<List<string>> GetFilePathsAsync(DateTime processDate, CancellationToken cancellationToken);
 
     Task<int> DeleteByProcessDateAsync(DateTime processDate);
+
+    Task<List<SiteLetterLogFile>> GetGeneratedPdfFilesAsync(int generatingSupplierId, CancellationToken cancellationToken);
+
+    Task<string?> GetGeneratedPdfFilePathAsync(int generatingSupplierId, DateTime processDate, string fileName, CancellationToken cancellationToken);
 }

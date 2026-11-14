@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedData, PageInfo, Query, QueryHelperService, UrlResolverService } from "@envirotrax/common-ui";
+import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
 import { FogDisposalSite } from "../../models/fog/fog-disposal-site";
 
@@ -40,5 +40,11 @@ export class FogDisposalSiteService {
         const url = this._urlResolver.resolveUrl(`/api/fog/disposal-sites/${id}`);
 
         return lastValueFrom(this._http.delete<void>(url));
+    }
+
+    public getLogs(id: number): Promise<RecordLog[]> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/disposal-sites/${id}/logs`);
+
+        return lastValueFrom(this._http.get<RecordLog[]>(url));
     }
 }

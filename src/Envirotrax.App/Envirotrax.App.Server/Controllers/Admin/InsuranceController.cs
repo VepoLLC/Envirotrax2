@@ -1,5 +1,7 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +11,12 @@ namespace Envirotrax.App.Server.Controllers.Admin;
 public class InsuranceController : AdminBaseController
 {
     private readonly IProfessionalInsuranceService _insuranceService;
+    private readonly IRecordLogService _recordLogService;
 
-    public InsuranceController(IProfessionalInsuranceService insuranceService)
+    public InsuranceController(IProfessionalInsuranceService insuranceService, IRecordLogService recordLogService)
     {
         _insuranceService = insuranceService;
+        _recordLogService = recordLogService;
     }
 
     [HttpGet]
@@ -52,5 +56,13 @@ public class InsuranceController : AdminBaseController
         }
 
         return Ok(url);
+    }
+
+    [HttpGet("{id}/logs")]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.ProfessionalInsurances, id, cancellationToken);
+
+        return Ok(logs);
     }
 }

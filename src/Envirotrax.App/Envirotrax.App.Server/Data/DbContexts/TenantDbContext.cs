@@ -38,6 +38,7 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
     public DbSet<Role> Roles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<UserImpersonationRequest> UserImpersonationRequests { get; set; }
 
     public DbSet<GisArea> GisAreas { get; set; }
     public DbSet<GisAreaCoordinate> GisAreaCoordinates { get; set; }

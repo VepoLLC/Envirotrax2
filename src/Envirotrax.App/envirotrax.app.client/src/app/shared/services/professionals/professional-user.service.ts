@@ -37,6 +37,11 @@ export class ProfesionalUserService {
         return lastValueFrom(this._currentUser$);
     }
 
+    public reloadMyData(): Promise<ProfessionalUser> {
+        this._currentUser$ = undefined;
+        return this.getMyData();
+    }
+
     public async updateMyData(user: ProfessionalUser): Promise<ProfessionalUser> {
         const url = this._urlResolver.resolveUrl('/api/professionals/users/my');
 

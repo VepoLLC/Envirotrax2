@@ -3065,6 +3065,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
+                    b.Property<bool>("IsPaymentBypassed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NameOnCard")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -3141,10 +3144,22 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("IsBackflowTester")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsBackflowTestingPaymentBypassed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCsiInspectionPaymentBypassed")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsCsiInspector")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsFogInspectionPaymentBypassed")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsFogInspector")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFogTransportationPaymentBypassed")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsFogTransporter")
@@ -3989,6 +4004,35 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasIndex("PermissionId");
 
                     b.ToTable("RolePermissions");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.UserImpersonationRequest", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SourceUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("SourceUserId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.ToTable("UserImpersonationRequests");
                 });
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.UserRole", b =>
@@ -5903,6 +5947,33 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("Permission");
 
                     b.Navigation("Role");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.UserImpersonationRequest", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "SourceUser")
+                        .WithMany()
+                        .HasForeignKey("SourceUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SourceUser");
+
+                    b.Navigation("TargetUser");
 
                     b.Navigation("WaterSupplier");
                 });

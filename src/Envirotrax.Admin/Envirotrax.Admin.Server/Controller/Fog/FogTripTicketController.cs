@@ -54,4 +54,12 @@ public class FogTripTicketController : AdminBaseController
 
         return ticket == null ? NotFound() : Ok(ticket);
     }
+
+    [HttpGet("{id}/logs")]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var logs = await _tripTicketService.GetLogsAsync(id, cancellationToken);
+
+        return Ok(logs);
+    }
 }

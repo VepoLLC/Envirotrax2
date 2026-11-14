@@ -21,6 +21,7 @@ export interface ProfessionalCheckoutReceipt<TItem> {
     cardCharge: number;
     nameOnCard?: string;
     cardNumber?: string;
+    isPaymentBypassed: boolean;
     emailResults: CheckoutEmailResult[];
     items: TItem[];
 }

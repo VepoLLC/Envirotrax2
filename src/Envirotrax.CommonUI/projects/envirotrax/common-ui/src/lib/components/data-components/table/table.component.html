@@ -4,6 +4,7 @@
                 type="button"
                 class="btn btn-primary btn-sm text-nowrap"
                 (click)="onViewDetails(rowData)"
+                title="View"
                 aria-label="View">
             <i class="fa-solid fa-magnifying-glass"></i>
             <span class="ms-1" *ngIf="showActionLabels">View</span>
@@ -12,6 +13,7 @@
                 type="button"
                 class="btn btn-primary btn-sm text-nowrap"
                 (click)="onEdit(rowData)"
+                title="Edit"
                 aria-label="Edit">
             <i class="fa-solid fa-pencil"></i>
             <span class="ms-1" *ngIf="showActionLabels">Edit</span>
@@ -19,6 +21,7 @@
         <button *ngIf="canDelete"
                 type="button" class="btn btn-primary btn-sm text-nowrap"
                 (click)="onDelete(rowData)"
+                title="Delete"
                 aria-label="Delete">
             <i class="fa-solid fa-trash"></i>
             <span class="ms-1" *ngIf="showActionLabels">Delete</span>
@@ -28,6 +31,7 @@
                     type="button"
                     class="btn btn-primary btn-sm text-nowrap"
                     (click)="customActionClicked(action, rowData)"
+                    [attr.title]="action.text"
                     [attr.aria-label]="action.text">
                 <i [attr.class]="action.iconClass"></i>
                 <span class="ms-1" *ngIf="showActionLabels">{{action.text}}</span>

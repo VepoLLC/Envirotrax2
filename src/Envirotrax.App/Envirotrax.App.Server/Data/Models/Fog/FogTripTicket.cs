@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Models.States;
@@ -15,6 +16,7 @@ namespace Envirotrax.App.Server.Data.Models.Fog;
 [Table("FogTripTickets")]
 // ISharedProfessionalModel: trip tickets are visible to every professional, but only the professional
 // that recorded one can change or delete it. See ProfessionalDbContext.SetSecurityProperties.
+[RecordLogged(RecordLogTableNames.FogTripTickets)]
 public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel, ISharedProfessionalModel
 {
     [AppPrimaryKey(true)]

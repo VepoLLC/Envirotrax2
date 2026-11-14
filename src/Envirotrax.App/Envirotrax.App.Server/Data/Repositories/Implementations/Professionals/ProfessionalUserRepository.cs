@@ -58,6 +58,11 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         entry.Property(u => u.IsFogInspector).IsModified = isAdmin;
         entry.Property(u => u.IsFogTransporter).IsModified = isAdmin;
         entry.Property(u => u.IsWiseGuy).IsModified = isAdmin;
+
+        entry.Property(u => u.IsBackflowTestingPaymentBypassed).IsModified = false;
+        entry.Property(u => u.IsCsiInspectionPaymentBypassed).IsModified = false;
+        entry.Property(u => u.IsFogInspectionPaymentBypassed).IsModified = false;
+        entry.Property(u => u.IsFogTransportationPaymentBypassed).IsModified = false;
     }
 
     public async Task<ProfessionalUser?> UpdateNonSensitiveDataAsync(ProfessionalUser user)
@@ -105,6 +110,54 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         }
 
         return existing;
+    }
+
+    public async Task<ProfessionalUser?> UpdatePaymentBypassAsync(int professionalId, int userId, ProfessionalType professionalType, bool isPaymentBypassed)
+    {
+        var existing = await DbContext.ProfessionalUsers
+            .Include(proUser => proUser.User)
+            .Where(HasProfessionalType(professionalType))
+            .SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
+
+        if (existing != null)
+        {
+            SetPaymentBypassed(existing, professionalType, isPaymentBypassed);
+
+            await SaveChangesAsync(logData: true);
+        }
+
+        return existing;
+    }
+
+    private static Expression<Func<ProfessionalUser, bool>> HasProfessionalType(ProfessionalType professionalType)
+    {
+        return professionalType switch
+        {
+            ProfessionalType.Bpat => proUser => proUser.IsBackflowTester,
+            ProfessionalType.CsiInspector => proUser => proUser.IsCsiInspector,
+            ProfessionalType.FogInspector => proUser => proUser.IsFogInspector,
+            ProfessionalType.FogTransporter => proUser => proUser.IsFogTransporter,
+            _ => proUser => false
+        };
+    }
+
+    private static void SetPaymentBypassed(ProfessionalUser user, ProfessionalType professionalType, bool isPaymentBypassed)
+    {
+        switch (professionalType)
+        {
+            case ProfessionalType.Bpat:
+                user.IsBackflowTestingPaymentBypassed = isPaymentBypassed;
+                break;
+            case ProfessionalType.CsiInspector:
+                user.IsCsiInspectionPaymentBypassed = isPaymentBypassed;
+                break;
+            case ProfessionalType.FogInspector:
+                user.IsFogInspectionPaymentBypassed = isPaymentBypassed;
+                break;
+            case ProfessionalType.FogTransporter:
+                user.IsFogTransportationPaymentBypassed = isPaymentBypassed;
+                break;
+        }
     }
 
     public async Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalReference } from '@developer-partners/ngx-modal-dialog';
-import { HelperService, ToastService } from '@envirotrax/common-ui';
+import { HelperService, RecordLog, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../../../shared/components/shared.components.module';
 import { ProfessionalInsurance } from '../../../../../shared/models/professionals/professional-insurance';
 import { CsiInspectorInsuranceService } from '../../../../../shared/services/csi/csi-inspector-insurance.service';
+import { InsuranceService } from '../../../../../shared/services/licenses/insurance.service';
 
 export interface CsiInspectorInsuranceModalData {
     professionalId: number;
@@ -20,11 +21,14 @@ export interface CsiInspectorInsuranceModalData {
         SharedComponentsModule
     ],
 })
-export class AddEditCsiInspectorInsuranceComponent {
+export class AddEditCsiInspectorInsuranceComponent implements OnInit {
     public insurance: ProfessionalInsurance;
     public certificateFile: File | null = null;
     public isLoading: boolean = false;
+    public isLoadingRecordLogs: boolean = false;
     public validationErrors: string[] = [];
+    public recordLogs: RecordLog[] = [];
+    public recordLogTitle: string = 'Record Log';
 
     public get isEditMode(): boolean {
         return !!this._modalReference.config.model?.insurance?.id;
@@ -34,9 +38,14 @@ export class AddEditCsiInspectorInsuranceComponent {
         private readonly _modalReference: ModalReference<CsiInspectorInsuranceModalData, ProfessionalInsurance>,
         private readonly _insuranceService: CsiInspectorInsuranceService,
         private readonly _helper: HelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _generalInsuranceService: InsuranceService
     ) {
         this.insurance = { ...this._modalReference.config.model!.insurance };
+    }
+
+    public async ngOnInit(): Promise<void> {
+        await this.loadRecordLogs();
     }
 
     public async save(form: NgForm): Promise<void> {
@@ -71,5 +80,21 @@ export class AddEditCsiInspectorInsuranceComponent {
 
     public cancel(): void {
         this._modalReference.cancel();
+    }
+
+    private async loadRecordLogs(): Promise<void> {
+        const id = this.insurance.id;
+
+        if (!id) {
+            return;
+        }
+
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._generalInsuranceService.getLogs(id);
+            this.recordLogTitle = `Record Log (${this.recordLogs.length})`;
+        } finally {
+            this.isLoadingRecordLogs = false;
+        }
     }
 }

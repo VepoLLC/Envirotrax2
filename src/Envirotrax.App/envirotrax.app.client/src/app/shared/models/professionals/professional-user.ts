@@ -14,6 +14,11 @@ export interface ProfessionalUser {
     isFogInspector?: boolean;
     isFogTransporter?: boolean;
 
+    isBackflowTestingPaymentBypassed?: boolean;
+    isCsiInspectionPaymentBypassed?: boolean;
+    isFogInspectionPaymentBypassed?: boolean;
+    isFogTransportationPaymentBypassed?: boolean;
+
     bpatLicenseNumber?: string;
     bpatLicenseTypeName?: string;
     bpatLicenseExpirationDate?: string;

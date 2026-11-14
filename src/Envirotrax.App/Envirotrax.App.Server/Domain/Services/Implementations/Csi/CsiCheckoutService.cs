@@ -32,18 +32,24 @@ public class CsiCheckoutService
         ICsiInspectionRepository inspectionRepository,
         ISiteRepository siteRepository,
         IProfessionalRepository professionalRepository,
+        IProfessionalUserRepository professionalUserRepository,
         IProfessionalTransactionRepository transactionRepository,
         IProfessionalPaymentService paymentService,
         ICsiCheckoutEmailService checkoutEmailService,
         ICsiInspectionAssemblyService assemblyService,
         IMailingInfoRedactionService mailingInfoRedactionService)
-        : base(authService, professionalRepository, transactionRepository, paymentService, mailingInfoRedactionService)
+        : base(authService, professionalRepository, professionalUserRepository, transactionRepository, paymentService, mailingInfoRedactionService)
     {
         _mapper = mapper;
         _inspectionRepository = inspectionRepository;
         _siteRepository = siteRepository;
         _checkoutEmailService = checkoutEmailService;
         _assemblyService = assemblyService;
+    }
+
+    protected override bool IsPaymentBypassed(ProfessionalUser payer)
+    {
+        return payer.IsCsiInspectionPaymentBypassed;
     }
 
     protected override Task<List<CsiInspection>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)

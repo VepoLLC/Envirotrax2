@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalReference } from '@developer-partners/ngx-modal-dialog';
-import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
+import { HelperService, InputOption, RecordLog, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { FogDisposalSite, PhysicalType, physicalTypeOptions } from '../../../shared/models/fog/fog-disposal-site';
 import { State } from '../../../shared/models/lookup/state';
@@ -21,7 +21,7 @@ export interface FogDisposalSiteModalData {
         SharedComponentsModule
     ],
 })
-export class AddEditFogDisposalSiteComponent {
+export class AddEditFogDisposalSiteComponent implements OnInit {
     public site: FogDisposalSite;
     public stateId: string;
     public physicalTypeId: string;
@@ -29,7 +29,10 @@ export class AddEditFogDisposalSiteComponent {
     public longitude: string;
 
     public isLoading: boolean = false;
+    public isLoadingRecordLogs: boolean = false;
     public validationErrors: string[] = [];
+    public recordLogs: RecordLog[] = [];
+    public recordLogTitle: string = 'Record Log';
 
     public readonly isEditMode: boolean;
     public readonly stateOptions: InputOption<State>[];
@@ -52,6 +55,10 @@ export class AddEditFogDisposalSiteComponent {
         this.physicalTypeId = String(site.physicalType ?? PhysicalType.Landfill);
         this.latitude = site.latitude == null ? '' : String(site.latitude);
         this.longitude = site.longitude == null ? '' : String(site.longitude);
+    }
+
+    public async ngOnInit(): Promise<void> {
+        await this.loadRecordLogs();
     }
 
     public async save(form: NgForm): Promise<void> {
@@ -85,6 +92,22 @@ export class AddEditFogDisposalSiteComponent {
 
     public cancel(): void {
         this._modalReference.cancel();
+    }
+
+    private async loadRecordLogs(): Promise<void> {
+        const id = this.site.id;
+
+        if (!id) {
+            return;
+        }
+
+        try {
+            this.isLoadingRecordLogs = true;
+            this.recordLogs = await this._disposalSiteService.getLogs(id);
+            this.recordLogTitle = `Record Log (${this.recordLogs.length})`;
+        } finally {
+            this.isLoadingRecordLogs = false;
+        }
     }
 
     private buildSite(): FogDisposalSite {

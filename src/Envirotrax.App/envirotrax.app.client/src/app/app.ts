@@ -106,6 +106,7 @@ export class App implements OnInit {
   private async createWaterSupplierMenuItems(): Promise<MenuItem[]> {
     const hasLicenseAccess = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.Licenses)
       || await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
+    const hasLetterHistoryAccess = await this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.AccountInformation);
 
     return [
       {
@@ -207,8 +208,8 @@ export class App implements OnInit {
           {
             title: 'Letter History',
             iconCss: 'fa-regular fa-envelope',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['letter-history'],
+            hasPermission: hasLetterHistoryAccess,
             hasFeature: true
           },
           {
@@ -307,8 +308,8 @@ export class App implements OnInit {
           {
             title: 'Letter History',
             iconCss: 'fa-regular fa-envelope',
-            routerLink: ['/'],
-            hasPermission: true,
+            routerLink: ['letter-history'],
+            hasPermission: hasLetterHistoryAccess,
             hasFeature: true
           },
           {
@@ -601,14 +602,14 @@ export class App implements OnInit {
       {
         title: 'FOG Management',
         iconCss: 'fa-regular fa-tank-water',
-        hasPermission: isFogInspector,
-        hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection),
+        hasPermission: isFogInspector || isFogTransporter,
+        hasFeature: await this._authService.hasAnyFeatures(FeatureType.FogInspection, FeatureType.FogTransportation),
         children: [
           {
             title: 'Property Record Search',
             iconCss: 'fa-regular fa-building-magnifying-glass',
             routerLink: ['professionals/sites'],
-            hasPermission: isFogInspector,
+            hasPermission: isFogInspector || isFogTransporter,
             hasFeature: true
           },
           {

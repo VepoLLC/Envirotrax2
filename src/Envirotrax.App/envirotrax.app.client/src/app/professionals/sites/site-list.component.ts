@@ -16,7 +16,8 @@ import { GisArea } from "../../shared/models/gis-areas/gis-area";
 import { DownloadConfig } from "../../shared/models/download-config";
 import { DownloadService } from "../../shared/services/download.service";
 import { PrintableTableService } from "../../shared/services/printable-table.service";
-import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
+import { AuthService } from "../../shared/services/auth/auth.service";
+import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
 import { SiteSchedule } from "../../shared/models/sites/site-schedule";
 import { EditSiteScheduleComponent, EditSiteScheduleModel } from "./schedule/edit-site-schedule.component";
 import { SITE_SCHEDULE_TYPE_NAMES, SiteScheduleService, SiteScheduleType } from "../../shared/services/sites/site-schedule.service";
@@ -27,7 +28,17 @@ const CRITERIA_FIELDS: (keyof ProfessionalSiteSearchCriteria)[] = [
     "workedOnly",
     "scheduledOnly",
     "scheduledFrom",
-    "scheduledTo"
+    "scheduledTo",
+    "csiRenewalFrom",
+    "csiRenewalTo",
+    "fogInspectionExpirationFrom",
+    "fogInspectionExpirationTo"
+];
+
+const DATE_TYPE_FIELDS: string[] = [
+    "scheduledDateType",
+    "csiRenewalDateType",
+    "fogInspectionExpirationDateType"
 ];
 
 @Component({
@@ -46,10 +57,17 @@ export class SiteListComponent implements OnInit {
     public mapZoom: number = 10;
 
     public waterSupplierOptions: InputOption[] = [];
-    public canFilterByCsiInspection: boolean = false;
+    public isCsiInspector: boolean = false;
+    public isFogInspector: boolean = false;
 
     public isScheduledOnly: boolean = false;
     public isScheduledDateRange: boolean = false;
+
+    public isNeedsCsiInspection: boolean = false;
+    public isCsiRenewalDateRange: boolean = false;
+
+    public isNeedsFogInspection: boolean = false;
+    public isFogInspectionExpirationDateRange: boolean = false;
 
     public scheduleTypes: SiteScheduleType[] = [];
     public readonly scheduleTypeNames = SITE_SCHEDULE_TYPE_NAMES;
@@ -112,9 +130,17 @@ export class SiteListComponent implements OnInit {
         { id: "true", text: "Scheduled Date" }
     ];
 
-    public scheduledDateTypeOptions: InputOption[] = [
+    public dateTypeOptions: InputOption[] = [
         { id: "", text: "Any Date" },
         { id: "range", text: "Date Range" }
+    ];
+
+    public greaseTrapOptions: InputOption[] = [
+        { id: "", text: "Any Value" },
+        { id: "0", text: "Trap Not Required" },
+        { id: "1", text: "Has Grease Trap" },
+        { id: "2", text: "Should Have Grease Trap" },
+        { id: "3", text: "Might Have Grease Trap" }
     ];
 
     constructor(
@@ -128,7 +154,7 @@ export class SiteListComponent implements OnInit {
         private readonly _gisMapService: GisMapService,
         private readonly _downloadService: DownloadService,
         private readonly _printService: PrintableTableService,
-        private readonly _professionalService: ProfesisonalService,
+        private readonly _authService: AuthService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _siteScheduleService: SiteScheduleService,
         private readonly _generalSettingsService: GeneralSettingsService
@@ -141,14 +167,16 @@ export class SiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
 
-            const [waterSupplierOptions, professional, scheduleTypes] = await Promise.all([
+            const [waterSupplierOptions, isCsiInspector, isFogInspector, scheduleTypes] = await Promise.all([
                 this._proSupplierService.getMyAsOptions(),
-                this._professionalService.getLoggedInProfessional(),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
+                this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR),
                 this._siteScheduleService.getMyScheduleTypes()
             ]);
 
             this.waterSupplierOptions = waterSupplierOptions;
-            this.canFilterByCsiInspection = professional.hasCsiInspection === true;
+            this.isCsiInspector = isCsiInspector;
+            this.isFogInspector = isFogInspector;
             this.scheduleTypes = scheduleTypes;
         } finally {
             this.table.isLoading = false;
@@ -274,14 +302,34 @@ export class SiteListComponent implements OnInit {
         }
 
         this.isScheduledOnly = !!this._criteria.scheduledOnly;
-        this.isScheduledDateRange = this.isScheduledOnly && queryProperties.find(p => p.columnName === 'scheduledDateType')?.value === 'range';
+        this.isScheduledDateRange = this.isScheduledOnly && this.getFilterValue(queryProperties, 'scheduledDateType') === 'range';
 
         if (!this.isScheduledDateRange) {
             this._criteria.scheduledFrom = null;
             this._criteria.scheduledTo = null;
         }
 
-        this.table.query.filter = queryProperties.filter(p => !CRITERIA_FIELDS.includes(p.columnName as keyof ProfessionalSiteSearchCriteria) && p.columnName !== 'scheduledDateType');
+        this.isNeedsCsiInspection = this.getFilterValue(queryProperties, 'needsCsiInspection') === 'true';
+        this.isCsiRenewalDateRange = this.isNeedsCsiInspection && this.getFilterValue(queryProperties, 'csiRenewalDateType') === 'range';
+
+        if (!this.isCsiRenewalDateRange) {
+            this._criteria.csiRenewalFrom = null;
+            this._criteria.csiRenewalTo = null;
+        }
+
+        this.isNeedsFogInspection = this.getFilterValue(queryProperties, 'needsFogInspection') === 'true';
+        this.isFogInspectionExpirationDateRange = this.isNeedsFogInspection && this.getFilterValue(queryProperties, 'fogInspectionExpirationDateType') === 'range';
+
+        if (!this.isFogInspectionExpirationDateRange) {
+            this._criteria.fogInspectionExpirationFrom = null;
+            this._criteria.fogInspectionExpirationTo = null;
+        }
+
+        this.table.query.filter = queryProperties.filter(p => !CRITERIA_FIELDS.includes(p.columnName as keyof ProfessionalSiteSearchCriteria) && !DATE_TYPE_FIELDS.includes(p.columnName!));
+    }
+
+    private getFilterValue(queryProperties: QueryProperty[], columnName: string): string | undefined {
+        return queryProperties.find(p => p.columnName === columnName)?.value;
     }
 
     public async search(searchForm: NgForm): Promise<void> {

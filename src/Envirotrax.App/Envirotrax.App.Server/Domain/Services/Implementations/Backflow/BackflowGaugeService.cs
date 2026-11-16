@@ -9,11 +9,14 @@ using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
+using Envirotrax.Common;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
@@ -23,6 +26,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
     private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".pdf"];
 
     private readonly IBackflowGaugeRepository _gaugeRepository;
+    private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
@@ -31,6 +35,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
     public BackflowGaugeService(
         IMapper mapper,
         IBackflowGaugeRepository repository,
+        IProfessionalUserRepository professionalUserRepository,
         IFileStorageService fileStorageService,
         ITimeZoneHelperService timeZoneHelper,
         IAuthService authService,
@@ -38,6 +43,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         : base(mapper, repository)
     {
         _gaugeRepository = repository;
+        _professionalUserRepository = professionalUserRepository;
         _fileStorageService = fileStorageService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
@@ -102,13 +108,97 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         if (!AllowedFileExtensions.Contains(fileExtension))
             throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
 
-        dto.FilePath = $"professionals/{_authService.ProfessionalId}/gauges/{Guid.NewGuid()}{fileExtension}";
+        var professionalId = IsSignedInAsProfessional() ? _authService.ProfessionalId : dto.Professional!.Id!.Value;
+
+        await SetAssignedUserAsync(dto, professionalId);
+
+        dto.FilePath = $"professionals/{professionalId}/gauges/{Guid.NewGuid()}{fileExtension}";
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         var added = await AddAsync(dto);
         await _fileStorageService.UploadAsync(dto.FilePath, fileStream);
         scope.Complete();
         return added;
+    }
+
+    private async Task SetAssignedUserAsync(BackflowGaugeDto dto, int professionalId)
+    {
+        if (IsTesterWithoutAdminRights())
+        {
+            dto.ProfessionalUser = new() { Id = _authService.ActingAsUserId };
+            return;
+        }
+
+        if (dto.ProfessionalUser?.Id is int userId
+            && !await _professionalUserRepository.IsBackflowTesterAsync(professionalId, userId, CancellationToken.None))
+        {
+            throw new AppValidationException("The gauge can only be assigned to a backflow tester of this company.");
+        }
+    }
+
+    private bool IsSignedInAsProfessional()
+    {
+        return _authService.ProfessionalId > 0 && !_authService.HasAnyScopes(ScopeDefinitions.AdminInternal);
+    }
+
+    private bool IsTesterWithoutAdminRights()
+    {
+        return IsSignedInAsProfessional() && !_authService.HasAnyRole(RoleDefinitions.Professionals.Admin);
+    }
+
+    public async Task<IPagedData<BackflowGaugeDto>> GetUsableByBpatAsync(int bpatUserId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        EnsureCanActAsBpat(bpatUserId);
+
+        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+
+        var gauges = await _gaugeRepository.GetCompanyAndUserGaugesAsync(bpatUserId, pageInfo, query, cancellationToken);
+
+        return gauges.Select(gauge => MapToDto(gauge)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<BackflowGaugeDto> GetValidGaugeForBpatAsync(int gaugeId, int bpatUserId, CancellationToken cancellationToken)
+    {
+        EnsureCanActAsBpat(bpatUserId);
+
+        var gauge = MapToDto(await _gaugeRepository.GetCompanyOrUserGaugeAsync(gaugeId, bpatUserId, cancellationToken));
+
+        if (gauge?.LastCalibrationDate == null || gauge.ExpirationType == GaugeExpirationType.Expired)
+        {
+            throw new AppValidationException("Please select a valid test gauge.");
+        }
+
+        return gauge;
+    }
+
+    private void EnsureCanActAsBpat(int bpatUserId)
+    {
+        if (IsTesterWithoutAdminRights() && bpatUserId != _authService.ActingAsUserId)
+        {
+            throw new AppValidationException("You can only use the gauges available to your own BPAT account.");
+        }
+    }
+
+    public async Task<int> CountUsableByCurrentUserAsync(CancellationToken cancellationToken)
+    {
+        if (IsTesterWithoutAdminRights())
+        {
+            return await _gaugeRepository.CountCompanyAndUserGaugesAsync(_authService.ActingAsUserId, cancellationToken);
+        }
+
+        return await CountAsync(cancellationToken);
+    }
+
+    public async Task DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        var deletedGauges = await _gaugeRepository.DeleteAssignedToUserAsync(professionalId, userId, cancellationToken);
+
+        foreach (var gauge in deletedGauges)
+        {
+            await _recordLogService.AddAsync(RecordLogTableNames.BackflowGauges, gauge.Id, null, RecordLogType.Delete,
+                $"Deleted gauge with its user — Manufacturer: '{gauge.Manufacturer}', SerialNumber: '{gauge.SerialNumber}'", professionalId: gauge.ProfessionalId);
+        }
     }
 
     public override async Task<BackflowGaugeDto?> DeleteAsync(int id)

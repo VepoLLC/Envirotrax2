@@ -2,6 +2,16 @@
     <dp-loading-spinner *ngIf="isLoading" />
 
     <form #form="ngForm" (ngSubmit)="save(form)">
+        <div class="mb-3" *ngIf="!isEditMode">
+            <vp-input type="select"
+                      [(ngModel)]="assignedUserId"
+                      name="assignedUserId"
+                      label="Assigned To"
+                      [options]="assignedToOptions"
+                      [required]="true"
+                      [form]="form" />
+        </div>
+
         <div class="mb-3">
             <vp-input [(ngModel)]="gauge.manufacturer"
                       name="manufacturer"

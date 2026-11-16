@@ -34,6 +34,9 @@ export class BackflowTesterGaugeComponent implements OnInit {
     @ViewChild('typeCell', { static: true })
     private typeCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
 
+    @ViewChild('assignedToCell', { static: true })
+    private assignedToCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
+
     constructor(
         private readonly _gaugeService: BackflowTesterGaugeService,
         private readonly _authService: AuthService,
@@ -70,6 +73,12 @@ export class BackflowTesterGaugeComponent implements OnInit {
     private getColumns(): TableColumn<BackflowGauge>[] {
         return [
             {
+                field: 'professionalUser.contactName',
+                caption: 'Assigned To',
+                cellTemplate: this.assignedToCellTemplate,
+                type: ColumnType.text
+            },
+            {
                 field: 'manufacturer',
                 caption: 'Mfr.',
                 type: ColumnType.text
@@ -102,7 +111,7 @@ export class BackflowTesterGaugeComponent implements OnInit {
     public addGauge(): void {
         this._modalHelper.show<BackflowGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title: 'Add Gauge',
-            model: { testerId: this.testerId, gauge: {} },
+            model: { testerId: this.testerId, companyName: this.tester?.name ?? '', gauge: {} },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadGauge());
@@ -111,7 +120,7 @@ export class BackflowTesterGaugeComponent implements OnInit {
     public editGauge(gauge: BackflowGauge): void {
         this._modalHelper.show<BackflowGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title: 'Edit Gauge',
-            model: { testerId: this.testerId, gauge },
+            model: { testerId: this.testerId, companyName: this.tester?.name ?? '', gauge },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadGauge());

@@ -19,6 +19,9 @@ export class BackflowTesterGaugeComponent implements OnInit {
     @Input() public testerId!: number;
     @Input() public tester: Professional | null = null;
 
+    // Gauges belong to the company, so a user's details page lists them without add, edit or delete.
+    @Input() public readOnly: boolean = false;
+
     public readonly gaugeExpirationType = GaugeExpirationType;
     public canManage: boolean = false;
     public gaugeCustomActions: TableCustomAction<BackflowGauge>[] = [];
@@ -49,9 +52,11 @@ export class BackflowTesterGaugeComponent implements OnInit {
     }
 
     private async setPermissions(): Promise<void> {
-        this.canManage = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
+        const canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
 
-        if (this.canManage) {
+        this.canManage = canModify && !this.readOnly;
+
+        if (canModify) {
             this.gaugeCustomActions = [
                 {
                     text: 'View',

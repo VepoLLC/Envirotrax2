@@ -3,6 +3,7 @@ import { State } from "../lookup/state";
 export interface ProfessionalUser {
     id?: number;
     emailAddress?: string;
+    phoneNumber?: string;
     contactName?: string;
     jobTitle?: string;
     signaturePath?: string;

@@ -26,6 +26,11 @@ export class BackflowTesterUserService {
         }));
     }
 
+    public get(testerId: number, userId: number): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/users/${userId}`);
+        return lastValueFrom(this._http.get<ProfessionalUser>(url));
+    }
+
     public add(testerId: number, user: ProfessionalUser): Promise<ProfessionalUser> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/users`);
         return lastValueFrom(this._http.post<ProfessionalUser>(url, user));

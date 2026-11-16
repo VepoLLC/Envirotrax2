@@ -14,6 +14,7 @@ public interface IProfessionalUserRepository : IRepository<ProfessionalUser>
     Task<ProfessionalUser?> UpdatePaymentBypassAsync(int professionalId, int userId, ProfessionalType professionalType, bool isPaymentBypassed);
     Task<bool> ExistsForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken);
     Task<bool> IsBackflowTesterAsync(int professionalId, int userId, CancellationToken cancellationToken);
+    Task<ProfessionalUser?> GetForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null);
     Task<IEnumerable<ProfessionalUser>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null);
     Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken);
 }

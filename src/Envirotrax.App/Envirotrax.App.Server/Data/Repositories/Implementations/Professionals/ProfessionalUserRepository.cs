@@ -188,6 +188,21 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId && pu.IsBackflowTester, cancellationToken);
     }
 
+    // The base GetAsync keys on UserId alone, and a user can belong to more than one company, so a water
+    // supplier opening one company's user names both halves of the key.
+    public Task<ProfessionalUser?> GetForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
+    {
+        var query = GetDetailsQuery()
+            .Where(pu => pu.ProfessionalId == professionalId && pu.UserId == userId);
+
+        if (roleFilter != null)
+        {
+            query = query.Where(roleFilter);
+        }
+
+        return query.SingleOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<ProfessionalUser>> SearchAccountsAsync(PageInfo pageInfo, Query query, string? licenseNumber, string? insuranceNumber, Expression<Func<ProfessionalUserLicense, bool>> licenseFilter, Expression<Func<ProfessionalUser, bool>> roleFilter, CancellationToken cancellationToken)
     {
         var dbQuery = DbContext.ProfessionalUsers

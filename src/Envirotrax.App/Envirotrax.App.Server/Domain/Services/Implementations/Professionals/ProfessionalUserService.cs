@@ -259,6 +259,13 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
+    public async Task<ProfessionalUserDto?> GetForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
+    {
+        var user = await _professionalUserRepository.GetForProfessionalAsync(professionalId, userId, cancellationToken, roleFilter);
+
+        return MapToDto(user);
+    }
+
     public async Task<ProfessionalUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken)
     {
         var user = await _professionalUserRepository.GetAsync(id, cancellationToken) ?? throw new InvalidOperationException();

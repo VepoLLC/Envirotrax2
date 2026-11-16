@@ -26,6 +26,11 @@ export class FogTransporterSubAccountsService {
         }));
     }
 
+    public get(transporterId: number, userId: number): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/transporters/${transporterId}/users/${userId}`);
+        return lastValueFrom(this._http.get<ProfessionalUser>(url));
+    }
+
     public add(transporterId: number, user: ProfessionalUser): Promise<ProfessionalUser> {
         const url = this._urlResolver.resolveUrl(`/api/fog/transporters/${transporterId}/users`);
         return lastValueFrom(this._http.post<ProfessionalUser>(url, user));

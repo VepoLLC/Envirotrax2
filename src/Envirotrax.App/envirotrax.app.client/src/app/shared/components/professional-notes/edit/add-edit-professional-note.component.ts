@@ -10,6 +10,7 @@ import { HelperService } from "../../../services/helpers/helper.service";
 export interface ProfessionalNoteModalData {
     professionalType: ProfessionalType;
     professionalId: number;
+    userId?: number;
     note: ProfessionalNote;
 }
 
@@ -37,11 +38,11 @@ export class AddEditProfessionalNoteComponent {
         if (form.valid) {
             try {
                 this.isLoading = true;
-                const { professionalType, professionalId } = this._modalReference.config.model!;
+                const { professionalType, professionalId, userId } = this._modalReference.config.model!;
 
                 const result = this.note.id
-                    ? await this._service.update(professionalType, professionalId, this.note)
-                    : await this._service.add(professionalType, professionalId, this.note);
+                    ? await this._service.update(professionalType, professionalId, this.note, userId)
+                    : await this._service.add(professionalType, professionalId, this.note, userId);
 
                 this._toastService.successfullySaved('Comment');
                 this._modalReference.closeSuccess(result);

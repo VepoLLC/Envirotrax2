@@ -21,6 +21,7 @@ export class BackflowCurrentComplianceTabComponent implements OnInit, OnDestroy 
     private _disposeThemeObserver?: () => void;
 
     public report: BackflowComplianceReport | null = null;
+    public calculatedOn?: Date;
     public isLoading = false;
     public ignoreLast30Days = false;
 
@@ -122,6 +123,8 @@ export class BackflowCurrentComplianceTabComponent implements OnInit, OnDestroy 
         try {
             this.isLoading = true;
             this.report = await this._reportService.getComplianceReport(this.ignoreLast30Days);
+            this.calculatedOn = new Date();
+
             this.buildChart();
         } finally {
             this.isLoading = false;

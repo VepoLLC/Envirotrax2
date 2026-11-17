@@ -20,4 +20,8 @@ export interface WaterSupplierDashboardStats {
     insurancePolicyCount: number;
     testGaugeCount: number;
     transporterRegistrationCount: number;
+
+    // Out of Service
+    outOfServiceReplacedCount: number;
+    outOfServiceRemovedCount: number;
 }

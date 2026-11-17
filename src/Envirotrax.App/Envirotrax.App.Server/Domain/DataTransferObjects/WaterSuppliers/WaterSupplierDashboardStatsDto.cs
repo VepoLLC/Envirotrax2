@@ -23,4 +23,8 @@ public class WaterSupplierDashboardStatsDto
     public int InsurancePolicyCount { get; set; }
     public int TestGaugeCount { get; set; }
     public int TransporterRegistrationCount { get; set; }
+
+    // Out of Service
+    public int OutOfServiceReplacedCount { get; set; }
+    public int OutOfServiceRemovedCount { get; set; }
 }

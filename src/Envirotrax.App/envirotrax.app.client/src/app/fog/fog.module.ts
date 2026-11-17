@@ -6,6 +6,7 @@ import { SharedComponentsModule } from "../shared/components/shared.components.m
 import { FogRoutingModule } from "./fog-routing.module";
 import { FogInspectorListComponent } from "./inspectors/list/fog-inspector-list.component";
 import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector-details.component";
+import { FogInspectorUserDetailsComponent } from "./inspectors/details/users/details/fog-inspector-user-details.component";
 import { FogInspectorWaterSuppliersComponent } from "./inspectors/details/water-suppliers/list/fog-inspector-water-suppliers.component";
 import { EditFogInspectorWaterSupplierComponent } from "./inspectors/details/water-suppliers/edit/edit-fog-inspector-water-supplier.component";
 import { FogInspectorUsersComponent } from "./inspectors/details/users/list/fog-inspector-users.component";
@@ -19,6 +20,7 @@ import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-
 import { FogTripTicketViewComponent } from "./trip-tickets/view/fog-trip-ticket-view.component";
 import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
+import { FogTransporterUserDetailsComponent } from "./transporters/details/users/details/fog-transporter-user-details.component";
 import { FogTransporterWaterSuppliersComponent } from "./transporters/details/water-suppliers/list/fog-transporter-water-suppliers.component";
 import { EditFogTransporterWaterSupplierComponent } from "./transporters/details/water-suppliers/edit/edit-fog-transporter-water-supplier.component";
 import { FogTransporterUsersComponent } from "./transporters/details/users/list/fog-transporter-users.component";
@@ -37,6 +39,7 @@ import { ProfessionalModule } from "../professionals/professional.module";
     declarations: [
         FogInspectorListComponent,
         FogInspectorDetailsComponent,
+        FogInspectorUserDetailsComponent,
         FogInspectorWaterSuppliersComponent,
         EditFogInspectorWaterSupplierComponent,
         FogInspectorUsersComponent,
@@ -50,6 +53,7 @@ import { ProfessionalModule } from "../professionals/professional.module";
         FogTripTicketViewComponent,
         FogTransporterListComponent,
         FogTransporterDetailsComponent,
+        FogTransporterUserDetailsComponent,
         FogTransporterWaterSuppliersComponent,
         EditFogTransporterWaterSupplierComponent,
         FogTransporterUsersComponent,

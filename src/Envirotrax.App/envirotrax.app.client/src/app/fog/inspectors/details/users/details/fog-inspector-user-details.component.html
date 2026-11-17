@@ -1,0 +1,67 @@
+<h1 class="h2 mb-4 text-center">FOG Inspector User Details</h1>
+
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<div *ngIf="!isLoading && professional && user">
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <vp-section header="User Account Information">
+                <vp-section-actions>
+                    <button *ngIf="canManageUser" type="button" class="btn btn-primary btn-sm" (click)="editUser()">
+                        <i class="fa-solid fa-pencil me-1"></i>
+                        Edit
+                    </button>
+                </vp-section-actions>
+
+                <div dp-spinner-parent>
+                    <dp-loading-spinner *ngIf="isUserLoading"></dp-loading-spinner>
+
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="w-40 text-end">Master Account:</th>
+                                <td>
+                                    <a [routerLink]="['/fog/inspectors/details', professionalId]">{{ professional.name }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Email Address:</th>
+                                <td>{{ user.emailAddress }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Contact Name:</th>
+                                <td>{{ user.contactName }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Job Title:</th>
+                                <td>{{ user.jobTitle }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Cell Number:</th>
+                                <td>{{ user.phoneNumber }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </vp-section>
+        </div>
+
+        <div class="col-lg-6">
+            <vp-fog-inspector-water-suppliers [inspectorId]="professionalId!" [readOnly]="true" />
+        </div>
+
+        <div class="col-12">
+            <vp-fog-inspector-license-insurances [inspectorId]="professionalId!" [inspector]="professional" [userId]="userId!" />
+        </div>
+
+        <div class="col-12">
+            <vp-professional-notes [professionalId]="professionalId!" [userId]="userId!" [professionalType]="ProfessionalType.FogInspector" />
+        </div>
+
+    </div>
+</div>
+
+<div *ngIf="!isLoading && !user" class="alert alert-warning">
+    User not found.
+</div>

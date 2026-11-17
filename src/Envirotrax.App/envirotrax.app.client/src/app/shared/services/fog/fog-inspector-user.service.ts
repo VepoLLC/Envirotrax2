@@ -26,6 +26,11 @@ export class FogInspectorSubAccountsService {
         }));
     }
 
+    public get(inspectorId: number, userId: number): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/users/${userId}`);
+        return lastValueFrom(this._http.get<ProfessionalUser>(url));
+    }
+
     public add(inspectorId: number, user: ProfessionalUser): Promise<ProfessionalUser> {
         const url = this._urlResolver.resolveUrl(`/api/fog/inspectors/${inspectorId}/users`);
         return lastValueFrom(this._http.post<ProfessionalUser>(url, user));

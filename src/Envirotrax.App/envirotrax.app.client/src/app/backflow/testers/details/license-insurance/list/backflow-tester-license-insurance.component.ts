@@ -11,10 +11,11 @@ import { PermissionAction, PermissionType } from "../../../../../shared/models/p
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
 import { AddEditBackflowTesterInsuranceComponent } from "../edit/add-edit-backflow-tester-insurance.component";
-import { AddEditBackflowTesterLicenseComponent } from "../edit/add-edit-backflow-tester-license.component";
+import { AddEditBackflowTesterLicenseComponent, BackflowLicenseModalData } from "../edit/add-edit-backflow-tester-license.component";
 import { AddEditBackflowTesterCompanyLicenseComponent, BackflowCompanyLicenseModalData } from "../edit/add-edit-backflow-tester-company-license.component";
 import { ProfessionalLicense } from "../../../../../shared/models/professionals/licenses/professional-license";
 import { DownloadService } from "../../../../../shared/services/download.service";
+import { withLicenseUserFilter } from "../../../../../shared/utils/license-user-filter.util";
 
 @Component({
     selector: 'vp-backflow-tester-license-insurances',
@@ -24,6 +25,11 @@ import { DownloadService } from "../../../../../shared/services/download.service
 export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     @Input() public testerId!: number;
     @Input() public tester: Professional | null = null;
+
+    // Set on a user's details page: only that user's licenses, without the company's insurances and licenses.
+    @Input() public userId?: number;
+
+    public sectionHeader: string = 'License & Insurance Management';
 
     public activeTab: 'insurances' | 'licenses' | 'companyLicenses' = 'licenses';
 
@@ -75,6 +81,10 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        if (this.userId) {
+            this.sectionHeader = 'License Management';
+        }
+
         await this.setPermissions();
         this.licensesTable.columns = this.getLicenseColumns();
         this.companyLicensesTable.columns = this.getCompanyLicenseColumns();
@@ -117,7 +127,7 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     }
 
     private getLicenseColumns(): TableColumn<ProfessionalUserLicense>[] {
-        return [
+        const columns: TableColumn<ProfessionalUserLicense>[] = [
             {
                 field: 'licenseNumber',
                 caption: 'License Number',
@@ -148,6 +158,9 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
                 type: ColumnType.date
             }
         ];
+
+        // Every license on a user's page is that user's, so the Email Address column would only repeat it.
+        return this.userId ? columns.filter(column => column.field !== 'user.emailAddress') : columns;
     }
 
     private getCompanyLicenseColumns(): TableColumn<ProfessionalLicense>[] {
@@ -198,18 +211,18 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
     }
 
     public addLicense(): void {
-        this._modalHelper.show<any, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
+        this._modalHelper.show<BackflowLicenseModalData, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
             title: 'Add License',
-            model: { testerId: this.testerId, license: {} },
+            model: { testerId: this.testerId, userId: this.userId, license: {} },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses(false));
     }
 
     public editLicense(license: ProfessionalUserLicense): void {
-        this._modalHelper.show<any, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
+        this._modalHelper.show<BackflowLicenseModalData, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
             title: 'Edit License',
-            model: { testerId: this.testerId, license },
+            model: { testerId: this.testerId, userId: this.userId, license },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses(false));
@@ -317,7 +330,7 @@ export class BackflowTesterLicenseInsuranceComponent implements OnInit {
             this.licensesTable.items = await this._licensesService.getLicenses(
                 this.testerId,
                 this.licensesTable.items?.pageInfo || {},
-                this.licensesTable.query
+                withLicenseUserFilter(this.licensesTable.query, this.userId)
             );
         } finally {
             this.licensesTable.isLoading = false;

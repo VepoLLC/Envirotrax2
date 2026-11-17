@@ -25,6 +25,7 @@ import {
 } from '../edit/add-edit-backflow-tester-gauge.component';
 
 interface BackflowTesterGaugeVm extends BackflowGauge {
+    assignedTo: string;
     waterSystemType: string;
     expirationCssClass: string;
 }
@@ -40,6 +41,12 @@ interface BackflowTesterGaugeVm extends BackflowGauge {
 export class BackflowTesterGaugeListComponent implements OnInit {
     @Input()
     public professionalId!: number;
+
+    @Input()
+    public companyName = '';
+
+    @ViewChild('assignedToCell', { static: true })
+    public assignedToCell?: TemplateRef<CellTemplateData<BackflowTesterGaugeVm>>;
 
     @ViewChild('waterSystemCell', { static: true })
     public waterSystemCell?: TemplateRef<CellTemplateData<BackflowTesterGaugeVm>>;
@@ -101,7 +108,7 @@ export class BackflowTesterGaugeListComponent implements OnInit {
     }
 
     public editGauge(row: BackflowTesterGaugeVm): void {
-        const { waterSystemType, expirationCssClass, ...gauge } = row;
+        const { assignedTo, waterSystemType, expirationCssClass, ...gauge } = row;
 
         this.showEditor('Edit Gauge', gauge);
     }
@@ -140,7 +147,7 @@ export class BackflowTesterGaugeListComponent implements OnInit {
     private showEditor(title: string, gauge: BackflowGauge): void {
         this._modalHelper.show<BackflowTesterGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title,
-            model: { professionalId: this.professionalId, gauge },
+            model: { professionalId: this.professionalId, companyName: this.companyName, gauge },
             size: ModalSize.medium,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.getGauges());
@@ -149,6 +156,7 @@ export class BackflowTesterGaugeListComponent implements OnInit {
     private toViewModel(gauge: BackflowGauge): BackflowTesterGaugeVm {
         return {
             ...gauge,
+            assignedTo: gauge.professionalUser?.contactName ?? this.companyName,
             waterSystemType: gauge.isPortable ? 'Potable' : 'Non-Potable',
             expirationCssClass: gauge.lastCalibrationDate && gauge.expirationType != null
                 ? expirationTypeCssClasses[gauge.expirationType]
@@ -158,6 +166,7 @@ export class BackflowTesterGaugeListComponent implements OnInit {
 
     private getColumns(): TableColumn<BackflowTesterGaugeVm>[] {
         return [
+            { field: 'professionalUser.contactName', caption: 'Assigned To', type: ColumnType.text, cellTemplate: this.assignedToCell },
             { field: 'manufacturer', caption: 'Manufacturer', type: ColumnType.text },
             { field: 'model', caption: 'Model', type: ColumnType.text },
             { field: 'isPortable', caption: 'Type', type: ColumnType.other, cellTemplate: this.waterSystemCell },

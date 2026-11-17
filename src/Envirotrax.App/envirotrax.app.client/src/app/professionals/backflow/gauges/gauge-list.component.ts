@@ -1,14 +1,17 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { BackflowGauge, GaugeExpirationType } from "../../../shared/models/backflow/backflow-gauge";
 import { BackflowGaugeService } from "../../../shared/services/backflow/backflow-gauge.service";
-import { ToastService, ToastType, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, ToastType, CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { EditGaugeComponent } from "./edit/edit-gauge.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
+import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
+import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
+
+const COMPANY_OPTION_ID = 0;
 
 @Component({
     standalone: false,
@@ -32,6 +35,11 @@ export class GaugeListComponent implements OnInit {
 
     public readonly gaugeExpirationType = GaugeExpirationType;
 
+    public isAdmin = false;
+    public companyName = '';
+    public assignedToOptions: InputOption[] = [];
+    public assignedUserId = COMPANY_OPTION_ID;
+
     public newGauge?: BackflowGauge;
     public tfaFile: File | null = null;
     public hasReadHelp: boolean = false;
@@ -45,19 +53,55 @@ export class GaugeListComponent implements OnInit {
     @ViewChild('typeCell', { static: true })
     private typeCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
 
+    @ViewChild('assignedToCell', { static: true })
+    private assignedToCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
+
     constructor(
         private readonly _gaugeService: BackflowGaugeService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
         private readonly _professionalService: ProfesisonalService,
+        private readonly _userService: ProfesionalUserService,
         private readonly _helperService: HelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        this.table.isLoading = true;
+
+        const [myUser, professional] = await Promise.all([
+            this._userService.getMyData(),
+            this._professionalService.getLoggedInProfessional()
+        ]);
+
+        this.isAdmin = !!myUser.isAdmin;
+        this.companyName = professional.name ?? '';
         this.table.columns = this.getColumns();
 
         this.getGauges();
         this.resetNewGauge();
+
+        if (this.isAdmin) {
+            await this.loadAssignedToOptions();
+        }
+    }
+
+    // V1 parity: an admin registers a gauge for the company or for one tester; a tester only for themselves.
+    private async loadAssignedToOptions(): Promise<void> {
+        try {
+            this.isNewGaugeLoading = true;
+
+            const testersPage = await this._userService.getAll(
+                { pageSize: MAX_PAGE_SIZE },
+                { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }
+            );
+
+            this.assignedToOptions = [
+                { id: COMPANY_OPTION_ID, text: this.companyName },
+                ...(testersPage.data ?? []).map(tester => ({ id: tester.id, text: tester.contactName ?? tester.emailAddress ?? '' }))
+            ];
+        } finally {
+            this.isNewGaugeLoading = false;
+        }
     }
 
     private async newGaugeObject(): Promise<BackflowGauge> {
@@ -70,12 +114,18 @@ export class GaugeListComponent implements OnInit {
 
     private async resetNewGauge(): Promise<void> {
         this.newGauge = await this.newGaugeObject();
+        this.assignedUserId = COMPANY_OPTION_ID;
         this.tfaFile = null;
         this.hasReadHelp = false;
     }
 
     private getColumns(): TableColumn<BackflowGauge>[] {
+        const assignedToColumn: TableColumn<BackflowGauge>[] = this.isAdmin
+            ? [{ field: 'professionalUser.contactName', caption: 'Assigned To', cellTemplate: this.assignedToCellTemplate, type: ColumnType.text }]
+            : [];
+
         return [
+            ...assignedToColumn,
             {
                 field: 'manufacturer',
                 caption: 'Manufacturer',
@@ -162,6 +212,8 @@ export class GaugeListComponent implements OnInit {
             try {
                 this.isNewGaugeLoading = true;
                 this.newGaugeValidationErrors = [];
+
+                this.newGauge!.professionalUser = this.assignedUserId !== COMPANY_OPTION_ID ? { id: this.assignedUserId } : null;
 
                 await this._gaugeService.add(this.newGauge!, this.tfaFile!);
 

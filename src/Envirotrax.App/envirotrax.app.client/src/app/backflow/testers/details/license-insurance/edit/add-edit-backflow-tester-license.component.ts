@@ -11,6 +11,8 @@ import { ToastService, InputOption, allSettled } from '@envirotrax/common-ui';
 
 export interface BackflowLicenseModalData {
     testerId: number;
+    // Set when opened from a user's details page: the license is that user's and the User field is locked.
+    userId?: number;
     license: ProfessionalUserLicense;
 }
 
@@ -26,6 +28,7 @@ export class AddEditBackflowTesterLicenseComponent implements OnInit {
     public validationErrors: string[] = [];
     public licenseTypes: InputOption<ProfessionalLicenseType>[] = [];
     public userOptions: InputOption<ProfessionalUser>[] = [];
+    public isUserFixed: boolean = false;
 
     public get isEditMode(): boolean {
         return !!this._modalReference.config.model?.license?.id;
@@ -38,9 +41,16 @@ export class AddEditBackflowTesterLicenseComponent implements OnInit {
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
-        this.license = { ...this._modalReference.config.model!.license };
+        const { userId, license } = this._modalReference.config.model!;
+
+        this.license = { ...license };
         if (this.license.professionalType == null) {
             this.license.professionalType = ProfessionalType.Bpat;
+        }
+
+        if (userId) {
+            this.license.user ??= { id: userId };
+            this.isUserFixed = true;
         }
     }
 

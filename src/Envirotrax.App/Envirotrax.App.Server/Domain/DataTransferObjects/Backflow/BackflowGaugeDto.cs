@@ -11,6 +11,8 @@ public class BackflowGaugeDto : IDto
 
     public ReferencedProfessionalDto? Professional { get; set; }
 
+    public ReferencedProfessionalUserDto? ProfessionalUser { get; set; }
+
     [Required]
     [StringLength(100)]
     public string Manufacturer { get; set; } = null!;

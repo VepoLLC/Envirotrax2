@@ -15,6 +15,7 @@ import { FogTransporterListComponent } from './fog/transporters/list/fog-transpo
 import { FogDisposalSiteListComponent } from './fog/disposal-sites/list/fog-disposal-site-list.component';
 import { FogTripTicketListComponent } from './fog/trip-tickets/list/fog-trip-ticket-list.component';
 import { LetterGeneratorComponent } from './management-tools/letter-generator/letter-generator.component';
+import { UserLogComponent } from './management-tools/user-log/user-log.component';
 import { LicenseManagementComponent } from './licenses/license-management.component';
 import { SubmissionValidationListComponent } from './validations/list/submission-validation-list.component';
 import { NavigationEnd, Router } from '@angular/router';
@@ -182,6 +183,11 @@ export class App implements OnInit {
             title: 'Letter Generator',
             iconCss: 'fa-solid fa-envelopes-bulk',
             onClick: this.showLetterGenerator.bind(this)
+          },
+          {
+            title: 'User Log',
+            iconCss: 'fa-solid fa-file-lines',
+            onClick: this.showUserLog.bind(this)
           }
         ]
       }
@@ -322,6 +328,12 @@ export class App implements OnInit {
   public showLetterGenerator(): void {
     this._windowService.addWindow(LetterGeneratorComponent, {
       title: 'Letter Generator'
+    });
+  }
+
+  public showUserLog(): void {
+    this._windowService.addWindow(UserLogComponent, {
+      title: 'User Log Search'
     });
   }
 }

@@ -435,13 +435,19 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    // V1 parity: a tester without admin rights sees the company's gauges plus their own on the overview.
     public async loadGauges(): Promise<void> {
         try {
             this.gaugesTable.isLoading = true;
-            this.gaugesTable.items = await this._gaugeService.getAll(
-                this.gaugesTable.items?.pageInfo || {},
-                this.gaugesTable.query
-            );
+
+            const pageInfo = this.gaugesTable.items?.pageInfo || {};
+
+            if (this.isAdmin) {
+                this.gaugesTable.items = await this._gaugeService.getAll(pageInfo, this.gaugesTable.query);
+            } else {
+                const myUser = await this._userService.getMyData();
+                this.gaugesTable.items = await this._gaugeService.getUsableByBpat(myUser.id!, pageInfo, this.gaugesTable.query);
+            }
         } finally {
             this.gaugesTable.isLoading = false;
         }

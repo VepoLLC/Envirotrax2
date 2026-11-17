@@ -68,10 +68,80 @@ BEGIN TRY
                 AND skipped.SourceTable = 'SaveBpatGauges'
         )
 
-    -- A gauge names its owner by login, and that login can be a sub-account. V2 hangs gauges off the
-    -- company, so the login is resolved through the staging table that 02_LegacyAccounts.sql fills in:
-    -- it already holds the rule that the company is MasterBpatID when there is one and the account's
-    -- own login otherwise. Ranking guards against a login appearing twice in SaveBpats.
+    -- A sub-account's gauge is that person's own: in V1 only tests submitted under that login could use
+    -- it, while the master's gauges were open to the whole company. V2 keeps the person in
+    -- ProfessionalUserId. Gauges loaded before that column existed all arrived as company gauges, so they
+    -- are assigned here. Self-disabling: it only touches rows whose ProfessionalUserId is still NULL.
+    ;WITH AccountsWithoutDuplicates AS
+    (
+        SELECT accounts.*,
+            ROW_NUMBER() OVER (PARTITION BY accounts.LegacyUserId ORDER BY accounts.LegacyRecordId) AS AccountRank
+        FROM MigrationLegacyProfessionalAccounts AS accounts
+        WHERE accounts.SourceTable = 'SaveBpats'
+    )
+    UPDATE BackflowGauges
+    SET ProfessionalUserId = professionalUsers.UserId
+    FROM BackflowGauges
+    INNER JOIN Vepo.dbo.SaveBpatGauges AS gauges
+        ON gauges.ID = BackflowGauges.LegacyRecordId
+    INNER JOIN AccountsWithoutDuplicates AS accounts
+        ON accounts.LegacyUserId = gauges.BpatID
+        AND accounts.AccountRank = 1
+    INNER JOIN AspNetUsers AS users
+        ON users.UserName = gauges.BpatID
+    INNER JOIN ProfessionalUsers AS professionalUsers
+        ON professionalUsers.ProfessionalId = BackflowGauges.ProfessionalId
+        AND professionalUsers.UserId = users.Id
+    WHERE BackflowGauges.ProfessionalUserId IS NULL
+        AND accounts.LegacyUserId <> accounts.LegacyCompanyUserId
+
+    -- A sub-account gauge whose person did not migrate is left out rather than handed to the company,
+    -- which would let every tester there use it. That happens when the users migration skipped the login,
+    -- for example one that appears in SaveBpats twice.
+    ;WITH AccountsWithoutDuplicates AS
+    (
+        SELECT accounts.*,
+            ROW_NUMBER() OVER (PARTITION BY accounts.LegacyUserId ORDER BY accounts.LegacyRecordId) AS AccountRank
+        FROM MigrationLegacyProfessionalAccounts AS accounts
+        WHERE accounts.SourceTable = 'SaveBpats'
+    )
+    INSERT INTO MigrationSkippedBackflowGauges (LegacyRecordId, LegacyUserId, SourceTable, Reason)
+    SELECT gauges.ID, gauges.BpatID, 'SaveBpatGauges', 'No professional user for the sub-account that owns the gauge'
+    FROM Vepo.dbo.SaveBpatGauges AS gauges
+    INNER JOIN AccountsWithoutDuplicates AS accounts
+        ON accounts.LegacyUserId = gauges.BpatID
+        AND accounts.AccountRank = 1
+    INNER JOIN Professionals AS professionals
+        ON professionals.LegacyUserId = accounts.LegacyCompanyUserId
+    WHERE accounts.LegacyUserId <> accounts.LegacyCompanyUserId
+        AND NOT EXISTS
+        (
+            SELECT 1
+            FROM AspNetUsers AS users
+            INNER JOIN ProfessionalUsers AS professionalUsers
+                ON professionalUsers.UserId = users.Id
+            WHERE users.UserName = gauges.BpatID
+                AND professionalUsers.ProfessionalId = professionals.Id
+        )
+        AND NOT EXISTS
+        (
+            SELECT 1
+            FROM BackflowGauges AS alreadyInserted
+            WHERE alreadyInserted.LegacyRecordId = gauges.ID
+        )
+        AND NOT EXISTS
+        (
+            SELECT 1
+            FROM MigrationSkippedBackflowGauges AS skipped
+            WHERE skipped.LegacyRecordId = gauges.ID
+                AND skipped.SourceTable = 'SaveBpatGauges'
+                AND skipped.Reason = 'No professional user for the sub-account that owns the gauge'
+        )
+
+    -- A gauge names its owner by login, and that login can be a sub-account. The company is resolved
+    -- through the staging table that 02_LegacyAccounts.sql fills in: it already holds the rule that the
+    -- company is MasterBpatID when there is one and the account's own login otherwise. Ranking guards
+    -- against a login appearing twice in SaveBpats. A sub-account's gauge also gets its person, as above.
     ;WITH AccountsWithoutDuplicates AS
     (
         SELECT accounts.*,
@@ -80,11 +150,12 @@ BEGIN TRY
         WHERE accounts.SourceTable = 'SaveBpats'
     )
     INSERT INTO BackflowGauges
-        (LegacyRecordId, ProfessionalId, Manufacturer, Model, SerialNumber, LastCalibrationDate,
+        (LegacyRecordId, ProfessionalId, ProfessionalUserId, Manufacturer, Model, SerialNumber, LastCalibrationDate,
          IsPortable, IsManaged, FilePath, LegacyFilePath, CreatedById, CreatedTime)
     SELECT
         gauges.ID,
         professionals.Id,
+        professionalUsers.UserId,
         -- V2 requires all three, V1 does not. Empty keeps the gauge itself, which is what a test is
         -- recorded against, rather than dropping it over a blank field.
         LEFT(ISNULL(gauges.Manufacturer, ''), 100),
@@ -120,12 +191,19 @@ BEGIN TRY
         AND accounts.AccountRank = 1
     INNER JOIN Professionals AS professionals
         ON professionals.LegacyUserId = accounts.LegacyCompanyUserId
-    WHERE NOT EXISTS
-    (
-        SELECT 1
-        FROM BackflowGauges AS alreadyInserted
-        WHERE alreadyInserted.LegacyRecordId = gauges.ID
-    )
+    LEFT JOIN AspNetUsers AS users
+        ON users.UserName = gauges.BpatID
+        AND accounts.LegacyUserId <> accounts.LegacyCompanyUserId
+    LEFT JOIN ProfessionalUsers AS professionalUsers
+        ON professionalUsers.ProfessionalId = professionals.Id
+        AND professionalUsers.UserId = users.Id
+    WHERE (accounts.LegacyUserId = accounts.LegacyCompanyUserId OR professionalUsers.UserId IS NOT NULL)
+        AND NOT EXISTS
+        (
+            SELECT 1
+            FROM BackflowGauges AS alreadyInserted
+            WHERE alreadyInserted.LegacyRecordId = gauges.ID
+        )
 
     COMMIT TRAN
 

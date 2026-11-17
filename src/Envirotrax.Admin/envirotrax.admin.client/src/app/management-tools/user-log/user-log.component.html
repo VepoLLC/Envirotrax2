@@ -1,0 +1,101 @@
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-section header="User Log Search Criteria">
+            <div class="row">
+                <div class="col-md-8 mb-2">
+                    <vp-input name="waterSupplierId"
+                              type="select"
+                              label="Water Supplier"
+                              [options]="waterSupplierOptions"
+                              [(ngModel)]="criteria.waterSupplierId" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <vp-input name="tableName"
+                                  label="Table Name"
+                                  [required]="true"
+                                  [(ngModel)]="criteria.tableName" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="recordId"
+                                  type="number"
+                                  label="Record ID"
+                                  [(ngModel)]="criteria.recordId" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="userEmail"
+                                  label="User ID"
+                                  [(ngModel)]="criteria.userEmail" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="logType"
+                                  type="select"
+                                  label="Log Type"
+                                  [options]="logTypeOptions"
+                                  [(ngModel)]="criteria.logType" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-2">
+                        <vp-input name="useDateRange"
+                                  type="select"
+                                  label="Date to Search"
+                                  [options]="dateSearchOptions"
+                                  [(ngModel)]="useDateRange" />
+                    </div>
+
+                    <div class="mb-2" *ngIf="useDateRange">
+                        <vp-input name="dateRange"
+                                  type="daterange"
+                                  label="Date Range"
+                                  [(ngModel)]="dateRange" />
+                    </div>
+                </div>
+            </div>
+        </vp-section>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="User Log Search Results ({{ table.items?.pageInfo?.totalItems }})">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getLogs()"
+                  [(query)]="table.query"
+                  (queryChange)="getLogs()"
+                  (queryReset)="getLogs()" />
+    </vp-section>
+</div>
+
+<ng-template #descriptionCell let-rowData="rowData">
+    <div style="white-space: pre-wrap;">{{ rowData?.description }}</div>
+</ng-template>

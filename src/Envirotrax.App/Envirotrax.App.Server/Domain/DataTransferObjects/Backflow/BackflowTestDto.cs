@@ -178,6 +178,11 @@ public class BackflowTestDto : IDto, IPropertyLocationDto, IMailingInfoDto, IRed
 
     public bool ProperlyInstalled { get; set; }
     public bool NonPotable { get; set; }
+
+    // The gauge picked on the submit page. The test keeps only a copy of its fields below, so a gauge
+    // deleted later never breaks the test.
+    public int? GaugeId { get; set; }
+
     [StringLength(100)]
     public string? GaugeManufacturer { get; set; }
 

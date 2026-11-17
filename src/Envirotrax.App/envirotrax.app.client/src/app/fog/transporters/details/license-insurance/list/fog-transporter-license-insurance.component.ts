@@ -24,6 +24,12 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
     @Input() public transporterId!: number;
     @Input() public transporter: Professional | null = null;
 
+    // Set on a user's details page. Transporter licenses are all company scope, so no user holds one of their own:
+    // the page lists the company's licenses read-only, without the insurances.
+    @Input() public userId?: number;
+
+    public sectionHeader: string = 'License & Insurance Management';
+
     public activeTab: 'insurances' | 'licenses' = 'licenses';
 
     public expirationType = ExpirationType;
@@ -63,6 +69,10 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        if (this.userId) {
+            this.sectionHeader = 'License Management';
+        }
+
         await this.setPermissions();
         this.setupColumns();
         await this.loadLicenses();
@@ -71,7 +81,7 @@ export class FogTransporterLicenseInsuranceComponent implements OnInit {
     private async setPermissions(): Promise<void> {
         const canEditFogTransporters = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.FogTransporters);
 
-        this.canManageLicenses = canEditFogTransporters && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
+        this.canManageLicenses = !this.userId && canEditFogTransporters && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalLicenses);
         this.canManageInsurances = canEditFogTransporters && await this._authService.hasAnyFeatures(FeatureType.ManageProfessionalInsurances);
 
         if (this.canManageInsurances) {

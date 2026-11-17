@@ -20,6 +20,7 @@
                         label="User"
                         [ngModel]="license.user?.id"
                         (ngModelChange)="userChange($event)"
+                        [disabled]="isUserFixed"
                         [required]="true"
                         [options]="userOptions"
                         [form]="form" />

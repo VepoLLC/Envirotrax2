@@ -15,6 +15,10 @@ public class RecordLogDto
 
     public string? Description { get; set; }
 
+    public int? WaterSupplierId { get; set; }
+
+    public int? ProfessionalId { get; set; }
+
     public RecordLogUserDto? User { get; set; }
 }
 

@@ -619,7 +619,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.isLoading = true;
 
         try {
-            await Promise.all([this.loadLicenseCheck(), this.loadGauges()]);
+            await allSettled([this.loadLicenseCheck(), this.loadGauges()]);
             this.updateVerification();
         } finally {
             this.isLoading = false;
@@ -892,7 +892,7 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     // V1 parity: a tester without admin rights submits only under their own BPAT account.
     private async getSelectableBpats(): Promise<ProfessionalUser[]> {
-        const [myUser, testersPage] = await Promise.all([
+        const [myUser, testersPage] = await allSettled([
             this._userService.getMyData(),
             this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] })
         ]);

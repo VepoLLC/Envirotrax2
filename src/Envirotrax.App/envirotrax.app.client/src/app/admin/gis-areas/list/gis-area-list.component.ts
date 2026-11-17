@@ -24,6 +24,7 @@ export class GisAreaListComponent implements OnInit {
     public cursorPosition: { lat: number, lng: number } | null = null;
 
     public isLoading: boolean = false;
+    public isInitializing: boolean = false;
     public loadingMessage?: string;
 
     public editRecord?: MapPolygon<GisAreaVm>;
@@ -91,11 +92,19 @@ export class GisAreaListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
 
-        await allSettled([
-            this.getAreas(),
-            this.getDefaultView(),
-            this.setPermissions()
-        ]);
+        // getAreas() hides its own spinner when it finishes, so this one keeps the page covered until the saved
+        // map view has loaded too. Otherwise Save Map View could overwrite it with the default center and zoom.
+        try {
+            this.isInitializing = true;
+
+            await allSettled([
+                this.getAreas(),
+                this.getDefaultView(),
+                this.setPermissions()
+            ]);
+        } finally {
+            this.isInitializing = false;
+        }
     }
 
     private async setPermissions(): Promise<void> {

@@ -90,6 +90,15 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<BackflowGaugeDto>> GetAllByProfessionalUserAsync(int professionalId, int userId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+
+        var items = await _gaugeRepository.GetAllByProfessionalUserAsync(professionalId, userId, pageInfo, query, cancellationToken);
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
     public async Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken)
     {
         var gauge = await _gaugeRepository.GetNoIncludesAsync(id, cancellationToken);

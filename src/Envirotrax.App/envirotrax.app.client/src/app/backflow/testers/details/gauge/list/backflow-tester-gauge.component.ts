@@ -19,8 +19,8 @@ export class BackflowTesterGaugeComponent implements OnInit {
     @Input() public testerId!: number;
     @Input() public tester: Professional | null = null;
 
-    // Gauges belong to the company, so a user's details page lists them without add, edit or delete.
-    @Input() public readOnly: boolean = false;
+    // Set on a user's details page: only the gauges assigned to that user are listed, and a new gauge is assigned to them.
+    @Input() public userId?: number;
 
     public readonly gaugeExpirationType = GaugeExpirationType;
     public canManage: boolean = false;
@@ -55,11 +55,9 @@ export class BackflowTesterGaugeComponent implements OnInit {
     }
 
     private async setPermissions(): Promise<void> {
-        const canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
+        this.canManage = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
 
-        this.canManage = canModify && !this.readOnly;
-
-        if (canModify) {
+        if (this.canManage) {
             this.gaugeCustomActions = [
                 {
                     text: 'View',
@@ -76,7 +74,7 @@ export class BackflowTesterGaugeComponent implements OnInit {
     }
 
     private getColumns(): TableColumn<BackflowGauge>[] {
-        return [
+        const columns: TableColumn<BackflowGauge>[] = [
             {
                 field: 'professionalUser.contactName',
                 caption: 'Assigned To',
@@ -111,12 +109,15 @@ export class BackflowTesterGaugeComponent implements OnInit {
                 type: ColumnType.date
             }
         ];
+
+        // Every gauge on a user's details page is assigned to that user, so the Assigned To column would only repeat it.
+        return this.userId ? columns.filter(column => column.field !== 'professionalUser.contactName') : columns;
     }
 
     public addGauge(): void {
         this._modalHelper.show<BackflowGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title: 'Add Gauge',
-            model: { testerId: this.testerId, companyName: this.tester?.name ?? '', gauge: {} },
+            model: { testerId: this.testerId, userId: this.userId, companyName: this.tester?.name ?? '', gauge: {} },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadGauge());
@@ -177,7 +178,8 @@ export class BackflowTesterGaugeComponent implements OnInit {
             this.table.items = await this._gaugeService.getGauges(
                 this.testerId,
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this.userId
             );
         } finally {
             this.table.isLoading = false;

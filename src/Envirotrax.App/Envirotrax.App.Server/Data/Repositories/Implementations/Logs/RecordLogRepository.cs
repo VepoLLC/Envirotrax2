@@ -1,9 +1,7 @@
 using DeveloperPartners.SortingFiltering;
-using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Logs;
 using Envirotrax.App.Server.Data.Services.Definitions;
-using Envirotrax.App.Server.Domain.DataTransferObjects.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +37,7 @@ public class RecordLogRepository : Repository<RecordLog, long>, IRecordLogReposi
             .CountAsync(log => log.TableName == tableName && log.RecordId == recordId, cancellationToken);
     }
 
-    public async Task<IEnumerable<RecordLog>> SearchAsync(RecordLogSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public override Task<IEnumerable<RecordLog>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         if (query.Sort.IsNullOrEmpty())
         {
@@ -48,18 +46,6 @@ public class RecordLogRepository : Repository<RecordLog, long>, IRecordLogReposi
 
         CreatedTimeDaySearch.Apply(query, _timeZoneHelper.GetUserTimeZone());
 
-        var dbQuery = GetListQuery()
-            .Where(query.Filter)
-            .Where(log => log.TableName == criteria.TableName)
-            .WhereIf(criteria.WaterSupplierId.HasValue, log => log.WaterSupplierId == criteria.WaterSupplierId)
-            .WhereIf(criteria.RecordId.HasValue, log => log.RecordId == criteria.RecordId)
-            .WhereIf(!string.IsNullOrWhiteSpace(criteria.UserEmail), log => log.CreatedBy!.Email == criteria.UserEmail)
-            .WhereIf(criteria.LogType.HasValue, log => log.LogType == criteria.LogType);
-
-        var paginated = await dbQuery
-            .OrderBy(query.Sort)
-            .PaginateAsync(pageInfo, cancellationToken);
-
-        return await paginated.ToListAsync(cancellationToken);
+        return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 }

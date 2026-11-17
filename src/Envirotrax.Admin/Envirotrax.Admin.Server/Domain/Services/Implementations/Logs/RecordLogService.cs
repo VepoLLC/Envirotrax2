@@ -16,8 +16,8 @@ public class RecordLogService : IRecordLogService
         _apiClient = apiClient;
     }
 
-    public Task<IPagedData<RecordLogDto>> SearchAsync(RecordLogSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public Task<IPagedData<RecordLogDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        return _apiClient.GetAsync<RecordLogDto>(BaseUrl, pageInfo, query, criteria.ToParameters(), cancellationToken);
+        return _apiClient.GetAsync<RecordLogDto>(BaseUrl, pageInfo, query, cancellationToken);
     }
 }

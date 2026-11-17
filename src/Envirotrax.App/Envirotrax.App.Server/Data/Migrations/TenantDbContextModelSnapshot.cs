@@ -3138,6 +3138,18 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
 
@@ -3164,9 +3176,21 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("ProfessionalId", "UserId");
 
                     b.HasIndex("BillingStateId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UserId");
 
@@ -5611,11 +5635,26 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("BillingStateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
                         .WithMany()
                         .HasForeignKey("ProfessionalId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "User")
                         .WithMany()
@@ -5625,7 +5664,13 @@ namespace Envirotrax.App.Server.Data.Migrations
 
                     b.Navigation("BillingState");
 
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
                     b.Navigation("Professional");
+
+                    b.Navigation("UpdatedBy");
 
                     b.Navigation("User");
                 });

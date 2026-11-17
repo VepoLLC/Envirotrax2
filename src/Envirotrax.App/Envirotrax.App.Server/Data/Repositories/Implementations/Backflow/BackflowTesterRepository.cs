@@ -70,7 +70,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
 
                 dbQuery = dbQuery.Where(p =>
                     p.CompanyEmail!.Contains(userEmail) ||
-                    DbContext.ProfessionalUsers.Any(u =>
+                    DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                         u.ProfessionalId == p.Id &&
                         u.IsBackflowTester &&
                         u.User!.Email!.Contains(userEmail)));
@@ -80,7 +80,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
             {
                 var contactName = criteria.ContactName;
 
-                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u =>
+                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                     u.ProfessionalId == p.Id &&
                     u.IsBackflowTester &&
                     u.ContactName!.Contains(contactName)));
@@ -90,7 +90,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Backflow
             {
                 var cellNumber = criteria.CellNumber;
 
-                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u =>
+                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                     u.ProfessionalId == p.Id &&
                     u.IsBackflowTester &&
                     u.User!.PhoneNumber!.Contains(cellNumber)));

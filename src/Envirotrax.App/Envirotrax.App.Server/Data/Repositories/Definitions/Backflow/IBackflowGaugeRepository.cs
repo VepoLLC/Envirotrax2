@@ -14,7 +14,6 @@ public interface IBackflowGaugeRepository : IRepository<BackflowGauge>
     Task<int> CountCompanyAndUserGaugesAsync(int userId, CancellationToken cancellationToken);
     Task<IEnumerable<BackflowGauge>> GetCompanyAndUserGaugesAsync(int userId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<BackflowGauge?> GetCompanyOrUserGaugeAsync(int gaugeId, int userId, CancellationToken cancellationToken);
-    Task<IEnumerable<BackflowGauge>> DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken);
 
     Task<IEnumerable<BackflowGauge>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken);

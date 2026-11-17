@@ -12,7 +12,6 @@ public interface IBackflowGaugeService : IService<BackflowGaugeDto>
     Task<IPagedData<BackflowGaugeDto>> GetUsableByBpatAsync(int bpatUserId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<BackflowGaugeDto> GetValidGaugeForBpatAsync(int gaugeId, int bpatUserId, CancellationToken cancellationToken);
     Task<int> CountUsableByCurrentUserAsync(CancellationToken cancellationToken);
-    Task DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken);
 
     Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken);

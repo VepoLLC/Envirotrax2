@@ -190,17 +190,6 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return await CountAsync(cancellationToken);
     }
 
-    public async Task DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken)
-    {
-        var deletedGauges = await _gaugeRepository.DeleteAssignedToUserAsync(professionalId, userId, cancellationToken);
-
-        foreach (var gauge in deletedGauges)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.BackflowGauges, gauge.Id, null, RecordLogType.Delete,
-                $"Deleted gauge with its user — Manufacturer: '{gauge.Manufacturer}', SerialNumber: '{gauge.SerialNumber}'", professionalId: gauge.ProfessionalId);
-        }
-    }
-
     public override async Task<BackflowGaugeDto?> DeleteAsync(int id)
     {
         var deleted = await base.DeleteAsync(id);

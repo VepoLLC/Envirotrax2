@@ -18,7 +18,7 @@ public class ProfessionalUserRepository : IProfessionalUserRepository
     {
         var professionalUser = await _dbContext
             .ProfessionalUsers
-            .SingleOrDefaultAsync(s => s.ProfessionalId == professionalId && s.UserId == userId);
+            .SingleOrDefaultAsync(s => s.ProfessionalId == professionalId && s.UserId == userId && s.DeletedTime == null);
 
         if (professionalUser == null)
         {

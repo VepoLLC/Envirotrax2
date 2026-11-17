@@ -25,7 +25,7 @@ import { Site } from '../../../shared/models/sites/site';
 import { SiteService } from '../../../shared/services/sites/site.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
-import { InputOption } from '@envirotrax/common-ui';
+import { InputOption, allSettled } from '@envirotrax/common-ui';
 
 const FIRE_SYSTEM_HAZARD_TYPE = 'Fire System';
 
@@ -644,7 +644,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     private async loadSupplierData(): Promise<void> {
-        await Promise.all([
+        await allSettled([
             this.loadAdditionalInfoSettings(),
             this.loadInsuranceCheck(),
             this.loadLicenseCheck(),
@@ -843,7 +843,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadData(fromTestId: number | null): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, usersPage, gaugesPage, stateOptions] = await Promise.all([
+            const [professional, usersPage, gaugesPage, stateOptions] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),
@@ -1041,7 +1041,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadForEdit(testId: number): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, usersPage, gaugesPage, stateOptions] = await Promise.all([
+            const [professional, usersPage, gaugesPage, stateOptions] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._gaugeService.getAll({ pageSize: MAX_PAGE_SIZE }, {}),

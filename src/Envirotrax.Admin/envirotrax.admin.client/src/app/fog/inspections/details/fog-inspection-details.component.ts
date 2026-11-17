@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { InputOption, RecordLog, ToastService, ToastType } from '@envirotrax/common-ui';
+import { InputOption, RecordLog, ToastService, ToastType, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import {
     FogInspection,
@@ -80,7 +80,7 @@ export class FogInspectionDetailsComponent implements OnInit {
         this.id = this._windowReference.config.model?.id ?? 0;
         this.idPrefix = `fog-${this.id}`;
 
-        await Promise.all([
+        await allSettled([
             this.loadInspection(),
             this.loadStates(),
             this.loadRecordLogs()

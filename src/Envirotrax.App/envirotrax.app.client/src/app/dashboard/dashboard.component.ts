@@ -11,6 +11,7 @@ import { FogInspectionSubmissionStats } from "../shared/models/water-suppliers/f
 import { FogTripTicketSubmissionStats } from "../shared/models/water-suppliers/fog-trip-ticket-submission-stats";
 import { FeatureType } from "../shared/models/feature-type";
 import { onThemeChange, readCssVar } from "../shared/utils/chart-theme.util";
+import { allSettled } from "@envirotrax/common-ui";
 
 @Component({
     templateUrl: './dashboard.component.html',
@@ -104,7 +105,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.hasBackflow,
             this.hasFogInspection,
             this.hasFogTransportation
-        ] = await Promise.all([
+        ] = await allSettled([
             this._authService.getWaterSupplierId(),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
@@ -143,7 +144,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 requests.push(this._dashboardService.getFogTripTicketSubmissionStats().then(s => this.fogTripTicketVm = this.buildFogTripTicketVm(s)));
             }
 
-            await Promise.all(requests);
+            await allSettled(requests);
         } finally {
             this.isLoading = false;
         }

@@ -8,7 +8,7 @@ import { State } from "../../shared/models/lookup/state";
 import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { Professional } from "../../shared/models/professionals/professional";
 import { WaterSupplierRegistrationComponent, WaterSupplierRegistrationVm } from "./registration/water-supplier-registration.component";
-import { ToastService, CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, ModalHelperService, TableColumn, allSettled } from '@envirotrax/common-ui';
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
@@ -127,7 +127,7 @@ export class WaterSuppliersComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
 
-        [this.hasBackflowTesting, this.hasCsiInspection, this.hasFogInspection, this.hasFogTransportation] = await Promise.all([
+        [this.hasBackflowTesting, this.hasCsiInspection, this.hasFogInspection, this.hasFogTransportation] = await allSettled([
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.FogInspection),
@@ -153,7 +153,7 @@ export class WaterSuppliersComponent implements OnInit {
         try {
             this.suppliers.isLoading = true;
 
-            const [currentProfessional, states] = await Promise.all([
+            const [currentProfessional, states] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this._lookupService.getAllStatesAsOptions(true)
             ]);

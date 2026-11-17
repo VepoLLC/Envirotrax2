@@ -12,7 +12,7 @@ import { TableViewModel } from '../../shared/models/table-view-model';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { GisArea } from '../../shared/models/gis-areas/gis-area';
 import { FacilityType } from '../../shared/enums/facility-type.enum';
-import { CellTemplateData, ColumnType, FilterPanelComponent, InputOption, MapMarker, MapPolygon, TableSettingsModalService } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, FilterPanelComponent, InputOption, MapMarker, MapPolygon, TableSettingsModalService, allSettled } from '@envirotrax/common-ui';
 import { BackflowPaymentStatus, BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
 import { BackflowTestSearchFilters } from '../../shared/models/backflow/backflow-test-search-filters';
 import { TableSettingType } from '../../shared/enums/table-setting-type.enum';
@@ -506,7 +506,7 @@ export class BackflowTestListComponent implements OnInit, OnDestroy {
             this.setShowResults(false);
             this.showMapResults = false;
 
-            const [testsPage, areas, coordinates, defaultView] = await Promise.all([
+            const [testsPage, areas, coordinates, defaultView] = await allSettled([
                 this._backflowTestService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query, this.getPaymentStatus()),
                 this._gisAreaService.getAllAreas(),
                 this._coordinateService.getAll(),

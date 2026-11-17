@@ -2,7 +2,7 @@ import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType, Ba
 import { BackflowSettings } from '../../../shared/models/settings/backflow-settings';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ToastService } from '@envirotrax/common-ui';
+import { ToastService, allSettled } from '@envirotrax/common-ui';
 import { HelperService } from '../../../shared/services/helpers/helper.service';
 import { BackflowTestingSettingsService } from '../../../shared/services/settings/backflow-testing-settings.service';
 import { SettingsSection } from '../../../shared/models/settings/settings-section';
@@ -114,7 +114,7 @@ export class BackflowTestingSettings implements OnInit {
           if (copied) {
               this.validationErrors = [];
 
-              await Promise.all([
+              await allSettled([
                   this.getSettings(),
                   this.renewalRequirements?.getRequirements()
               ]);

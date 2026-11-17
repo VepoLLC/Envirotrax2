@@ -7,7 +7,7 @@ import { GisArea, GisAreaCoordinate } from "../../../shared/models/gis-areas/gis
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
-import { MapPolygon } from "@envirotrax/common-ui";
+import { MapPolygon, allSettled } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 import { GisMapService } from "../../../shared/services/gis-areas/gis-map.service";
 
@@ -91,7 +91,7 @@ export class GisAreaListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
 
-        await Promise.all([
+        await allSettled([
             this.getAreas(),
             this.getDefaultView(),
             this.setPermissions()
@@ -108,7 +108,7 @@ export class GisAreaListComponent implements OnInit {
             this.isLoading = true;
             this.loadingMessage = 'Loading GIS Areas...'
 
-            const [areas, allCoordinates] = await Promise.all([
+            const [areas, allCoordinates] = await allSettled([
                 this._gisAreaService.getAll({ pageNumber: 1, pageSize: MAX_PAGE_SIZE }, {}),
                 this._gisAreaCoordinateService.getAll()
             ]);

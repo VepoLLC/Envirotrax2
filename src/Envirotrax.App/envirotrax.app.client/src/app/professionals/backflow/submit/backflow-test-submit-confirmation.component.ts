@@ -6,6 +6,7 @@ import { BackflowSubmissionSite } from "../../../shared/models/backflow/backflow
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
 import { BackflowTestService } from "../../../shared/services/backflow/backflow-test.service";
 import { SiteService } from "../../../shared/services/sites/site.service";
+import { allSettled } from "@envirotrax/common-ui";
 
 interface ConfirmationAssemblyRow {
     test: BackflowTest;
@@ -97,7 +98,7 @@ export class BackflowTestSubmitConfirmationComponent implements OnInit, OnDestro
         try {
             this.isLoading = true;
 
-            const [sitesPage, unpaidPage] = await Promise.all([
+            const [sitesPage, unpaidPage] = await allSettled([
                 this._siteService.getAllForBackflowSubmission({ pageSize: 1 }, {
                     sort: {},
                     filter: [{ columnName: 'id', comparisonOperator: 'Eq', value: String(siteId) }]

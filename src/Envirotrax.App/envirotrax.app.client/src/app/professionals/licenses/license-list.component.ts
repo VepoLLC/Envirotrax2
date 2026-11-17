@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { ExpirationType, ProfessionalType, ProfessionalUserLicense, professionalTypeLabels } from "../../shared/models/professionals/licenses/professional-user-license";
 import { ProfessionalUserLicenseService } from "../../shared/services/professionals/professional-user-license.service";
-import { ToastService, ToastType, CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, ToastType, CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn, allSettled } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { CreateEditLicenseComponent } from "../users/edit/licenses/create-edit/create-edit-license.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
@@ -74,7 +74,7 @@ export class LicenseListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
 
-        const [_, professional, licenseTypes] = await Promise.all([
+        const [_, professional, licenseTypes] = await allSettled([
             this.getLicenses(),
             this._professionalService.getLoggedInProfessional(),
             this._licenseService.getAllTypesAsOptions({ sort: {}, filter: [] }, false)

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HelperService, InputOption, RecordLog } from '@envirotrax/common-ui';
+import { HelperService, InputOption, RecordLog, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import {
     BackflowTestDetails,
@@ -109,7 +109,7 @@ export class BackflowTestDetailsComponent implements OnInit, OnDestroy {
         this.id = this._windowReference.config.model?.id ?? 0;
         this.idPrefix = `backflow-test-${this.id}`;
 
-        await Promise.all([
+        await allSettled([
             this.loadStates(),
             this.loadTest(),
             this.loadCounts(),

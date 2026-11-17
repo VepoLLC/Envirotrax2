@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { CellTemplateData, CheckboxCellComponent, ColumnType, CurrencyCellComponent, InputOption, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, CheckboxCellComponent, ColumnType, CurrencyCellComponent, InputOption, TableColumn, allSettled } from "@envirotrax/common-ui";
 import { QueryProperty } from "../../shared/models/query";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { PagedData } from "../../shared/models/paged-data";
@@ -81,7 +81,7 @@ export class PaymentReceiptsComponent implements OnInit {
             isCsiInspector,
             isFogInspector,
             isFogTransporter
-        ] = await Promise.all([
+        ] = await allSettled([
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.FogInspection),

@@ -116,6 +116,31 @@ Four things are specific to notifications:
 - **`SentTime` stays NULL.** V1 records no send time; its scheduled jobs select by `CreationDate`
   and interval instead of stamping a row once it has gone out.
 
+## How backflow gauges are migrated
+
+V1 names a gauge's owner by login (`SaveBpatGauges.BpatID`), and that login is either a master account or
+a sub-account. The company is resolved through `MigrationLegacyProfessionalAccounts`, which already applies
+the master/sub-account rule. V2 gives each gauge a new `Id`; the V1 id goes into `LegacyRecordId`.
+
+Three things are worth knowing:
+
+- **A sub-account's gauge stays that person's own.** In V1 only tests submitted under that login could use
+  it, while the master's gauges were open to the whole company. V2 keeps the person in
+  `ProfessionalUserId`, found through `AspNetUsers` and `ProfessionalUsers` in the same company; a master's
+  gauge leaves it NULL, which makes it a company gauge. Gauges migrated before that column existed are
+  assigned on the next run.
+- **A sub-account gauge whose person did not migrate is skipped** instead of becoming a company gauge, which
+  would let every tester there use it. In the July 2026 copy of V1 that is 2 of 649 sub-account gauges,
+  both owned by a login that appears in `SaveBpats` twice and that the users migration therefore skipped.
+  Gauges already in V2 from an earlier run are never deleted; they stay company gauges.
+- **The Test for Accuracy report** is copied from the legacy file server into Azure Storage by
+  `BackflowGaugeService`, and `FilePath` is written only once the upload has returned.
+
+Gauges that could not be migrated, or whose report was missing, are queryable:
+
+`SELECT * FROM MigrationSkippedBackflowGauges` — the owner login has no migrated company, a sub-account
+owner has no migrated professional user, or the gauge has no report on the legacy file server.
+
 ## How backflow tests are migrated
 
 This is the largest entity in the system: 176 columns, 135 of which carry the same name in both

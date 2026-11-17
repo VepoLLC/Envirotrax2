@@ -35,6 +35,11 @@ public class BackflowTesterGaugeService : IBackflowTesterGaugeService
             ["isPortable"] = gauge.IsPortable.ToString()
         };
 
+        if (gauge.ProfessionalUser?.Id is int professionalUserId)
+        {
+            formFields["professionalUser.id"] = professionalUserId.ToString();
+        }
+
         if (gauge.LastCalibrationDate.HasValue)
         {
             formFields["lastCalibrationDate"] = gauge.LastCalibrationDate.Value.ToString("O", CultureInfo.InvariantCulture);

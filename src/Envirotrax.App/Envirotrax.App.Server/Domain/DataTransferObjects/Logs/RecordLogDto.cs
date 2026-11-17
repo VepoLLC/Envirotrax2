@@ -17,5 +17,9 @@ public class RecordLogDto : IDto<long>
 
     public string? Description { get; set; }
 
+    public int? WaterSupplierId { get; set; }
+
+    public int? ProfessionalId { get; set; }
+
     public AppUserDto? User { get; set; }
 }

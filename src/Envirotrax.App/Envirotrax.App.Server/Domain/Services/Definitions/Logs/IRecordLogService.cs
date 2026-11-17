@@ -1,3 +1,4 @@
+using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Logs;
 
@@ -7,5 +8,6 @@ public interface IRecordLogService
 {
     Task<List<RecordLogDto>> GetByRecordAsync(string tableName, int recordId, CancellationToken cancellationToken);
     Task<int> GetCountByRecordAsync(string tableName, int recordId, CancellationToken cancellationToken);
+    Task<IPagedData<RecordLogDto>> SearchAsync(RecordLogSearchDto criteria, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task AddAsync(string tableName, int recordId, int? waterSupplierId, RecordLogType logType, string? description, int? professionalId = null);
 }

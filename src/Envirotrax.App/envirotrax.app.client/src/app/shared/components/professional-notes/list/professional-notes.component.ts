@@ -30,6 +30,9 @@ export class ProfessionalNotesComponent implements OnInit {
     @Input() public professionalId!: number;
     @Input() public professionalType!: ProfessionalType;
 
+    // Set on a user's details page: the comment log is that user's (ProfessionalUserNotes), not the company's.
+    @Input() public userId?: number;
+
     @ViewChild('createdTemplate', { static: true })
     public createdTemplate!: TemplateRef<CellTemplateData<ProfessionalNote>>;
 
@@ -103,7 +106,7 @@ export class ProfessionalNotesComponent implements OnInit {
     private showEditModal(title: string, note: ProfessionalNote): void {
         this._modalHelper.show<ProfessionalNoteModalData, ProfessionalNote>(AddEditProfessionalNoteComponent, {
             title,
-            model: { professionalType: this.professionalType, professionalId: this.professionalId, note },
+            model: { professionalType: this.professionalType, professionalId: this.professionalId, userId: this.userId, note },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadNotes());
@@ -113,7 +116,7 @@ export class ProfessionalNotesComponent implements OnInit {
         this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
             try {
                 this.table.isLoading = true;
-                await this._service.delete(this.professionalType, this.professionalId, note.id!);
+                await this._service.delete(this.professionalType, this.professionalId, note.id!, this.userId);
                 this._toastService.successFullyDeleted('Comment');
             } finally {
                 this.table.isLoading = false;
@@ -130,7 +133,8 @@ export class ProfessionalNotesComponent implements OnInit {
                 this.professionalType,
                 this.professionalId,
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this.userId
             );
         } finally {
             this.table.isLoading = false;

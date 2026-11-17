@@ -9,6 +9,7 @@ import { CsiInspectionDetailsComponent } from "./inspections/details/csi-inspect
 import { DisapproveCsiInspectionComponent } from "./inspections/details/disapprove/disapprove-csi-inspection.component";
 import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
 import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
+import { CsiInspectorUserDetailsComponent } from "./inspectors/details/users/details/csi-inspector-user-details.component";
 import { CsiInspectorWaterSuppliersComponent } from "./inspectors/details/water-suppliers/list/csi-inspector-water-suppliers.component";
 import { CsiInspectorUsersComponent } from "./inspectors/details/users/list/csi-inspector-users.component";
 import { CsiInspectorLicenseInsuranceComponent } from "./inspectors/details/license-insurance/list/csi-inspector-license-insurance.component";
@@ -28,6 +29,7 @@ import { CsiComplianceManagementComponent } from "./reports/compliance/csi-compl
         DisapproveCsiInspectionComponent,
         CsiInspectorListComponent,
         CsiInspectorDetailsComponent,
+        CsiInspectorUserDetailsComponent,
         CsiInspectorWaterSuppliersComponent,
         CsiInspectorUsersComponent,
         CsiInspectorLicenseInsuranceComponent,

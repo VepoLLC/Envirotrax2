@@ -1,4 +1,5 @@
 ﻿import { Component, Input, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { CsiInspectorSubAccountsService } from "../../../../../shared/services/csi/csi-inspector-user.service";
@@ -27,6 +28,7 @@ export class CsiInspectorUsersComponent implements OnInit {
     constructor(
         private readonly _service: CsiInspectorSubAccountsService,
         private readonly _modalHelper: ModalHelperService,
+        private readonly _router: Router,
         private readonly _toastService: ToastService,
         private readonly _authService: AuthService
     ) { }
@@ -75,13 +77,12 @@ export class CsiInspectorUsersComponent implements OnInit {
         }).result().subscribe(() => this.loadSubAccounts());
     }
 
-    public editUser(user: ProfessionalUser): void {
-        this._modalHelper.show<CsiUserModalData, ProfessionalUser>(AddEditCsiInspectorUserComponent, {
-            title: 'Edit User Account',
-            model: { inspectorId: this.inspectorId, user },
-            size: ModalSize.large,
-            mode: 'disableFullScreen'
-        }).result().subscribe(() => this.loadSubAccounts());
+    // The user's details open in a new tab, so the company page stays where it was.
+    public viewUser(user: ProfessionalUser): void {
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['/csi/inspectors/details', this.inspectorId, 'users', user.id])
+        );
+        window.open(url, '_blank');
     }
 
     public deleteUser(user: ProfessionalUser): void {

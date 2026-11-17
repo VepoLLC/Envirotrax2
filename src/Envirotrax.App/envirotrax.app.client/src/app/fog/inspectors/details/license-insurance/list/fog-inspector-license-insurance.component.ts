@@ -6,6 +6,7 @@ import { FogInspectorLicensesService } from "../../../../../shared/services/fog/
 import { FogInspectorInsurancesService } from "../../../../../shared/services/fog/fog-inspector-insurances.service";
 import { Professional } from "../../../../../shared/models/professionals/professional";
 import { DownloadService } from "../../../../../shared/services/download.service";
+import { withLicenseUserFilter } from "../../../../../shared/utils/license-user-filter.util";
 import { AuthService } from "../../../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../../../shared/models/permission-type";
@@ -22,6 +23,11 @@ import { CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCus
 export class FogInspectorLicenseInsuranceComponent implements OnInit {
     @Input() public inspectorId!: number;
     @Input() public inspector: Professional | null = null;
+
+    // Set on a user's details page: only that user's licenses, without the company's insurances.
+    @Input() public userId?: number;
+
+    public sectionHeader: string = 'License & Insurance Management';
 
     public activeTab: 'insurances' | 'licenses' = 'licenses';
 
@@ -68,6 +74,10 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        if (this.userId) {
+            this.sectionHeader = 'License Management';
+        }
+
         await this.setPermissions();
         this.setupColumns();
         await this.loadLicenses();
@@ -110,7 +120,7 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
     }
 
     private getLicenseColumns(): TableColumn<ProfessionalUserLicense>[] {
-        return [
+        const columns: TableColumn<ProfessionalUserLicense>[] = [
             {
                 field: 'licenseNumber',
                 caption: 'License Number',
@@ -141,6 +151,9 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
                 type: ColumnType.date
             }
         ];
+
+        // Every license on a user's page is that user's, so the Email Address column would only repeat it.
+        return this.userId ? columns.filter(column => column.field !== 'user.emailAddress') : columns;
     }
 
     private getInsuranceColumns(): TableColumn<ProfessionalInsurance>[] {
@@ -162,7 +175,7 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
     public addLicense(): void {
         this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogInspectorLicenseComponent, {
             title: 'Add License',
-            model: { inspectorId: this.inspectorId, license: {} },
+            model: { inspectorId: this.inspectorId, userId: this.userId, license: {} },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses());
@@ -171,7 +184,7 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
     public editLicense(license: ProfessionalUserLicense): void {
         this._modalHelper.show<FogLicenseModalData, ProfessionalUserLicense>(EditFogInspectorLicenseComponent, {
             title: 'Edit License',
-            model: { inspectorId: this.inspectorId, license },
+            model: { inspectorId: this.inspectorId, userId: this.userId, license },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses());
@@ -241,7 +254,7 @@ export class FogInspectorLicenseInsuranceComponent implements OnInit {
             this.licensesTable.items = await this._licensesService.getLicenses(
                 this.inspectorId,
                 this.licensesTable.items?.pageInfo || {},
-                this.licensesTable.query
+                withLicenseUserFilter(this.licensesTable.query, this.userId)
             );
         } finally {
             this.licensesTable.isLoading = false;

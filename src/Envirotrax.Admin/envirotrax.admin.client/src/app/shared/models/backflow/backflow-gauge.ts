@@ -1,9 +1,10 @@
-import { ReferencedProfessional } from '../professionals/professional';
+import { ProfessionalUser, ReferencedProfessional } from '../professionals/professional';
 import { ExpirationType } from '../professionals/licenses/professional-user-license';
 
 export interface BackflowGauge {
     id?: number;
     professional?: ReferencedProfessional;
+    professionalUser?: ProfessionalUser | null;
     manufacturer?: string;
     model?: string;
     serialNumber?: string;

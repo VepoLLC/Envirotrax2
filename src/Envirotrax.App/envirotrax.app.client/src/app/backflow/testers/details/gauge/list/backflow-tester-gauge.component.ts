@@ -19,6 +19,9 @@ export class BackflowTesterGaugeComponent implements OnInit {
     @Input() public testerId!: number;
     @Input() public tester: Professional | null = null;
 
+    // Gauges belong to the company, so a user's details page lists them without add, edit or delete.
+    @Input() public readOnly: boolean = false;
+
     public readonly gaugeExpirationType = GaugeExpirationType;
     public canManage: boolean = false;
     public gaugeCustomActions: TableCustomAction<BackflowGauge>[] = [];
@@ -33,6 +36,9 @@ export class BackflowTesterGaugeComponent implements OnInit {
 
     @ViewChild('typeCell', { static: true })
     private typeCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
+
+    @ViewChild('assignedToCell', { static: true })
+    private assignedToCellTemplate!: TemplateRef<CellTemplateData<BackflowGauge>>;
 
     constructor(
         private readonly _gaugeService: BackflowTesterGaugeService,
@@ -49,9 +55,11 @@ export class BackflowTesterGaugeComponent implements OnInit {
     }
 
     private async setPermissions(): Promise<void> {
-        this.canManage = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
+        const canModify = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
 
-        if (this.canManage) {
+        this.canManage = canModify && !this.readOnly;
+
+        if (canModify) {
             this.gaugeCustomActions = [
                 {
                     text: 'View',
@@ -69,6 +77,12 @@ export class BackflowTesterGaugeComponent implements OnInit {
 
     private getColumns(): TableColumn<BackflowGauge>[] {
         return [
+            {
+                field: 'professionalUser.contactName',
+                caption: 'Assigned To',
+                cellTemplate: this.assignedToCellTemplate,
+                type: ColumnType.text
+            },
             {
                 field: 'manufacturer',
                 caption: 'Mfr.',
@@ -102,7 +116,7 @@ export class BackflowTesterGaugeComponent implements OnInit {
     public addGauge(): void {
         this._modalHelper.show<BackflowGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title: 'Add Gauge',
-            model: { testerId: this.testerId, gauge: {} },
+            model: { testerId: this.testerId, companyName: this.tester?.name ?? '', gauge: {} },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadGauge());
@@ -111,7 +125,7 @@ export class BackflowTesterGaugeComponent implements OnInit {
     public editGauge(gauge: BackflowGauge): void {
         this._modalHelper.show<BackflowGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title: 'Edit Gauge',
-            model: { testerId: this.testerId, gauge },
+            model: { testerId: this.testerId, companyName: this.tester?.name ?? '', gauge },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadGauge());

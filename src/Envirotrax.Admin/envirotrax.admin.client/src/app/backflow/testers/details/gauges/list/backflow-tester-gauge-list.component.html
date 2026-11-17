@@ -21,6 +21,10 @@
     </div>
 </vp-section>
 
+<ng-template #assignedToCell let-rowData="rowData">
+    {{ rowData.assignedTo }}
+</ng-template>
+
 <ng-template #waterSystemCell let-rowData="rowData">
     {{ rowData.waterSystemType }}
 </ng-template>

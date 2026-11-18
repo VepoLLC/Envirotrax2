@@ -98,6 +98,18 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    // A user can belong to more than one company, so the gauges assigned to them are matched on the company too.
+    public async Task<IEnumerable<BackflowGauge>> GetAllByProfessionalUserAsync(int professionalId, int userId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await IncludeAssignedUser(DbContext.BackflowGauges.AsNoTracking())
+            .Where(g => g.ProfessionalId == professionalId && g.ProfessionalUserId == userId)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
     public async Task<BackflowGauge?> UpdateGaugeAsync(BackflowGauge model)
     {
         var gauge = await GetTrackedForUpdateAsync(model.Id, default);

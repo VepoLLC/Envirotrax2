@@ -8,6 +8,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
 public interface IBackflowGaugeRepository : IRepository<BackflowGauge>
 {
     Task<IEnumerable<BackflowGauge>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<IEnumerable<BackflowGauge>> GetAllByProfessionalUserAsync(int professionalId, int userId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
     Task<BackflowGauge?> UpdateGaugeAsync(BackflowGauge model);
 

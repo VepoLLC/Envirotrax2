@@ -36,17 +36,17 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog
                     i.InsuranceNumber.Contains(criteria.InsurancePolicyNumber!)))
                 .WhereIf(!string.IsNullOrWhiteSpace(criteria.UserEmail), p =>
                     p.CompanyEmail!.Contains(criteria.UserEmail!) ||
-                    DbContext.ProfessionalUsers.Any(u =>
+                    DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                         u.ProfessionalId == p.Id &&
                         u.IsFogTransporter &&
                         u.User!.Email!.Contains(criteria.UserEmail!)))
-                .WhereIf(!string.IsNullOrWhiteSpace(criteria.ContactName), p => DbContext.ProfessionalUsers.Any(u =>
+                .WhereIf(!string.IsNullOrWhiteSpace(criteria.ContactName), p => DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                     u.ProfessionalId == p.Id &&
                     u.IsFogTransporter &&
                     u.ContactName!.Contains(criteria.ContactName!)))
                 .WhereIf(!string.IsNullOrWhiteSpace(criteria.CellNumber), p =>
                     p.CellPhoneNumber!.Contains(criteria.CellNumber!) ||
-                    DbContext.ProfessionalUsers.Any(u =>
+                    DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                         u.ProfessionalId == p.Id &&
                         u.IsFogTransporter &&
                         u.User!.PhoneNumber!.Contains(criteria.CellNumber!)));

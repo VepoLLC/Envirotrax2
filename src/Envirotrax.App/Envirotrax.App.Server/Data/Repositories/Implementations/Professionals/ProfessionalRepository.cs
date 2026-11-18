@@ -41,7 +41,7 @@ public class ProfessionalRepository : Repository<Professional>, IProfessionalRep
         var paginated = await DbContext
             .ProfessionalUsers
             .IgnoreQueryFilters()
-            .Where(proUser => proUser.UserId == _tenantProvider.UserId)
+            .Where(proUser => proUser.UserId == _tenantProvider.UserId && proUser.DeletedTime == null)
             .Select(proUser => proUser.Professional!)
             .Where(query.Filter)
             .OrderBy(query.Sort)

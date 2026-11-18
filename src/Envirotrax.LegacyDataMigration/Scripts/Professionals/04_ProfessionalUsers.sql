@@ -44,7 +44,8 @@ BEGIN TRY
     INSERT INTO ProfessionalUsers
         (ProfessionalId, UserId, LegacyRecordId, LegacyUserId, ContactName, JobTitle, IsAdmin,
          IsWiseGuy, IsBackflowTester, IsCsiInspector, IsFogInspector, IsFogTransporter,
-         BillingFirstName, BillingLastName, BillingAddress, BillingCity, BillingStateId, BillingZipCode)
+         BillingFirstName, BillingLastName, BillingAddress, BillingCity, BillingStateId, BillingZipCode,
+         CreatedTime)
     SELECT
         professionals.Id,
         users.Id,
@@ -63,7 +64,9 @@ BEGIN TRY
         NULLIF(primaryRows.BillingAddress, ''),
         NULLIF(primaryRows.BillingCity, ''),
         billingStates.Id,
-        LEFT(NULLIF(primaryRows.BillingZipCode, ''), 25)
+        LEFT(NULLIF(primaryRows.BillingZipCode, ''), 25),
+        -- V1 keeps the date a login was created on the account itself, which is when the person joined.
+        COALESCE(primaryRows.CreationDate, GETUTCDATE())
     FROM PrimaryRows AS primaryRows
     INNER JOIN UserAggregates AS aggregates
         ON aggregates.LegacyCompanyUserId = primaryRows.LegacyCompanyUserId

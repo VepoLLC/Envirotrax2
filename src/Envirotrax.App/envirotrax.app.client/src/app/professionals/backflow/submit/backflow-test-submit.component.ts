@@ -26,6 +26,8 @@ import { SiteService } from '../../../shared/services/sites/site.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
 import { InputOption } from '@envirotrax/common-ui';
+import { AuthService } from '../../../shared/services/auth/auth.service';
+import { ROLE_DEFINITIONS } from '../../../shared/models/role-definitions';
 
 const FIRE_SYSTEM_HAZARD_TYPE = 'Fire System';
 
@@ -522,7 +524,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _checkoutService: CheckoutService,
         private readonly _lookupService: LookupService,
-        private readonly _generalSettingsService: GeneralSettingsService
+        private readonly _generalSettingsService: GeneralSettingsService,
+        private readonly _authService: AuthService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
         this.manufacturerOptions = this._options.manufacturerOptions;
@@ -892,14 +895,15 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     // V1 parity: a tester without admin rights submits only under their own BPAT account.
     private async getSelectableBpats(): Promise<ProfessionalUser[]> {
-        const [myUser, testersPage] = await Promise.all([
+        const [myUser, isAdmin, testersPage] = await Promise.all([
             this._userService.getMyData(),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN),
             this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] })
         ]);
 
         const testers = testersPage.data ?? [];
 
-        if (myUser.isAdmin) {
+        if (isAdmin) {
             return testers;
         }
 

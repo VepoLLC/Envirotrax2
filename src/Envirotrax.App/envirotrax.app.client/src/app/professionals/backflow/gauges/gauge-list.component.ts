@@ -10,6 +10,8 @@ import { EditGaugeComponent } from "./edit/edit-gauge.component";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 import { ProfesionalUserService } from "../../../shared/services/professionals/professional-user.service";
+import { AuthService } from "../../../shared/services/auth/auth.service";
+import { ROLE_DEFINITIONS } from "../../../shared/models/role-definitions";
 
 const COMPANY_OPTION_ID = 0;
 
@@ -62,18 +64,19 @@ export class GaugeListComponent implements OnInit {
         private readonly _toastService: ToastService,
         private readonly _professionalService: ProfesisonalService,
         private readonly _userService: ProfesionalUserService,
+        private readonly _authService: AuthService,
         private readonly _helperService: HelperService
     ) { }
 
     public async ngOnInit(): Promise<void> {
         this.table.isLoading = true;
 
-        const [myUser, professional] = await Promise.all([
-            this._userService.getMyData(),
+        const [isAdmin, professional] = await Promise.all([
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN),
             this._professionalService.getLoggedInProfessional()
         ]);
 
-        this.isAdmin = !!myUser.isAdmin;
+        this.isAdmin = isAdmin;
         this.companyName = professional.name ?? '';
         this.table.columns = this.getColumns();
 

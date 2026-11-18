@@ -14,7 +14,6 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses
 using Envirotrax.App.Server.Domain.Configuration;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions;
-using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
@@ -34,7 +33,6 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IFileStorageService _fileStorageService;
     private readonly IRecordLogService _recordLogService;
-    private readonly IBackflowGaugeService _gaugeService;
 
     public ProfessionalUserService(
         IMapper mapper,
@@ -45,8 +43,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         IProfessionalUserLicenseRepository licenseRepository,
         ITimeZoneHelperService timeZoneHelper,
         IFileStorageService fileStorageService,
-        IRecordLogService recordLogService,
-        IBackflowGaugeService gaugeService)
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _professionalUserRepository = repository;
@@ -57,7 +54,6 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         _timeZoneHelper = timeZoneHelper;
         _fileStorageService = fileStorageService;
         _recordLogService = recordLogService;
-        _gaugeService = gaugeService;
     }
 
     public override async Task<IPagedData<ProfessionalUserDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -173,7 +169,24 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         dto.Id = await SendInvitationAsync(dto.EmailAddress, professional.Name, CancellationToken.None);
 
+        var restored = await RestoreDeletedUserAsync(professional.Id, dto, CancellationToken.None);
+
+        if (restored != null)
+        {
+            return restored;
+        }
+
         return await base.AddAsync(dto);
+    }
+
+    private async Task<ProfessionalUserDto?> RestoreDeletedUserAsync(int professionalId, ProfessionalUserDto dto, CancellationToken cancellationToken)
+    {
+        var model = MapToModel(dto)!;
+        model.ProfessionalId = professionalId;
+
+        var restored = await _professionalUserRepository.RestoreDeletedAsync(model, cancellationToken);
+
+        return MapToDto(restored);
     }
 
     public override async Task<ProfessionalUserDto?> DeleteAsync(int id)
@@ -182,19 +195,7 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         await _authApiClient.DeleteAsync<object>(_authService.UserId, $"/api/users/{id}/invitations", CancellationToken.None);
 
-        ProfessionalUserDto? deleted;
-
-        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-        {
-            if (user != null)
-            {
-                await _gaugeService.DeleteAssignedToUserAsync(user.ProfessionalId, user.UserId, CancellationToken.None);
-            }
-
-            deleted = await base.DeleteAsync(id);
-
-            scope.Complete();
-        }
+        var deleted = await base.DeleteAsync(id);
 
         if (deleted != null && user != null)
         {
@@ -212,6 +213,13 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
             ?? throw new InvalidOperationException("Professional not found.");
 
         dto.Id = await SendInvitationAsync(dto.EmailAddress, professional.Name, cancellationToken);
+
+        var restored = await RestoreDeletedUserAsync(professionalId, dto, cancellationToken);
+
+        if (restored != null)
+        {
+            return restored;
+        }
 
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;

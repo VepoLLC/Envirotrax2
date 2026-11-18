@@ -87,18 +87,6 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
             .SingleOrDefaultAsync(gauge => gauge.Id == gaugeId, cancellationToken);
     }
 
-    public async Task<IEnumerable<BackflowGauge>> DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken)
-    {
-        var gauges = await Entity
-            .Where(gauge => gauge.ProfessionalId == professionalId && gauge.ProfessionalUserId == userId)
-            .ToListAsync(cancellationToken);
-
-        Entity.RemoveRange(gauges);
-        await DbContext.SaveChangesAsync(cancellationToken);
-
-        return gauges;
-    }
-
     public async Task<IEnumerable<BackflowGauge>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await IncludeAssignedUser(DbContext.BackflowGauges.AsNoTracking())

@@ -10,7 +10,7 @@ import { ProfessionalUser } from "../../shared/models/professionals/professional
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
-import { ToastService, InputOption } from '@envirotrax/common-ui';
+import { ToastService, InputOption, allSettled } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -43,7 +43,7 @@ export class CompanyComponent implements OnInit {
             this.isLoading = true;
             this.loadingMessage = 'Loading Profile';
 
-            const [states, professional, user, isAdmin] = await Promise.all([
+            const [states, professional, user, isAdmin] = await allSettled([
                 this._lookupService.getAllStatesAsOptions(true),
                 this.getLoggedInProfessional(),
                 this.getMyData(),

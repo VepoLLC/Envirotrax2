@@ -8,7 +8,7 @@ import { LookupService } from "../../../shared/services/lookup/lookup.service";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
 import { FeatureType } from "../../../shared/models/feature-type";
-import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
+import { ToastService, InputOption, ModalHelperService, allSettled } from '@envirotrax/common-ui';
 import { HelperService } from "../../../shared/services/helpers/helper.service";
 import { ImageUrlChange } from "./images/backflow-test-images.component";
 import { DownloadService } from "../../../shared/services/download.service";
@@ -79,7 +79,7 @@ export class BackflowTestDetailsComponent implements OnInit {
     }
 
     private async initialize(): Promise<void> {
-        const [states, canModify, canViewTesters, canForceRenewal, settings] = await Promise.all([
+        const [states, canModify, canViewTesters, canForceRenewal, settings] = await allSettled([
             this._lookupService.getAllStatesAsOptions(true),
             this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTests),
             this._authService.hasAnyPermisison(PermissionAction.CanView, PermissionType.BackflowTesters),
@@ -98,7 +98,7 @@ export class BackflowTestDetailsComponent implements OnInit {
 
             if (id) {
                 this.id = +id;
-                await Promise.all([
+                await allSettled([
                     this.loadTest(),
                     this.loadRecordLogs()
                 ]);

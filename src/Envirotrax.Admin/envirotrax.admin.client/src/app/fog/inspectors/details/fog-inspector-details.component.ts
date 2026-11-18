@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ToastService, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { State } from '../../../shared/models/lookup/state';
 import { ProfessionalType } from '../../../shared/models/professionals/licenses/professional-user-license';
@@ -60,7 +60,7 @@ export class FogInspectorDetailsComponent implements OnInit {
         this.professionalId = this._windowReference.config.model?.id ?? 0;
         this.idPrefix = `fog-inspector-${this.professionalId}`;
 
-        await Promise.all([
+        await allSettled([
             this.loadStates(),
             this.loadProfessional()
         ]);

@@ -25,7 +25,7 @@ import { FOG_VEHICLE_CAPACITY_TYPE_LABELS } from '../../shared/models/fog/fog-ve
 import { PHYSICAL_TYPE_LABELS } from '../../shared/models/fog/fog-disposal-site-enums';
 import { ProfessionalDashboardStats } from '../../shared/models/professionals/professional-dashboard-stats';
 import { TableViewModel } from '../../shared/models/table-view-model';
-import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn, ModalHelperService } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn, ModalHelperService, allSettled } from '@envirotrax/common-ui';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { FogSignaturePadModalComponent, FogSignatureModel } from '../fog/inspections/create/fog-signature-pad-modal.component';
 import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
@@ -199,7 +199,7 @@ export class DashboardComponent implements OnInit {
         this.setupColumns();
 
         try {
-            const [hasCsi, hasFog, hasBackflow, hasFogTransportation, isCsiInspector, isFogInspector, isBackflowTester, isFogTransporter, isAdmin] = await Promise.all([
+            const [hasCsi, hasFog, hasBackflow, hasFogTransportation, isCsiInspector, isFogInspector, isBackflowTester, isFogTransporter, isAdmin] = await allSettled([
                 this._authService.hasAnyFeatures(FeatureType.CsiInspection),
                 this._authService.hasAnyFeatures(FeatureType.FogInspection),
                 this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
@@ -251,7 +251,7 @@ export class DashboardComponent implements OnInit {
                 promises.push(this.loadBackflowExpiryCounts());
             }
 
-            await Promise.all(promises);
+            await allSettled(promises);
         } finally {
             this.isLoading = false;
         }

@@ -60,3 +60,6 @@ export * from "./lib/services/helpers/timezone/timezone.interceptor";
 export * from "./lib/services/toast/toast.service";
 export * from "./lib/services/download/download.service";
 export * from "./lib/services/table-setting/table-settings-modal.service";
+
+// Utils
+export * from './lib/utils/promise.util';

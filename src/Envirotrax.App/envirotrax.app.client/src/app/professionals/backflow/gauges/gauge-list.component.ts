@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { BackflowGauge, GaugeExpirationType } from "../../../shared/models/backflow/backflow-gauge";
 import { BackflowGaugeService } from "../../../shared/services/backflow/backflow-gauge.service";
-import { ToastService, ToastType, CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, ToastType, CellTemplateData, ColumnType, InputOption, ModalHelperService, TableColumn, allSettled } from '@envirotrax/common-ui';
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { ProfesisonalService } from "../../../shared/services/professionals/professional.service";
 import { NgForm } from "@angular/forms";
@@ -71,7 +71,7 @@ export class GaugeListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.table.isLoading = true;
 
-        const [isAdmin, professional] = await Promise.all([
+        const [isAdmin, professional] = await allSettled([
             this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN),
             this._professionalService.getLoggedInProfessional()
         ]);

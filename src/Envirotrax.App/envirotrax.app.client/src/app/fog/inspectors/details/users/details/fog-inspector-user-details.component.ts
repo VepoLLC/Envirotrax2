@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs";
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
-import { ModalHelperService } from "@envirotrax/common-ui";
+import { ModalHelperService, allSettled } from "@envirotrax/common-ui";
 import { Professional } from "../../../../../shared/models/professionals/professional";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { ProfessionalType } from "../../../../../shared/models/professionals/licenses/professional-user-license";
@@ -74,7 +74,7 @@ export class FogInspectorUserDetailsComponent implements OnInit, OnDestroy {
         try {
             this.isLoading = true;
 
-            [this.professional, this.user] = await Promise.all([
+            [this.professional, this.user] = await allSettled([
                 this._inspectorService.getAccountInfo(this.professionalId),
                 this._userService.get(this.professionalId, this.userId)
             ]);

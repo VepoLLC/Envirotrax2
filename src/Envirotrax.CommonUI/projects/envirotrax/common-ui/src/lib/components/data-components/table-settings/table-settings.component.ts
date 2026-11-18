@@ -6,6 +6,7 @@ import { ToastService } from "../../../services/toast/toast.service";
 import { TableColumn } from "../table/table-models";
 import { ColumnType } from "../sorting-filtering/query-view-model";
 import { EditTableSettingComponent, EditTableSettingConfig } from "./edit-table-setting.component";
+import { allSettled } from "../../../utils/promise.util";
 
 export interface TableSettingsConfig {
     dataSource: TableSettingDataSource;
@@ -45,7 +46,7 @@ export class TableSettingsComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [settings, canAdd] = await Promise.all([
+            const [settings, canAdd] = await allSettled([
                 this._config.dataSource.getAll(this._config.tableType),
                 this._config.dataSource.canAdd()
             ]);

@@ -22,7 +22,7 @@ import { FogInspectionResult } from "../../../../shared/models/fog/fog-inspectio
 import { LookupService } from "../../../../shared/services/lookup/lookup.service";
 import { GeneralSettingsService } from "../../../../shared/services/settings/general-settings.service";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
-import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
+import { InputOption, ModalHelperService, allSettled } from "@envirotrax/common-ui";
 
 const UNLISTED_PROPERTY_ROUTE = 'unlisted';
 
@@ -406,7 +406,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [professional, usersPage, site, stateOptions] = await Promise.all([
+            const [professional, usersPage, site, stateOptions] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isFogInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this.isUnlistedProperty ? undefined : this._siteService.getForProfessional(this._siteId),
@@ -448,7 +448,7 @@ export class ProfessionalFogSubmissionCreateComponent implements OnInit {
             const inspection = await this._inspectionService.getById(id);
             this._siteId = inspection.site?.id ?? 0;
 
-            const [professional, usersPage, site, stateOptions] = await Promise.all([
+            const [professional, usersPage, site, stateOptions] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isFogInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._siteService.getForProfessional(this._siteId),

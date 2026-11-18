@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService, ToastType } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService, ToastType, allSettled } from '@envirotrax/common-ui';
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { BackflowTest } from "../../../shared/models/backflow/backflow-test";
@@ -126,7 +126,7 @@ export class CheckoutBackflowComponent implements OnInit {
 
             this.items.query.filter = filter;
 
-            const [tests, professional, currentUser] = await Promise.all([
+            const [tests, professional, currentUser] = await allSettled([
                 this._backflowTestService.getAllForProfessional({ pageSize: MAX_PAGE_SIZE }, this.items.query),
                 this._professionalService.reloadLoggedInProfessional(),
                 this._professionalUserService.reloadMyData()

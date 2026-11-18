@@ -7,7 +7,7 @@ import { GisArea, GisAreaCoordinate } from "../../../shared/models/gis-areas/gis
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { FeatureType } from "../../../shared/models/feature-type";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
-import { MapPolygon } from "@envirotrax/common-ui";
+import { MapPolygon, allSettled } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../../shared/services/helpers/app-contaner-helper.service";
 import { GisMapService } from "../../../shared/services/gis-areas/gis-map.service";
 
@@ -24,6 +24,7 @@ export class GisAreaListComponent implements OnInit {
     public cursorPosition: { lat: number, lng: number } | null = null;
 
     public isLoading: boolean = false;
+    public isInitializing: boolean = false;
     public loadingMessage?: string;
 
     public editRecord?: MapPolygon<GisAreaVm>;
@@ -91,11 +92,19 @@ export class GisAreaListComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
 
-        await Promise.all([
-            this.getAreas(),
-            this.getDefaultView(),
-            this.setPermissions()
-        ]);
+        // getAreas() hides its own spinner when it finishes, so this one keeps the page covered until the saved
+        // map view has loaded too. Otherwise Save Map View could overwrite it with the default center and zoom.
+        try {
+            this.isInitializing = true;
+
+            await allSettled([
+                this.getAreas(),
+                this.getDefaultView(),
+                this.setPermissions()
+            ]);
+        } finally {
+            this.isInitializing = false;
+        }
     }
 
     private async setPermissions(): Promise<void> {
@@ -108,7 +117,7 @@ export class GisAreaListComponent implements OnInit {
             this.isLoading = true;
             this.loadingMessage = 'Loading GIS Areas...'
 
-            const [areas, allCoordinates] = await Promise.all([
+            const [areas, allCoordinates] = await allSettled([
                 this._gisAreaService.getAll({ pageNumber: 1, pageSize: MAX_PAGE_SIZE }, {}),
                 this._gisAreaCoordinateService.getAll()
             ]);

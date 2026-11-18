@@ -7,6 +7,7 @@ import { WaterSupplierService } from "../../shared/services/water-suppliers/wate
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { Professional } from "../../shared/models/professionals/professional";
 import { isSafeReturnUrl } from "../../shared/utils/return-url.util";
+import { allSettled } from "@envirotrax/common-ui";
 
 export type LoginAccountType = 'professional' | 'waterSupplier';
 
@@ -63,7 +64,7 @@ export class LoginRedirectComponent {
 
             this.returnUrl = await this._authService.signInCallback();
 
-            const [profesisonalId, waterSupplierId] = await Promise.all([
+            const [profesisonalId, waterSupplierId] = await allSettled([
                 this._authService.getProfessionalId(),
                 this._authService.getWaterSupplierId()
             ]);
@@ -124,7 +125,7 @@ export class LoginRedirectComponent {
     }
 
     private async loadSystems(): Promise<void> {
-        [this.professionals, this.suppliers] = await Promise.all([
+        [this.professionals, this.suppliers] = await allSettled([
             this._professionalService.getAllMy(this.professionals?.pageInfo || {}, {}),
             this._supplierService.getAllMySuppliers()
         ]);

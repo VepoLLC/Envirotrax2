@@ -9,7 +9,7 @@ import { AuthService } from '../shared/services/auth/auth.service';
 import { FeatureType } from '../shared/models/feature-type';
 import { PermissionAction, PermissionType } from '../shared/models/permission-type';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, allSettled } from '@envirotrax/common-ui';
 import { EditWaterSupplierLicenseComponent, WaterSupplierLicenseModalData } from './edit/edit-water-supplier-license.component';
 import { STANDALONE_GRID_PAGE_SIZE } from '../shared/models/page-info';
 
@@ -83,7 +83,7 @@ export class LicenseManagementComponent implements OnInit {
         }
 
         this.table.columns = this.getColumns();
-        await Promise.all([this.loadLicenses(), this.loadCounts()]);
+        await allSettled([this.loadLicenses(), this.loadCounts()]);
     }
 
     private getColumns(): TableColumn<WaterSupplierLicense>[] {
@@ -133,7 +133,7 @@ export class LicenseManagementComponent implements OnInit {
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(async () => {
-            await Promise.all([this.loadLicenses(), this.loadCounts()]);
+            await allSettled([this.loadLicenses(), this.loadCounts()]);
         });
     }
 
@@ -152,7 +152,7 @@ export class LicenseManagementComponent implements OnInit {
             } finally {
                 this.table.isLoading = false;
             }
-            await Promise.all([this.loadLicenses(), this.loadCounts()]);
+            await allSettled([this.loadLicenses(), this.loadCounts()]);
         });
     }
 

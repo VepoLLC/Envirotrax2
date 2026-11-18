@@ -12,6 +12,7 @@ public interface IProfessionalUserRepository : IRepository<ProfessionalUser>
     Task<ProfessionalUser?> UpdateSignaturePathAsync(int userId, string signaturePath);
     Task<ProfessionalUser?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle);
     Task<ProfessionalUser?> UpdatePaymentBypassAsync(int professionalId, int userId, ProfessionalType professionalType, bool isPaymentBypassed);
+    Task<ProfessionalUser?> RestoreDeletedAsync(ProfessionalUser user, CancellationToken cancellationToken);
     Task<bool> ExistsForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken);
     Task<bool> IsBackflowTesterAsync(int professionalId, int userId, CancellationToken cancellationToken);
     Task<ProfessionalUser?> GetForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null);

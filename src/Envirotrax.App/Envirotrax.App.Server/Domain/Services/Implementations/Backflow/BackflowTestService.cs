@@ -296,13 +296,19 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         }
     }
 
-    private void EnsureCanSubmitForBpat(BackflowTestDto dto)
+    private async Task EnsureCanSubmitForBpatAsync(BackflowTestDto dto, CancellationToken cancellationToken)
     {
         var isTesterWithoutAdminRights = !_authService.HasAnyRole(RoleDefinitions.Professionals.Admin);
 
         if (isTesterWithoutAdminRights && dto.Bpat?.Id != _authService.ActingAsUserId)
         {
             throw new AppValidationException("You can only submit tests under your own BPAT account.");
+        }
+
+        if (dto.Bpat?.Id is not int bpatUserId
+            || !await _professionalUserRepository.IsBackflowTesterAsync(_authService.ProfessionalId, bpatUserId, cancellationToken))
+        {
+            throw new AppValidationException("Please select an active backflow tester of your company as the BPAT account.");
         }
     }
 
@@ -767,7 +773,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
 
         await ApplyWaterSupplierAsync(dto, cancellationToken);
 
-        EnsureCanSubmitForBpat(dto);
+        await EnsureCanSubmitForBpatAsync(dto, cancellationToken);
         await ApplyGaugeAsync(dto, cancellationToken);
 
         await PopulateBpatSnapshotAsync(dto);
@@ -919,7 +925,7 @@ public class BackflowTestService : Service<BackflowTest, BackflowTestDto>, IBack
         dto.Site = existing.SiteId == null ? null : new ReferencedSiteDto { Id = existing.SiteId };
         dto.WaterSupplier = new ReferencedWaterSupplierDto { Id = existing.WaterSupplierId };
 
-        EnsureCanSubmitForBpat(dto);
+        await EnsureCanSubmitForBpatAsync(dto, cancellationToken);
         await ApplyGaugeAsync(dto, cancellationToken);
 
         await PopulateBpatSnapshotAsync(dto);

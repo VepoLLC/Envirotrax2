@@ -19,8 +19,10 @@ export class BackflowTesterGaugeService {
     ) {
     }
 
-    public getGauges(testerId: number, pageInfo: PageInfo, query: Query): Promise<PagedData<BackflowGauge>> {
-        const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${testerId}/gauges`);
+    // With a userId, only the gauges assigned to that user of the company.
+    public getGauges(testerId: number, pageInfo: PageInfo, query: Query, userId?: number): Promise<PagedData<BackflowGauge>> {
+        const path = userId ? `/api/backflow/testers/${testerId}/users/${userId}/gauges` : `/api/backflow/testers/${testerId}/gauges`;
+        const url = this._urlResolver.resolveUrl(path);
         return lastValueFrom(this._http.get<PagedData<BackflowGauge>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));

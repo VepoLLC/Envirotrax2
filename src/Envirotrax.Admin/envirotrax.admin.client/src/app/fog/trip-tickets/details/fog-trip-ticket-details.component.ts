@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HelperService, InputOption, RecordLog, ToastService } from '@envirotrax/common-ui';
+import { HelperService, InputOption, RecordLog, ToastService, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { FogTripTicket, FogTripTicketUpdateRequest } from '../../../shared/models/fog/fog-trip-ticket';
 import { State } from '../../../shared/models/lookup/state';
@@ -62,7 +62,7 @@ export class FogTripTicketDetailsComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
         this.id = this._windowReference.config.model?.id ?? 0;
 
-        await Promise.all([
+        await allSettled([
             this.loadTicket(),
             this.loadStates(),
             this.loadRecordLogs()

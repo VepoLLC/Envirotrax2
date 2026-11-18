@@ -87,22 +87,22 @@ public class BackflowGaugeRepository : Repository<BackflowGauge>, IBackflowGauge
             .SingleOrDefaultAsync(gauge => gauge.Id == gaugeId, cancellationToken);
     }
 
-    public async Task<IEnumerable<BackflowGauge>> DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken)
-    {
-        var gauges = await Entity
-            .Where(gauge => gauge.ProfessionalId == professionalId && gauge.ProfessionalUserId == userId)
-            .ToListAsync(cancellationToken);
-
-        Entity.RemoveRange(gauges);
-        await DbContext.SaveChangesAsync(cancellationToken);
-
-        return gauges;
-    }
-
     public async Task<IEnumerable<BackflowGauge>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await IncludeAssignedUser(DbContext.BackflowGauges.AsNoTracking())
             .Where(g => g.ProfessionalId == professionalId)
+            .Where(query.Filter)
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    // A user can belong to more than one company, so the gauges assigned to them are matched on the company too.
+    public async Task<IEnumerable<BackflowGauge>> GetAllByProfessionalUserAsync(int professionalId, int userId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        var paginated = await IncludeAssignedUser(DbContext.BackflowGauges.AsNoTracking())
+            .Where(g => g.ProfessionalId == professionalId && g.ProfessionalUserId == userId)
             .Where(query.Filter)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);

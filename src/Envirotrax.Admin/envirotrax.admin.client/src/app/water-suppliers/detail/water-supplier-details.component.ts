@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HelperService, InputOption } from '@envirotrax/common-ui';
+import { HelperService, InputOption, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../shared/components/shared.components.module';
 import { WindowReference } from '../../window/window-config';
 import { WaterSupplier } from '../../shared/models/water-suppliers/water-supplier';
@@ -83,7 +83,7 @@ export class WaterSupplierDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [states, details] = await Promise.all([
+            const [states, details] = await allSettled([
                 this._lookupService.getAllStates(),
                 this._waterSupplierService.getDetails(this.supplierId)
             ]);

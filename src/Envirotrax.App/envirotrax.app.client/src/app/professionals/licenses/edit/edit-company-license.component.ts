@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
-import { InputOption, ToastService } from '@envirotrax/common-ui';
+import { InputOption, ToastService, allSettled } from '@envirotrax/common-ui';
 import { ProfessionalLicense } from "../../../shared/models/professionals/licenses/professional-license";
 import { LicenseScope, ProfessionalLicenseType } from "../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalLicenseService } from "../../../shared/services/professionals/professional-license.service";
@@ -33,7 +33,7 @@ export class EditCompanyLicenseComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [license, professional, licenseTypes] = await Promise.all([
+            const [license, professional, licenseTypes] = await allSettled([
                 this._licenseService.get(this._modalReference.config.model!.id!),
                 this._professionalService.getLoggedInProfessional(),
                 this._userLicenseService.getAllTypesAsOptions({ sort: {}, filter: [{ columnName: 'licenseScope', comparisonOperator: 'Eq', value: LicenseScope.Company.toString() }] }, false)

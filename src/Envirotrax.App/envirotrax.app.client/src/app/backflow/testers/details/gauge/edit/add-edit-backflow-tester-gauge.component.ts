@@ -12,6 +12,8 @@ const COMPANY_OPTION_ID = 0;
 
 export interface BackflowGaugeModalData {
     testerId: number;
+    // Set when adding from a user's details page, which lists only the gauges assigned to that user.
+    userId?: number;
     companyName: string;
     gauge: BackflowGauge;
 }
@@ -27,6 +29,7 @@ export class AddEditBackflowTesterGaugeComponent {
     public calibrationFile: File | null = null;
     public assignedToOptions: InputOption[] = [];
     public assignedUserId = COMPANY_OPTION_ID;
+    public isUserFixed: boolean = false;
 
     public get isEditMode(): boolean {
         return !!this._modalReference.config.model?.gauge?.id;
@@ -39,9 +42,15 @@ export class AddEditBackflowTesterGaugeComponent {
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
-        this.gauge = { ...this._modalReference.config.model!.gauge };
+        const { userId, gauge } = this._modalReference.config.model!;
+        this.gauge = { ...gauge };
 
         if (!this.gauge.id) {
+            if (userId) {
+                this.assignedUserId = userId;
+                this.isUserFixed = true;
+            }
+
             this.loadAssignedToOptions();
         }
     }

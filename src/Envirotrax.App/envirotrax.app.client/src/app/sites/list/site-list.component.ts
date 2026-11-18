@@ -15,7 +15,7 @@ import { DownloadConfig } from "../../shared/models/download-config";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { DownloadService } from "../../shared/services/download.service";
-import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn, allSettled } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { GeneralSettingsService } from "../../shared/services/settings/general-settings.service";
 import { PrintableTableService } from "../../shared/services/printable-table.service";
@@ -286,7 +286,7 @@ export class SiteListComponent implements OnInit {
             this.setShowResults(false);
             this.showMapResults = false;
 
-            const [sitesPage, areas, coordinates, defaultView] = await Promise.all([
+            const [sitesPage, areas, coordinates, defaultView] = await allSettled([
                 this._siteService.getAll({ pageSize: 10000, pageNumber: 1 }, this.table.query),
                 this._gisAreaService.getAllAreas(),
                 this._coordinateService.getAll(),

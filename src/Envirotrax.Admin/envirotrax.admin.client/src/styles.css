@@ -304,6 +304,17 @@ dp-loading-spinner.vp-spinner-overlay .dp-spinner-container {
     bottom: 0 !important;
 }
 
+/* Allow scrolling while a nested spinner parent (a section) is loading, but preserve
+   the window scroll lock while a window-level spinner is active. */
+.vp-window-body:has([dp-spinner-parent] > dp-loading-spinner:not([hidden])):not(:has(dp-loading-spinner:not([dp-spinner-parent] > *):not([hidden]))) {
+    overflow: auto !important;
+}
+
+[dp-spinner-parent] > dp-loading-spinner .dp-spinner-container {
+    top: 0 !important;
+    bottom: 0 !important;
+}
+
 .input-group .vp-input-container .form-control {
     margin-left: calc(-1 * var(--bs-border-width));
     border-top-left-radius: 0px;

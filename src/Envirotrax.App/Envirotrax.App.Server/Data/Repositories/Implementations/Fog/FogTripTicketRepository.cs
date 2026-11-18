@@ -117,7 +117,7 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
             dbQuery = dbQuery.Where(t =>
                 t.TransporterEmailAddress!.Contains(userEmail)
                 || t.Transporter!.User!.Email!.Contains(userEmail)
-                || DbContext.ProfessionalUsers.Any(u =>
+                || DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                     u.ProfessionalId == t.ProfessionalId
                     && u.IsAdmin
                     && u.User!.Email!.Contains(userEmail)));

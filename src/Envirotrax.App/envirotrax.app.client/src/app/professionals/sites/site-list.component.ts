@@ -7,7 +7,7 @@ import { QueryProperty } from "../../shared/models/query";
 import { NgForm } from "@angular/forms";
 import { ProfessionalSupplierService } from "../../shared/services/professionals/professional-supplier.service";
 import { PropertyType } from "../../shared/enums/property-type.enum";
-import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, InputOption, MapMarker, MapPolygon, ModalHelperService, TableColumn, allSettled } from "@envirotrax/common-ui";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { GisAreaService } from "../../shared/services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../shared/services/gis-areas/gis-area-coordinate.service";
@@ -167,7 +167,7 @@ export class SiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
 
-            const [waterSupplierOptions, isCsiInspector, isFogInspector, scheduleTypes] = await Promise.all([
+            const [waterSupplierOptions, isCsiInspector, isFogInspector, scheduleTypes] = await allSettled([
                 this._proSupplierService.getMyAsOptions(),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.CSI_INSPECTOR),
                 this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.FOG_INSPECTOR),
@@ -364,7 +364,7 @@ export class SiteListComponent implements OnInit {
             this.setShowResults(false);
             this.showMapResults = false;
 
-            const [sitesPage, areas, coordinates, defaultView] = await Promise.all([
+            const [sitesPage, areas, coordinates, defaultView] = await allSettled([
                 this._siteService.getAllForProfessional({ pageSize: 10000, pageNumber: 1 }, this.table.query, this._criteria),
                 this._gisAreaService.getAllAreasForProfessional(waterSupplierId),
                 this._coordinateService.getAllForProfessional(waterSupplierId),

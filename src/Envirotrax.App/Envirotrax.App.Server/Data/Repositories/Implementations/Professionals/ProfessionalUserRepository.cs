@@ -1,6 +1,7 @@
 
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Transactions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Professionals;
@@ -26,13 +27,15 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
     protected override IQueryable<ProfessionalUser> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
-            .Include(proUser => proUser.User);
+            .Include(proUser => proUser.User)
+            .Where(proUser => proUser.DeletedTime == null);
     }
 
     protected override IQueryable<ProfessionalUser> GetListQuery()
     {
         return base.GetListQuery()
-            .Include(proUser => proUser.User);
+            .Include(proUser => proUser.User)
+            .Where(proUser => proUser.DeletedTime == null);
     }
 
     public override Task<IEnumerable<ProfessionalUser>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -68,7 +71,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
     public async Task<ProfessionalUser?> UpdateNonSensitiveDataAsync(ProfessionalUser user)
     {
         user.ProfessionalId = _authService.ProfessionalId;
-        var existing = await DbContext.ProfessionalUsers.SingleOrDefaultAsync(u => u.ProfessionalId == user.ProfessionalId && u.UserId == user.UserId);
+        var existing = await DbContext.ProfessionalUsers.SingleOrDefaultAsync(u => u.ProfessionalId == user.ProfessionalId && u.UserId == user.UserId && u.DeletedTime == null);
 
         if (existing != null)
         {
@@ -84,7 +87,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
     public async Task<ProfessionalUser?> UpdateSignaturePathAsync(int userId, string signaturePath)
     {
         var professionalId = _authService.ProfessionalId;
-        var existing = await DbContext.ProfessionalUsers.SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
+        var existing = await DbContext.ProfessionalUsers.SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId && u.DeletedTime == null);
 
         if (existing != null)
         {
@@ -99,7 +102,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
     public async Task<ProfessionalUser?> UpdateSubAccountAsync(int professionalId, int userId, string? contactName, string? jobTitle)
     {
         var existing = await DbContext.ProfessionalUsers
-            .SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId);
+            .SingleOrDefaultAsync(u => u.ProfessionalId == professionalId && u.UserId == userId && u.DeletedTime == null);
 
         if (existing != null)
         {
@@ -165,7 +168,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         var q = DbContext.ProfessionalUsers
             .AsNoTracking()
             .Include(pu => pu.User)
-            .Where(pu => pu.ProfessionalId == professionalId);
+            .Where(pu => pu.ProfessionalId == professionalId && pu.DeletedTime == null);
 
         if (roleFilter != null)
             q = q.Where(roleFilter);
@@ -178,14 +181,48 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
         return await paginated.ToListAsync(cancellationToken);
     }
 
+    public async Task<ProfessionalUser?> RestoreDeletedAsync(ProfessionalUser user, CancellationToken cancellationToken)
+    {
+        var deletedUser = Entity.Where(u => u.ProfessionalId == user.ProfessionalId && u.UserId == user.UserId && u.DeletedTime != null);
+
+        if (!await deletedUser.AnyAsync(cancellationToken))
+        {
+            return null;
+        }
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        // SaveChanges cannot clear these: AuditEntities keeps them unmodified on every save except a delete.
+        await deletedUser.ExecuteUpdateAsync(set => set
+            .SetProperty(u => u.DeletedTime, (DateTime?)null)
+            .SetProperty(u => u.DeletedById, (int?)null), cancellationToken);
+
+        var restored = await Entity.SingleAsync(u => u.ProfessionalId == user.ProfessionalId && u.UserId == user.UserId, cancellationToken);
+
+        restored.ContactName = user.ContactName;
+        restored.JobTitle = user.JobTitle;
+        restored.IsAdmin = user.IsAdmin;
+        restored.IsWiseGuy = user.IsWiseGuy;
+        restored.IsCsiInspector = user.IsCsiInspector;
+        restored.IsBackflowTester = user.IsBackflowTester;
+        restored.IsFogInspector = user.IsFogInspector;
+        restored.IsFogTransporter = user.IsFogTransporter;
+
+        await SaveChangesAsync(logData: true, cancellationToken);
+
+        scope.Complete();
+
+        return restored;
+    }
+
     public Task<bool> ExistsForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken)
     {
-        return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId, cancellationToken);
+        return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId && pu.DeletedTime == null, cancellationToken);
     }
 
     public Task<bool> IsBackflowTesterAsync(int professionalId, int userId, CancellationToken cancellationToken)
     {
-        return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId && pu.IsBackflowTester, cancellationToken);
+        return Entity.AnyAsync(pu => pu.ProfessionalId == professionalId && pu.UserId == userId && pu.IsBackflowTester && pu.DeletedTime == null, cancellationToken);
     }
 
     // The base GetAsync keys on UserId alone, and a user can belong to more than one company, so a water
@@ -210,6 +247,7 @@ public class ProfessionalUserRepository : Repository<ProfessionalUser>, IProfess
             .Include(proUser => proUser.User)
             .Include(proUser => proUser.Professional)
                 .ThenInclude(professional => professional!.State)
+            .Where(proUser => proUser.DeletedTime == null)
             .Where(roleFilter)
             .Where(query.Filter);
 

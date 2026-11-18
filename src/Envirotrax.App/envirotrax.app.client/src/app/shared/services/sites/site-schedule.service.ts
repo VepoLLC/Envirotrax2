@@ -7,6 +7,7 @@ import { SiteSchedule } from "../../models/sites/site-schedule";
 import { ProfessionalType } from "../../models/professionals/licenses/professional-user-license";
 import { FeatureType } from "../../models/feature-type";
 import { ROLE_DEFINITIONS } from "../../models/role-definitions";
+import { allSettled } from "@envirotrax/common-ui";
 
 export interface SiteScheduleType {
     professionalType: ProfessionalType;
@@ -42,7 +43,7 @@ export class SiteScheduleService {
             isCsiInspector,
             isFogInspector,
             isFogTransporter
-        ] = await Promise.all([
+        ] = await allSettled([
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.FogInspection),

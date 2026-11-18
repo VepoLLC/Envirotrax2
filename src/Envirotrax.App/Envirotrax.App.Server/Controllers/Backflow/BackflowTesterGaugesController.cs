@@ -42,6 +42,14 @@ namespace Envirotrax.App.Server.Controllers.Backflow
             return Ok(result);
         }
 
+        [HttpGet("{id}/users/{userId}/gauges")]
+        [HasPermission(PermissionAction.CanView)]
+        public async Task<IActionResult> GetUserGaugesAsync(int id, int userId, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+        {
+            var result = await _gaugeService.GetAllByProfessionalUserAsync(id, userId, pageInfo, query, cancellationToken);
+            return Ok(result);
+        }
+
         [HttpPost("{id}/gauges")]
         [HasPermission(PermissionAction.CanModify)]
         public async Task<IActionResult> AddGaugeAsync(int id, [FromForm] CreateBackflowGaugeDto dto)

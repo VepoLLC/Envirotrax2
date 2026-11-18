@@ -23,4 +23,6 @@ public class ProfessionalUser
     public bool IsBackflowTester { get; set; }
     public bool IsFogInspector { get; set; }
     public bool IsFogTransporter { get; set; }
+
+    public DateTime? DeletedTime { get; set; }
 }

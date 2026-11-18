@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { InputOption, RecordLog } from '@envirotrax/common-ui';
+import { InputOption, RecordLog, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import {
     CsiInspection,
@@ -96,7 +96,7 @@ export class CsiInspectionDetailsComponent implements OnInit, OnDestroy {
         this.id = this._windowReference.config.model?.id ?? 0;
         this.idPrefix = `csi-${this.id}`;
 
-        await Promise.all([
+        await allSettled([
             this.loadStates(),
             this.loadInspection(),
             this.loadCounts(),

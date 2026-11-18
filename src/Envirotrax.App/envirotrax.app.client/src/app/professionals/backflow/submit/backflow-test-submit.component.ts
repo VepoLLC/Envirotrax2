@@ -25,7 +25,9 @@ import { Site } from '../../../shared/models/sites/site';
 import { SiteService } from '../../../shared/services/sites/site.service';
 import { LookupService } from '../../../shared/services/lookup/lookup.service';
 import { PropertyType } from '../../../shared/enums/property-type.enum';
-import { InputOption } from '@envirotrax/common-ui';
+import { InputOption, allSettled } from '@envirotrax/common-ui';
+import { AuthService } from '../../../shared/services/auth/auth.service';
+import { ROLE_DEFINITIONS } from '../../../shared/models/role-definitions';
 
 const FIRE_SYSTEM_HAZARD_TYPE = 'Fire System';
 
@@ -522,7 +524,8 @@ export class BackflowTestSubmitComponent implements OnInit {
         private readonly _siteService: SiteService,
         private readonly _checkoutService: CheckoutService,
         private readonly _lookupService: LookupService,
-        private readonly _generalSettingsService: GeneralSettingsService
+        private readonly _generalSettingsService: GeneralSettingsService,
+        private readonly _authService: AuthService
     ) {
         this.deviceTypeOptions = this._options.deviceTypeOptions;
         this.manufacturerOptions = this._options.manufacturerOptions;
@@ -619,7 +622,7 @@ export class BackflowTestSubmitComponent implements OnInit {
         this.isLoading = true;
 
         try {
-            await Promise.all([this.loadLicenseCheck(), this.loadGauges()]);
+            await allSettled([this.loadLicenseCheck(), this.loadGauges()]);
             this.updateVerification();
         } finally {
             this.isLoading = false;
@@ -646,7 +649,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     }
 
     private async loadSupplierData(): Promise<void> {
-        await Promise.all([
+        await allSettled([
             this.loadAdditionalInfoSettings(),
             this.loadInsuranceCheck(),
             this.loadLicenseCheck(),
@@ -842,7 +845,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadData(fromTestId: number | null): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, bpats, stateOptions] = await Promise.all([
+            const [professional, bpats, stateOptions] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this.getSelectableBpats(),
                 this._lookupService.getAllStatesAsOptions(false)
@@ -892,14 +895,15 @@ export class BackflowTestSubmitComponent implements OnInit {
 
     // V1 parity: a tester without admin rights submits only under their own BPAT account.
     private async getSelectableBpats(): Promise<ProfessionalUser[]> {
-        const [myUser, testersPage] = await Promise.all([
+        const [myUser, isAdmin, testersPage] = await allSettled([
             this._userService.getMyData(),
+            this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN),
             this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isBackflowTester', comparisonOperator: 'Eq', value: 'true' }] })
         ]);
 
         const testers = testersPage.data ?? [];
 
-        if (myUser.isAdmin) {
+        if (isAdmin) {
             return testers;
         }
 
@@ -1094,7 +1098,7 @@ export class BackflowTestSubmitComponent implements OnInit {
     private async loadForEdit(testId: number): Promise<void> {
         this.isLoading = true;
         try {
-            const [professional, bpats, stateOptions] = await Promise.all([
+            const [professional, bpats, stateOptions] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this.getSelectableBpats(),
                 this._lookupService.getAllStatesAsOptions(false)

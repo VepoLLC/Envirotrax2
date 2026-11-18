@@ -50,7 +50,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi
             {
                 dbQuery = dbQuery.Where(p =>
                     p.CompanyEmail!.Contains(userEmail) ||
-                    DbContext.ProfessionalUsers.Any(u =>
+                    DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                         u.ProfessionalId == p.Id &&
                         u.IsCsiInspector &&
                         u.User!.Email!.Contains(userEmail)));
@@ -58,7 +58,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Csi
 
             if (!string.IsNullOrWhiteSpace(contactName))
             {
-                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u =>
+                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                     u.ProfessionalId == p.Id &&
                     u.IsCsiInspector &&
                     u.ContactName!.Contains(contactName)));

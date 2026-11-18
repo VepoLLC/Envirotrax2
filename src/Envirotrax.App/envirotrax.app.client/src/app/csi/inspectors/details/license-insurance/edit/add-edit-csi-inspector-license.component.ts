@@ -7,7 +7,7 @@ import { CsiInspectorSubAccountsService } from "../../../../../shared/services/c
 import { LicenseScope, ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService, InputOption } from '@envirotrax/common-ui';
+import { ToastService, InputOption, allSettled } from '@envirotrax/common-ui';
 
 export interface CsiLicenseModalData {
     inspectorId: number;
@@ -63,7 +63,7 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
         const { inspectorId } = this._modalReference.config.model!;
         try {
             this.isLoading = true;
-            const [types, users] = await Promise.all([
+            const [types, users] = await allSettled([
                 this._licensesService.getLicenseTypes(),
                 this._subAccountsService.getSubAccounts(inspectorId, { pageNumber: 1, pageSize: 1000 }, {})
             ]);

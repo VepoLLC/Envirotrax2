@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService, ToastType } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, CurrencyCellComponent, InputOption, MAX_PAGE_SIZE, ModalHelperService, TableColumn, ToastService, ToastType, allSettled } from '@envirotrax/common-ui';
 import { QueryProperty } from "../../../shared/models/query";
 import { TableViewModel } from "../../../shared/models/table-view-model";
 import { CsiInspection } from "../../../shared/models/csi/csi-inspection";
@@ -126,7 +126,7 @@ export class CheckoutCsiComponent implements OnInit {
 
             this.items.query.filter = filter;
 
-            const [inspections, professional, currentUser] = await Promise.all([
+            const [inspections, professional, currentUser] = await allSettled([
                 this._csiInspectionService.getProfessionalInspections({ pageSize: MAX_PAGE_SIZE }, this.items.query, false),
                 this._professionalService.reloadLoggedInProfessional(),
                 this._professionalUserService.reloadMyData()

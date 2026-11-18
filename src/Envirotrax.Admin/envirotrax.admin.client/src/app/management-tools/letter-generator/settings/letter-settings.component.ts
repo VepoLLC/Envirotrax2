@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalReference } from '@developer-partners/ngx-modal-dialog';
-import { HelperService, InputOption, ModalHelperService, ToastService } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ModalHelperService, ToastService, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { BackflowExpiredType, BackflowExpiringType, BackflowNonCompliantType } from '../../../shared/models/water-suppliers/backflow-settings';
 import { CsiImpendingType, CsiNonCompliantType, CsiPastDueType } from '../../../shared/models/water-suppliers/csi-settings';
@@ -123,7 +123,7 @@ export class LetterSettingsComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [states, details] = await Promise.all([
+            const [states, details] = await allSettled([
                 this._lookupService.getAllStates(),
                 this._waterSupplierService.getDetails(this._waterSupplierId)
             ]);

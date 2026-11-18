@@ -90,6 +90,15 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<BackflowGaugeDto>> GetAllByProfessionalUserAsync(int professionalId, int userId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+
+        var items = await _gaugeRepository.GetAllByProfessionalUserAsync(professionalId, userId, pageInfo, query, cancellationToken);
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
     public async Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken)
     {
         var gauge = await _gaugeRepository.GetNoIncludesAsync(id, cancellationToken);
@@ -188,17 +197,6 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         }
 
         return await CountAsync(cancellationToken);
-    }
-
-    public async Task DeleteAssignedToUserAsync(int professionalId, int userId, CancellationToken cancellationToken)
-    {
-        var deletedGauges = await _gaugeRepository.DeleteAssignedToUserAsync(professionalId, userId, cancellationToken);
-
-        foreach (var gauge in deletedGauges)
-        {
-            await _recordLogService.AddAsync(RecordLogTableNames.BackflowGauges, gauge.Id, null, RecordLogType.Delete,
-                $"Deleted gauge with its user — Manufacturer: '{gauge.Manufacturer}', SerialNumber: '{gauge.SerialNumber}'", professionalId: gauge.ProfessionalId);
-        }
     }
 
     public override async Task<BackflowGaugeDto?> DeleteAsync(int id)

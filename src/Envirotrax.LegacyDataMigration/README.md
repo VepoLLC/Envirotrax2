@@ -413,6 +413,23 @@ empty, its account or sub-account never migrated, or none of its author's water 
 **Note:** Re-running the migration after renewal requirements have been deleted or copied in V2 may restore
 original V1 records.
 
+## How CRM companies are migrated
+
+V1 Vepo Manager's Contact Manager keeps the companies Vepo works with in `ContactManagerContacts`.
+`Scripts/Companies` copies them to `crm.Companies`. V2 gives each company a new `Id`; the V1 id goes into
+`LegacyRecordId`, which is how the later additional contact and contact log migrations will find a company.
+
+- **Every company belongs to the Vepo LLC supplier** (domain `vepollc`). Only Vepo administrators use the
+  Contact Manager, and V2 has them as users of that supplier.
+- **`Type` is copied as it is.** The V2 `ContactType` enum keeps the V1 values: 0 Existing Client,
+  1 Prospective Client, 2 Past Client, 3 Competitor Client, 4 Technology.
+- **The state is matched by full name**, which is what V1 stores (`Texas`), or by code in case a row holds an
+  abbreviation (`TX`).
+- **Last Contacted By is a login in V1** and a user in V2. It is matched on `AspNetUsers.UserName`; a login that
+  did not migrate leaves the field blank, and the company still migrates.
+- **V1 has no FOG transportation program**, so `HasFogTransportation` starts false.
+- Blank V1 text (an empty string in a NOT NULL column) becomes NULL.
+
 ## Running it
 
 Before running, double-check every connection string in `Program.cs` points to `localhost` / `(localdb)` — never to a shared server — and check the storage account name right below them. Then run the project. Logs print to the console and to `Logs/<ServiceName>.log`.

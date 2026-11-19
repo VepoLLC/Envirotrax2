@@ -12,3 +12,9 @@ public interface IProfessionalModel
 public interface ISharedProfessionalModel : IProfessionalModel
 {
 }
+
+public interface INullableSharedProfessionalModel
+{
+    int? ProfessionalId { get; set; }
+    Professional? Professional { get; set; }
+}

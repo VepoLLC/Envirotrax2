@@ -35,8 +35,15 @@ public class FogInspectionProfile : Profile
                     dto.MailingState ??= new() { Id = model.MailingStateId.Value };
                 }
 
-                dto.Professional ??= new() { Id = model.ProfessionalId };
-                dto.Inspector ??= new() { Id = model.InspectorId };
+                if (model.ProfessionalId.HasValue)
+                {
+                    dto.Professional ??= new() { Id = model.ProfessionalId.Value };
+                }
+
+                if (model.InspectorId.HasValue)
+                {
+                    dto.Inspector ??= new() { Id = model.InspectorId.Value };
+                }
 
                 dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
             })
@@ -53,7 +60,7 @@ public class FogInspectionProfile : Profile
             .ForMember(m => m.DeletedBy, opt => opt.Ignore())
             .ForMember(m => m.Professional, opt => opt.Ignore())
             .ForMember(m => m.Inspector, opt => opt.Ignore())
-            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id ?? 0 : 0))
-            .ForMember(m => m.InspectorId, opt => opt.MapFrom(dto => dto.Inspector != null ? dto.Inspector.Id ?? 0 : 0));
+            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id : (int?)null))
+            .ForMember(m => m.InspectorId, opt => opt.MapFrom(dto => dto.Inspector != null ? dto.Inspector.Id : (int?)null));
     }
 }

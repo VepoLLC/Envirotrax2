@@ -46,6 +46,13 @@ namespace Envirotrax.App.Server.Data.DbContexts
                     .Property(nameof(IProfessionalModel.ProfessionalId))
                     .IsConcurrencyToken();
             }
+
+            foreach (var entity in modelBuilder.Model.GetEntityTypes().Where(e => typeof(INullableSharedProfessionalModel).IsAssignableFrom(e.ClrType)))
+            {
+                modelBuilder.Entity(entity.ClrType)
+                    .Property(nameof(INullableSharedProfessionalModel.ProfessionalId))
+                    .IsConcurrencyToken();
+            }
         }
 
         protected override void SetupGlobalFiltering(ModelBuilder builder, IMutableEntityType entity)
@@ -83,6 +90,11 @@ namespace Envirotrax.App.Server.Data.DbContexts
                     var professionalProperty = entry.Property(e => e.ProfessionalId);
                     professionalProperty.CurrentValue = professionalId;
                 }
+
+                foreach (var entry in ChangeTracker.Entries<INullableSharedProfessionalModel>())
+                {
+                    SetSharedProfessionalSecurityProperties(entry, professionalId);
+                }
             }
         }
 
@@ -91,6 +103,23 @@ namespace Envirotrax.App.Server.Data.DbContexts
         // professional recorded as its owner — otherwise this would let anyone editing a shared row
         // silently reassign it to themselves.
         private static void SetSharedProfessionalSecurityProperties(EntityEntry<IProfessionalModel> entry, int professionalId)
+        {
+            var professionalProperty = entry.Property(e => e.ProfessionalId);
+
+            if (entry.State == EntityState.Added)
+            {
+                professionalProperty.CurrentValue = professionalId;
+
+                return;
+            }
+
+            if (entry.State is EntityState.Modified or EntityState.Deleted && professionalProperty.OriginalValue != professionalId)
+            {
+                throw new AppValidationException("Access denied.");
+            }
+        }
+
+        private static void SetSharedProfessionalSecurityProperties(EntityEntry<INullableSharedProfessionalModel> entry, int professionalId)
         {
             var professionalProperty = entry.Property(e => e.ProfessionalId);
 

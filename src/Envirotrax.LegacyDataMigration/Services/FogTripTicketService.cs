@@ -129,7 +129,14 @@ public class FogTripTicketService
                     // transporter signature, but V1 does, so it gets a folder of its own next to the other two.
                     // The folder is the V2 ProfessionalId, which a rebuild of the V2 database reassigns, so the
                     // previous run's blobs are left behind rather than reused after one.
-                    var blobPath = $"professionals/{ticket.ProfessionalId}/fog-trip-tickets/{signature.Kind}/legacy-{ticket.LegacyRecordId}.png";
+                    var blobFolder = $"fog-trip-tickets/{ticket.Id}";
+
+                    if (ticket.ProfessionalId != null)
+                    {
+                        blobFolder = $"professionals/{ticket.ProfessionalId}/fog-trip-tickets";
+                    }
+
+                    var blobPath = $"{blobFolder}/{signature.Kind}/legacy-{ticket.LegacyRecordId}.png";
 
                     string uploadedPath;
 

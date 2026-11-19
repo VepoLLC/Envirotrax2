@@ -42,7 +42,7 @@ CREATE TABLE MigrationPendingCsiInspectionImages (
     LegacyRecordId INT NOT NULL PRIMARY KEY,
     WaterSupplierId INT NOT NULL,
     InspectionId INT NOT NULL,
-    ProfessionalId INT NOT NULL,
+    ProfessionalId INT NULL,
     Description NVARCHAR(1000) NULL,
     LegacyFilePath NVARCHAR(500) NOT NULL,
     IsStoredInDatabase BIT NOT NULL

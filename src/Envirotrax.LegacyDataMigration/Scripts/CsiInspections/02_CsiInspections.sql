@@ -26,26 +26,6 @@ BEGIN TRY
     WHERE Sites.Id IS NULL
         AND alreadySkipped.LegacyRecordId IS NULL
 
-    -- V2 requires a professional inspector. Inspections entered by water supplier staff, by a bulk import
-    -- or with a blank login have none, so they are recorded here instead.
-    INSERT INTO MigrationSkippedCsiInspections (LegacyRecordId, LegacyUserId, SourceTable, Reason)
-    SELECT legacyInspections.ID, legacyInspections.InspectorID, 'CsiInspections', 'No migrated professional user for the inspector login'
-    FROM Vepo.dbo.CsiInspections AS legacyInspections
-    INNER JOIN WaterSuppliers
-        ON WaterSuppliers.LegacyRecordId = legacyInspections.WaterSupplierID
-    INNER JOIN Sites
-        ON Sites.LegacyRecordId = legacyInspections.SiteID
-    LEFT JOIN MigrationSkippedCsiInspections AS alreadySkipped
-        ON alreadySkipped.LegacyRecordId = legacyInspections.ID
-        AND alreadySkipped.SourceTable = 'CsiInspections'
-    WHERE alreadySkipped.LegacyRecordId IS NULL
-        AND NOT EXISTS
-        (
-            SELECT 1
-            FROM ProfessionalUsers AS professionalUsers
-            WHERE professionalUsers.LegacyUserId = NULLIF(legacyInspections.InspectorID, '')
-        )
-
     INSERT INTO CsiInspections
         (LegacyRecordId, WaterSupplierId, SiteId, InspectionDate, SubmissionId,
 
@@ -141,7 +121,7 @@ BEGIN TRY
         ON sites.LegacyRecordId = legacyInspections.SiteID
     -- One login can belong to more than one company, so the company the inspection was submitted under
     -- (MasterInspectorID, or the login itself for a company owner) is preferred.
-    CROSS APPLY
+    OUTER APPLY
     (
         SELECT TOP 1 professionalUsers.ProfessionalId, professionalUsers.UserId
         FROM ProfessionalUsers AS professionalUsers
@@ -172,6 +152,12 @@ BEGIN TRY
         FROM CsiInspections AS alreadyInserted
         WHERE alreadyInserted.LegacyRecordId = legacyInspections.ID
     )
+
+    DELETE MigrationSkippedCsiInspections
+    FROM MigrationSkippedCsiInspections
+    INNER JOIN CsiInspections
+        ON CsiInspections.LegacyRecordId = MigrationSkippedCsiInspections.LegacyRecordId
+    WHERE MigrationSkippedCsiInspections.SourceTable = 'CsiInspections'
 
     COMMIT TRAN
 

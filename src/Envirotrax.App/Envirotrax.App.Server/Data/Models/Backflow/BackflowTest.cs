@@ -15,9 +15,9 @@ namespace Envirotrax.App.Server.Data.Models.Backflow;
 
 [Table("BackflowTests")]
 [RecordLogged(RecordLogTableNames.BackflowTests)]
-// ISharedProfessionalModel: a device's test history is visible to every professional, but only the
+// INullableSharedProfessionalModel: a device's test history is visible to every professional, but only the
 // professional that recorded a test can change or delete it. See ProfessionalDbContext.SetSecurityProperties.
-public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel, ISharedProfessionalModel
+public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel, INullableSharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -32,7 +32,7 @@ public class BackflowTest : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
     public string? JobNumber { get; set; }
 
     // BPAT (Backflow Prevention Assembly Tester)
-    public int ProfessionalId { get; set; }
+    public int? ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
     public int? BpatId { get; set; }
     public ProfessionalUser? Bpat { get; set; }

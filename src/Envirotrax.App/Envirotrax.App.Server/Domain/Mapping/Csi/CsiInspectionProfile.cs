@@ -24,9 +24,15 @@ public class CsiInspectionProfile : Profile
                     AccountNumber = model.Site?.AccountNumber,
                 };
 
-                dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId };
+                if (model.ProfessionalId.HasValue)
+                {
+                    dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId.Value };
+                }
 
-                dto.InspectorUser ??= new ReferencedProfessionalUserDto { Id = model.InspectorId };
+                if (model.InspectorId.HasValue)
+                {
+                    dto.InspectorUser ??= new ReferencedProfessionalUserDto { Id = model.InspectorId.Value };
+                }
 
                 dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 

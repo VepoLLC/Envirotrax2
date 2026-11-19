@@ -14,10 +14,10 @@ using Envirotrax.Common.Data.Models;
 namespace Envirotrax.App.Server.Data.Models.Fog;
 
 [Table("FogTripTickets")]
-// ISharedProfessionalModel: trip tickets are visible to every professional, but only the professional
+// INullableSharedProfessionalModel: trip tickets are visible to every professional, but only the professional
 // that recorded one can change or delete it. See ProfessionalDbContext.SetSecurityProperties.
 [RecordLogged(RecordLogTableNames.FogTripTickets)]
-public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel, ISharedProfessionalModel
+public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser>, IPayableModel, INullableSharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
@@ -63,7 +63,7 @@ public class FogTripTicket : TenantModel<WaterSupplier>, IAuditableModel<AppUser
     public string? FogGeneratorContactName { get; set; }
 
     // Transporter
-    public int ProfessionalId { get; set; }
+    public int? ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
 
     public int? TransporterId { get; set; }

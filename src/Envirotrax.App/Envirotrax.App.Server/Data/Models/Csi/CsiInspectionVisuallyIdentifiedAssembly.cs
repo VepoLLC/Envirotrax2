@@ -7,17 +7,17 @@ using Envirotrax.Common.Data.Models;
 
 namespace Envirotrax.App.Server.Data.Models.Csi;
 
-// ISharedProfessionalModel: assemblies at a site are visible to every professional (a site's test
+// INullableSharedProfessionalModel: assemblies at a site are visible to every professional (a site's test
 // history is shared), but only the professional whose inspection added the row can change or delete
 // it (V1 let only the inspection's inspector or master account change them). ExecuteUpdateAsync/
 // ExecuteDeleteAsync calls bypass that check, so CsiInspectionAssemblyRepository filters those by
 // ProfessionalId itself.
-public class CsiInspectionVisuallyIdentifiedAssembly : TenantModel<WaterSupplier>, ISharedProfessionalModel
+public class CsiInspectionVisuallyIdentifiedAssembly : TenantModel<WaterSupplier>, INullableSharedProfessionalModel
 {
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 
-    public int ProfessionalId { get; set; }
+    public int? ProfessionalId { get; set; }
     public Professional? Professional { get; set; }
 
     public int InspectionId { get; set; }

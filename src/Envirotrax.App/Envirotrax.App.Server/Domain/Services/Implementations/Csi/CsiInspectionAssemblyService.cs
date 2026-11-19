@@ -127,7 +127,7 @@ public class CsiInspectionAssemblyService : ICsiInspectionAssemblyService
         }
     }
 
-    public Task DeleteByInspectionAsync(int inspectionId, int professionalId, CancellationToken cancellationToken)
+    public Task DeleteByInspectionAsync(int inspectionId, int? professionalId, CancellationToken cancellationToken)
     {
         return _repository.DeleteByInspectionAsync(inspectionId, professionalId, cancellationToken);
     }

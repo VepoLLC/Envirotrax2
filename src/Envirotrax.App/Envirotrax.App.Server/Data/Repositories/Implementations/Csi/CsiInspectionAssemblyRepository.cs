@@ -52,7 +52,7 @@ public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyI
     // ExecuteUpdateAsync bypasses SaveChanges, so ISharedProfessionalModel's ownership check never runs
     // for it — the ProfessionalId check below is this method's only protection against touching another
     // professional's assemblies.
-    public Task UpdateVisuallyIdentifiedAsync(int inspectionId, int professionalId, IReadOnlyCollection<int> visuallyIdentifiedIds, CancellationToken cancellationToken)
+    public Task UpdateVisuallyIdentifiedAsync(int inspectionId, int? professionalId, IReadOnlyCollection<int> visuallyIdentifiedIds, CancellationToken cancellationToken)
     {
         return Entity
             .Where(assembly => assembly.InspectionId == inspectionId && assembly.ProfessionalId == professionalId)
@@ -61,7 +61,7 @@ public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyI
     }
 
     // See UpdateVisuallyIdentifiedAsync: ExecuteUpdateAsync needs its own ProfessionalId check.
-    public Task MarkPaidAsync(int inspectionId, int professionalId, string transactionId, CancellationToken cancellationToken)
+    public Task MarkPaidAsync(int inspectionId, int? professionalId, string transactionId, CancellationToken cancellationToken)
     {
         return Entity
             .Where(assembly => assembly.InspectionId == inspectionId && assembly.ProfessionalId == professionalId && (assembly.TransactionId == null || assembly.TransactionId == ""))
@@ -93,7 +93,7 @@ public class CsiInspectionAssemblyRepository : Repository<CsiInspectionVisuallyI
 
     // V1 checkout delete of an unpaid inspection: its rows go, the tests it added stay. See
     // UpdateVisuallyIdentifiedAsync: ExecuteDeleteAsync needs its own ProfessionalId check.
-    public Task DeleteByInspectionAsync(int inspectionId, int professionalId, CancellationToken cancellationToken)
+    public Task DeleteByInspectionAsync(int inspectionId, int? professionalId, CancellationToken cancellationToken)
     {
         return Entity
             .Where(assembly => assembly.InspectionId == inspectionId && assembly.ProfessionalId == professionalId)

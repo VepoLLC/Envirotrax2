@@ -17,7 +17,7 @@ public class CsiInspectionImage : TenantModel<WaterSupplier>
     [MaxLength(1000)]
     public string? Description { get; set; }
 
-    public int ProfessionalId { get; set; }
+    public int? ProfessionalId { get; set; }
 
     public int? LegacyRecordId { get; set; }
 }

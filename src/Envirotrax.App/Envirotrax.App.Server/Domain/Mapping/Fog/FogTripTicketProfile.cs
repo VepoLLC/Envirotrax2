@@ -23,7 +23,11 @@ public class FogTripTicketProfile : Profile
                 dto.WaterSupplier ??= new ReferencedWaterSupplierDto { Id = model.WaterSupplierId };
 
                 dto.Site ??= new ReferencedSiteDto { Id = model.SiteId, AccountNumber = model.Site?.AccountNumber };
-                dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId };
+
+                if (model.ProfessionalId.HasValue)
+                {
+                    dto.Professional ??= new ReferencedProfessionalDto { Id = model.ProfessionalId.Value };
+                }
 
                 if (model.TransporterId.HasValue)
                 {
@@ -46,7 +50,7 @@ public class FogTripTicketProfile : Profile
             .ForMember(m => m.Site, opt => opt.Ignore())
             .ForMember(m => m.SiteId, opt => opt.MapFrom(dto => dto.Site != null ? dto.Site.Id : (int?)null))
             .ForMember(m => m.Professional, opt => opt.Ignore())
-            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id ?? 0 : 0))
+            .ForMember(m => m.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id : (int?)null))
             .ForMember(m => m.Transporter, opt => opt.Ignore())
             .ForMember(m => m.TransporterId, opt => opt.MapFrom(dto => dto.Transporter != null ? dto.Transporter.Id : (int?)null))
             .ForMember(m => m.PropertyState, opt => opt.Ignore())

@@ -629,7 +629,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("ProfessionalId")
+                    b.Property<int?>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.Property<bool>("ProperlyInstalled")
@@ -1008,7 +1008,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("InspectorId")
+                    b.Property<int?>("InspectorId")
                         .HasColumnType("int");
 
                     b.Property<string>("InspectorJobTitle")
@@ -1109,7 +1109,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("NeedsValidation")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProfessionalId")
+                    b.Property<int?>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.Property<string>("PropertyBusinessName")
@@ -1216,7 +1216,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<int>("InspectionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProfessionalId")
+                    b.Property<int?>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.HasKey("WaterSupplierId", "Id");
@@ -1281,7 +1281,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("OutOfService")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProfessionalId")
+                    b.Property<int?>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.Property<string>("SerialNumber")
@@ -1521,7 +1521,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("InspectorId")
+                    b.Property<int?>("InspectorId")
                         .HasColumnType("int");
 
                     b.Property<string>("InspectorJobTitle")
@@ -1643,7 +1643,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("PastOverflow")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProfessionalId")
+                    b.Property<int?>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.Property<string>("PropertyBusinessName")
@@ -1891,7 +1891,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Property<bool>("PickupCompleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProfessionalId")
+                    b.Property<int?>("ProfessionalId")
                         .HasColumnType("int");
 
                     b.Property<string>("PropertyBusinessName")
@@ -4879,8 +4879,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
                         .WithMany()
                         .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "PropertyState")
                         .WithMany()
@@ -4970,8 +4969,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
                         .WithMany()
                         .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "PropertyState")
                         .WithMany()
@@ -4998,8 +4996,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "Inspector")
                         .WithMany()
                         .HasForeignKey("ProfessionalId", "InspectorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 
@@ -5025,8 +5022,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
                         .WithMany()
                         .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
                         .WithMany()
@@ -5052,8 +5048,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
                         .WithMany()
                         .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
                         .WithMany()
@@ -5125,8 +5120,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
                         .WithMany()
                         .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "PropertyState")
                         .WithMany()
@@ -5153,8 +5147,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.ProfessionalUser", "Inspector")
                         .WithMany()
                         .HasForeignKey("ProfessionalId", "InspectorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 
@@ -5216,8 +5209,7 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.HasOne("Envirotrax.App.Server.Data.Models.Professionals.Professional", "Professional")
                         .WithMany()
                         .HasForeignKey("ProfessionalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "PropertyState")
                         .WithMany()

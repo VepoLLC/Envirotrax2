@@ -27,34 +27,6 @@ BEGIN TRY
     WHERE Sites.Id IS NULL
         AND alreadySkipped.LegacyRecordId IS NULL
 
-    -- ProfessionalId is NOT NULL in V2, but TransporterId is not, so a ticket only needs its company. It
-    -- is skipped when neither the transporter login nor the company it was filed under (MasterTransporterID,
-    -- empty when the transporter is the company) has been migrated. These are the same two lookups the
-    -- insert below makes.
-    INSERT INTO MigrationSkippedFogTripTickets (LegacyRecordId, LegacyUserId, SourceTable, Reason)
-    SELECT legacyTickets.ID, legacyTickets.TransporterID, 'FogTripTickets', 'No migrated transporter or transporter company for the ticket'
-    FROM Vepo.dbo.FogTripTickets AS legacyTickets
-    INNER JOIN WaterSuppliers
-        ON WaterSuppliers.LegacyRecordId = legacyTickets.WaterSupplierID
-    INNER JOIN Sites
-        ON Sites.LegacyRecordId = legacyTickets.SiteID
-    LEFT JOIN MigrationSkippedFogTripTickets AS alreadySkipped
-        ON alreadySkipped.LegacyRecordId = legacyTickets.ID
-        AND alreadySkipped.SourceTable = 'FogTripTickets'
-    WHERE alreadySkipped.LegacyRecordId IS NULL
-        AND NOT EXISTS
-        (
-            SELECT 1
-            FROM ProfessionalUsers AS professionalUsers
-            WHERE professionalUsers.LegacyUserId = NULLIF(legacyTickets.TransporterID, '')
-        )
-        AND NOT EXISTS
-        (
-            SELECT 1
-            FROM Professionals AS professionals
-            WHERE professionals.LegacyUserId = ISNULL(NULLIF(legacyTickets.MasterTransporterID, ''), legacyTickets.TransporterID)
-        )
-
     -- V2 assigns the ticket a new Id. LegacyRecordId keeps the V1 record id and is what links the row back
     -- to V1: every guard here and the signature upload read it.
     -- Every text column is copied as it is, without LEFT: V1 declares each one no wider than its V2
@@ -243,8 +215,7 @@ BEGIN TRY
         FROM AspNetUsers
         WHERE AspNetUsers.Email = NULLIF(legacyTickets.LastModifiedBy, '')
     ) AS lastModifiedByUsers
-    WHERE COALESCE(transporters.ProfessionalId, companies.Id) IS NOT NULL
-        AND NOT EXISTS
+    WHERE NOT EXISTS
         (
             SELECT 1
             FROM FogTripTickets AS alreadyInserted

@@ -13,26 +13,6 @@ BEGIN TRY
     WHERE WaterSuppliers.Id IS NULL
         AND alreadySkipped.LegacyRecordId IS NULL
 
-    -- ProfessionalId is NOT NULL in V2, so a test whose tester login matches no migrated professional
-    -- user cannot be represented. ProfessionalUsers.LegacyUserId already carries the V1 login, and
-    -- 04_ProfessionalUsers.sql resolved sub-accounts to their company, so one join settles both.
-    INSERT INTO MigrationSkippedBackflowTests (LegacyRecordId, LegacyUserId, SourceTable, Reason)
-    SELECT legacyTests.ID, ISNULL(NULLIF(legacyTests.BpatID, ''), legacyTests.InspectorID),
-           'SaveBackflowDeviceTests', 'No migrated professional user for the tester login'
-    FROM Vepo.dbo.SaveBackflowDeviceTests AS legacyTests
-    INNER JOIN WaterSuppliers
-        ON WaterSuppliers.LegacyRecordId = legacyTests.WaterSupplierID
-    LEFT JOIN MigrationSkippedBackflowTests AS alreadySkipped
-        ON alreadySkipped.LegacyRecordId = legacyTests.ID
-        AND alreadySkipped.SourceTable = 'SaveBackflowDeviceTests'
-    WHERE alreadySkipped.LegacyRecordId IS NULL
-        AND NOT EXISTS
-        (
-            SELECT 1
-            FROM ProfessionalUsers AS professionalUsers
-            WHERE professionalUsers.LegacyUserId IN (NULLIF(legacyTests.BpatID, ''), NULLIF(legacyTests.InspectorID, ''))
-        )
-
     -- The V1 record id becomes the V2 row id, the way sites and water suppliers are migrated (EN-241).
     -- Backflow tests are the entity that depends on it most: Notifications.RecordId and
     -- SiteLogs.LegacyAssemblyRecordId both point here by V1 id and resolve the moment this lands.
@@ -252,14 +232,20 @@ BEGIN TRY
             AND waterSupplierUsers.WaterSupplierId = waterSuppliers.Id
         WHERE AspNetUsers.Email = NULLIF(legacyTests.RejectedBy, '')
     ) AS rejectedByUsers
-    WHERE COALESCE(bpats.ProfessionalId, inspectors.ProfessionalId) IS NOT NULL
-        AND NOT EXISTS (
-            SELECT 1
-            FROM BackflowTests AS alreadyInserted
-            WHERE alreadyInserted.LegacyRecordId = legacyTests.ID
-        )
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM BackflowTests AS alreadyInserted
+        WHERE alreadyInserted.LegacyRecordId = legacyTests.ID
+    )
 
     SET IDENTITY_INSERT BackflowTests OFF;
+
+    DELETE MigrationSkippedBackflowTests
+    FROM MigrationSkippedBackflowTests
+    INNER JOIN BackflowTests
+        ON BackflowTests.LegacyRecordId = MigrationSkippedBackflowTests.LegacyRecordId
+    WHERE MigrationSkippedBackflowTests.SourceTable = 'SaveBackflowDeviceTests'
 
     COMMIT TRAN
 

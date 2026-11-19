@@ -12,7 +12,7 @@ public class PendingCsiInspectionImage
 
     public int InspectionId { get; set; }
 
-    public int ProfessionalId { get; set; }
+    public int? ProfessionalId { get; set; }
 
     [MaxLength(1000)]
     public string? Description { get; set; }

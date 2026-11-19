@@ -64,6 +64,12 @@ BEGIN TRY
         WHERE alreadyInserted.LegacyRecordId = legacyAssemblies.ID
     )
 
+    DELETE MigrationSkippedCsiInspections
+    FROM MigrationSkippedCsiInspections
+    INNER JOIN CsiInspectionVisuallyIdentifiedAssemblies
+        ON CsiInspectionVisuallyIdentifiedAssemblies.LegacyRecordId = MigrationSkippedCsiInspections.LegacyRecordId
+    WHERE MigrationSkippedCsiInspections.SourceTable = 'CsiInspectionVisuallyIdentifiedAssemblies'
+
     COMMIT TRAN
 
 END TRY

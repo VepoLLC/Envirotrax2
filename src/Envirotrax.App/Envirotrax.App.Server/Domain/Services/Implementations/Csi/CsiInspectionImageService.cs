@@ -80,7 +80,14 @@ public class CsiInspectionImageService : ICsiInspectionImageService
         }
 
         var ext = ValidateAndGetExtension(fileName);
-        var filePath = $"professionals/{professionalId}/csi-inspections/{inspectionId}/{Guid.NewGuid()}{ext}";
+        var folder = $"csi-inspections/{inspectionId}";
+
+        if (professionalId != null)
+        {
+            folder = $"professionals/{professionalId}/{folder}";
+        }
+
+        var filePath = $"{folder}/{Guid.NewGuid()}{ext}";
 
         var entity = new CsiInspectionImage
         {

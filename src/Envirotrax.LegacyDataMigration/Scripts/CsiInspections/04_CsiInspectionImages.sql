@@ -37,6 +37,14 @@ BEGIN TRY
         WHERE alreadyInserted.LegacyRecordId = legacyImages.ID
     )
 
+    DELETE MigrationSkippedCsiInspections
+    FROM MigrationSkippedCsiInspections
+    INNER JOIN Vepo.dbo.CsiInspectionImages AS legacyImages
+        ON legacyImages.ID = MigrationSkippedCsiInspections.LegacyRecordId
+    INNER JOIN CsiInspections
+        ON CsiInspections.LegacyRecordId = legacyImages.InspectionId
+    WHERE MigrationSkippedCsiInspections.SourceTable = 'CsiInspectionImages'
+
     COMMIT TRAN
 
 END TRY

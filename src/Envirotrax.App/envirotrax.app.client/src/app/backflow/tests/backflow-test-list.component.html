@@ -135,12 +135,19 @@
 
 <ng-template #bpatTemplate let-test="rowData">
     <div>
-        <a [routerLink]="['/backflow/testers/details', test.professional.id]" target="_blank">
+        @if (test.professional?.id) {
+            <a [routerLink]="['/backflow/testers/details', test.professional.id]" target="_blank">
+                @if (test.bpatCompanyName) {
+                    <div class="fw-semibold">{{ test.bpatCompanyName }}</div>
+                }
+                <div>{{ test.bpatContactName }}</div>
+            </a>
+        } @else {
             @if (test.bpatCompanyName) {
                 <div class="fw-semibold">{{ test.bpatCompanyName }}</div>
             }
             <div>{{ test.bpatContactName }}</div>
-        </a>
+        }
     </div>
 </ng-template>
 

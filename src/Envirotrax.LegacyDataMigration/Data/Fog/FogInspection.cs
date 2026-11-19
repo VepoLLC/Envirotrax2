@@ -13,7 +13,7 @@ public class FogInspection : TenantModel<WaterSupplier>
     [AppPrimaryKey(true)]
     public int Id { get; set; }
 
-    public int ProfessionalId { get; set; }
+    public int? ProfessionalId { get; set; }
 
     [MaxLength(500)]
     public string? ExteriorImagePath { get; set; }

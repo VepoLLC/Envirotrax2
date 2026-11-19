@@ -132,7 +132,14 @@ public class FogInspectionService
                 // GUID, so a retry overwrites the same blob instead of orphaning one. The folder is the
                 // V2 ProfessionalId, so that holds within one database only: rebuilding V2 from scratch
                 // reassigns those ids, and the previous run's blobs are left behind rather than reused.
-                var blobPath = $"professionals/{inspection.ProfessionalId}/fog-inspections/{image.Kind}/legacy-{inspection.LegacyRecordId}{image.Extension}";
+                var blobFolder = $"fog-inspections/{inspection.Id}";
+
+                if (inspection.ProfessionalId != null)
+                {
+                    blobFolder = $"professionals/{inspection.ProfessionalId}/fog-inspections";
+                }
+
+                var blobPath = $"{blobFolder}/{image.Kind}/legacy-{inspection.LegacyRecordId}{image.Extension}";
 
                 string uploadedPath;
 

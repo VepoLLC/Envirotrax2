@@ -27,27 +27,6 @@ BEGIN TRY
     WHERE Sites.Id IS NULL
         AND alreadySkipped.LegacyRecordId IS NULL
 
-    -- ProfessionalId and InspectorId are NOT NULL in V2, so an inspection whose inspector login matches
-    -- no migrated professional user cannot be represented. ProfessionalUsers.LegacyUserId already
-    -- carries the V1 login, and 04_ProfessionalUsers.sql resolved sub-accounts to their company.
-    INSERT INTO MigrationSkippedFogInspections (LegacyRecordId, LegacyUserId, SourceTable, Reason)
-    SELECT legacyInspections.ID, legacyInspections.InspectorID, 'FogInspections', 'No migrated professional user for the inspector login'
-    FROM Vepo.dbo.FogInspections AS legacyInspections
-    INNER JOIN WaterSuppliers
-        ON WaterSuppliers.LegacyRecordId = legacyInspections.WaterSupplierID
-    INNER JOIN Sites
-        ON Sites.LegacyRecordId = legacyInspections.SiteID
-    LEFT JOIN MigrationSkippedFogInspections AS alreadySkipped
-        ON alreadySkipped.LegacyRecordId = legacyInspections.ID
-        AND alreadySkipped.SourceTable = 'FogInspections'
-    WHERE alreadySkipped.LegacyRecordId IS NULL
-        AND NOT EXISTS
-        (
-            SELECT 1
-            FROM ProfessionalUsers AS professionalUsers
-            WHERE professionalUsers.LegacyUserId = NULLIF(legacyInspections.InspectorID, '')
-        )
-
     -- V2 assigns the inspection a new Id. LegacyRecordId keeps the V1 record id, and it is what links
     -- the row back to V1: every guard below, the image upload and any later migration read it.
     INSERT INTO FogInspections
@@ -233,7 +212,7 @@ BEGIN TRY
     -- is the company). One login can belong to more than one company in V2, and the composite foreign
     -- key only admits one pairing, so the company the inspection was filed under is preferred, then
     -- a pairing that really is a FOG inspector; ordering by id makes the remaining choice repeatable.
-    CROSS APPLY
+    OUTER APPLY
     (
         SELECT TOP 1 professionalUsers.ProfessionalId, professionalUsers.UserId
         FROM ProfessionalUsers AS professionalUsers

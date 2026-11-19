@@ -104,7 +104,14 @@ public class CsiInspectionService
                     continue;
                 }
 
-                var blobPath = $"professionals/{pendingImage.ProfessionalId}/csi-inspections/{pendingImage.InspectionId}/legacy-{pendingImage.LegacyRecordId}{Path.GetExtension(pendingImage.LegacyFilePath)}";
+                var blobFolder = $"csi-inspections/{pendingImage.InspectionId}";
+
+                if (pendingImage.ProfessionalId != null)
+                {
+                    blobFolder = $"professionals/{pendingImage.ProfessionalId}/{blobFolder}";
+                }
+
+                var blobPath = $"{blobFolder}/legacy-{pendingImage.LegacyRecordId}{Path.GetExtension(pendingImage.LegacyFilePath)}";
 
                 string uploadedPath;
 

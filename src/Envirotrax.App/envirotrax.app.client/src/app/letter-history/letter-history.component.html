@@ -24,7 +24,7 @@
                         @for (file of process.files; track file.fileName) {
                             <tr>
                                 <td class="ps-3">
-                                    <button type="button" class="btn btn-link p-0 text-start" (click)="openFile(process, file)">
+                                    <button type="button" class="btn btn-link text-decoration-none p-0 text-start" (click)="openFile(process, file)">
                                         <i class="fa-solid fa-file-pdf me-1" [ngClass]="isBackflowFile(file) ? 'text-danger' : 'text-primary'"></i>
                                         {{ file.fileName }}
                                     </button>

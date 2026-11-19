@@ -13,7 +13,7 @@ import {
     TableViewModel,
     ToastService
 } from '@envirotrax/common-ui';
-import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
+import { SharedComponentsModule } from '../../../../shared/components/shared.components.module';
 import {
     Company,
     CompanyProgramBadge,
@@ -24,12 +24,12 @@ import {
     contactTypeOptions,
     NextContactDateStatus,
     nextContactDateStatusClasses
-} from '../../../shared/models/crm/company';
-import { State } from '../../../shared/models/lookup/state';
-import { MODULE_COLORS } from '../../../shared/models/module-colors';
-import { CompanyService } from '../../../shared/services/crm/company.service';
-import { LookupService } from '../../../shared/services/lookup/lookup.service';
-import { WindowService } from '../../../shared/services/window.service';
+} from '../../../../shared/models/crm/company';
+import { State } from '../../../../shared/models/lookup/state';
+import { MODULE_COLORS } from '../../../../shared/models/module-colors';
+import { CompanyService } from '../../../../shared/services/crm/company.service';
+import { LookupService } from '../../../../shared/services/lookup/lookup.service';
+import { WindowService } from '../../../../shared/services/window.service';
 import { CompanyDetailsComponent, CompanyWindowModel } from '../details/company-details.component';
 
 // V1 Vepo Manager's Search Contacts tab opens on the next contact dates from 180 days ago to 30 days ahead.

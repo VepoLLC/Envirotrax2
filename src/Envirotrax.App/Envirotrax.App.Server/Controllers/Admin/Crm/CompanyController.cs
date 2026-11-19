@@ -3,7 +3,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Crm;
 using Envirotrax.App.Server.Domain.Services.Definitions.Crm;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Envirotrax.App.Server.Controllers.Admin;
+namespace Envirotrax.App.Server.Controllers.Admin.Crm;
 
 /// <summary>
 /// The CRM companies of Envirotrax.Admin (V1 Vepo Manager, Contact Management). Deleted companies are soft-deleted

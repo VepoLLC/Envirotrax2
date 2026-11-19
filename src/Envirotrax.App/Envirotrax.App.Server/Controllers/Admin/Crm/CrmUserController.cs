@@ -2,7 +2,7 @@ using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.Services.Definitions.Crm;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Envirotrax.App.Server.Controllers.Admin;
+namespace Envirotrax.App.Server.Controllers.Admin.Crm;
 
 /// <summary>
 /// The users a CRM company's Last Contacted By can name: the users of the Vepo LLC water supplier, which owns the

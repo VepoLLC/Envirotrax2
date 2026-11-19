@@ -25,6 +25,7 @@ import { STANDALONE_GRID_PAGE_SIZE } from "../../shared/models/page-info";
 })
 export class LicenseListComponent implements OnInit {
     private _allLicenseTypes: InputOption<ProfessionalLicenseType>[] = [];
+    private readonly _hiddenProfessions: ProfessionalType[] = [ProfessionalType.FogInspector];
 
     @ViewChild('typeCell', { static: true })
     private typeCellTemplate!: TemplateRef<CellTemplateData<ProfessionalDashboardLicenseInsurance>>;
@@ -109,7 +110,7 @@ export class LicenseListComponent implements OnInit {
 
         return this._licenseService
             .getProfessionalTypeOptions(this._allLicenseTypes)
-            .filter(profession => providedTypes.includes(profession.data!));
+            .filter(profession => providedTypes.includes(profession.data!) && !this._hiddenProfessions.includes(profession.data!));
     }
 
     private getColumns(): TableColumn<ProfessionalDashboardLicenseInsurance>[] {

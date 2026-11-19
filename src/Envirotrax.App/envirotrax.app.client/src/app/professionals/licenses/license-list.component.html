@@ -52,7 +52,7 @@
     </vp-section>
 </div>
 
-<vp-section header="Register New License">
+<vp-section *ngIf="professions.length > 0" header="Register New License">
     <div *ngIf="professions.length > 1" class="text-center mb-3">
         <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
             <li *ngFor="let profession of professions" class="nav-item">

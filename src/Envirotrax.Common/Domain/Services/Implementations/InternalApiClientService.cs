@@ -7,14 +7,15 @@ using System.Text.Json.Serialization;
 using Envirotrax.Common.Configuration;
 using Envirotrax.Common.Domain.DataTransferObjects;
 using Envirotrax.Common.Domain.Services.Defintions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace Envirotrax.Common.Domain.Services.Implementations;
 
 public class InternalApiClientService : InternalApiClientService<InternalApiOptions>, IInternalApiClientService
 {
-    public InternalApiClientService(IHttpClientFactory httpClientFactory, IOptions<InternalApiOptions> apiOptions)
-        : base(httpClientFactory, apiOptions)
+    public InternalApiClientService(IHttpClientFactory httpClientFactory, IOptions<InternalApiOptions> apiOptions, IHttpContextAccessor httpContextAccessor)
+        : base(httpClientFactory, apiOptions, httpContextAccessor)
     {
     }
 }
@@ -22,8 +23,13 @@ public class InternalApiClientService : InternalApiClientService<InternalApiOpti
 public class InternalApiClientService<TOptions> : IInternalApiClientService<TOptions>
     where TOptions : InternalApiOptions
 {
+    // The user's browser time zone (CommonUI TimeZoneInterceptor). The called API needs it for "today" and month
+    // boundaries; without it the App's TimeZoneHelperService falls back to UTC.
+    private const string TimeZoneHeader = "EV-TimeZone";
+
     private readonly HttpClient _httpClient;
     private readonly TOptions _apiOptions;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -34,10 +40,11 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
     private static TokenResponse? _tokenResponse;
     private static DateTime? _tokenIssuedTime;
 
-    public InternalApiClientService(IHttpClientFactory httpClientFactory, IOptions<TOptions> apiOptions)
+    public InternalApiClientService(IHttpClientFactory httpClientFactory, IOptions<TOptions> apiOptions, IHttpContextAccessor httpContextAccessor)
     {
         _httpClient = httpClientFactory.CreateClient();
         _apiOptions = apiOptions.Value;
+        _httpContextAccessor = httpContextAccessor;
 
         _httpClient.BaseAddress = new(_apiOptions.BaseUrl);
     }
@@ -81,6 +88,13 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
         if (loggedInUserId.HasValue)
         {
             request.Headers.Add("Vp-User-Id", loggedInUserId.Value.ToString());
+        }
+
+        var timeZone = _httpContextAccessor.HttpContext?.Request.Headers[TimeZoneHeader].FirstOrDefault();
+
+        if (!string.IsNullOrWhiteSpace(timeZone))
+        {
+            request.Headers.Add(TimeZoneHeader, timeZone);
         }
 
         return request;

@@ -6,6 +6,8 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses
 using Envirotrax.App.Server.Data.Services.Definitions;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.Common;
+using Envirotrax.Common.Data.Services.Definitions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Envirotrax.App.Server.Data.Repositories.Implementations.Professionals.Licenses;
@@ -14,11 +16,13 @@ public class WaterSupplierLicenseRepository : IWaterSupplierLicenseRepository
 {
     private readonly TenantDbContext _dbContext;
     private readonly ITimeZoneHelperService _timeZoneHelper;
+    private readonly ITenantProvidersService _tenantProvider;
 
-    public WaterSupplierLicenseRepository(IDbContextSelector dbContextSelector, ITimeZoneHelperService timeZoneHelper)
+    public WaterSupplierLicenseRepository(IDbContextSelector dbContextSelector, ITimeZoneHelperService timeZoneHelper, ITenantProvidersService tenantProvider)
     {
         _dbContext = dbContextSelector.Current;
         _timeZoneHelper = timeZoneHelper;
+        _tenantProvider = tenantProvider;
     }
 
     public Task<IEnumerable<WaterSupplierLicenseDto>> GetAllAsync(string? licenseFilter, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -31,18 +35,6 @@ public class WaterSupplierLicenseRepository : IWaterSupplierLicenseRepository
     public Task<int> CountAsync(string? licenseFilter, CancellationToken cancellationToken)
     {
         return ApplyLicenseFilter(GetLicensesQuery(), licenseFilter).CountAsync(cancellationToken);
-    }
-
-    public Task<IEnumerable<WaterSupplierLicenseDto>> GetAllForAdminAsync(string? licenseFilter, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        var licenses = ApplyLicenseFilter(GetAllLicensesQuery(), licenseFilter);
-
-        return PaginateLicensesAsync(licenses, pageInfo, query, cancellationToken);
-    }
-
-    public Task<int> CountForAdminAsync(string? licenseFilter, CancellationToken cancellationToken)
-    {
-        return ApplyLicenseFilter(GetAllLicensesQuery(), licenseFilter).CountAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<WaterSupplierLicenseDto>> GetUnverifiedRegistrationsAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -67,25 +59,23 @@ public class WaterSupplierLicenseRepository : IWaterSupplierLicenseRepository
         return GetUnverifiedRegistrationsQuery().CountAsync(cancellationToken);
     }
 
+    // A water supplier sees the licenses of professionals registered with it, without FOG transporter registrations
+    // (those have their own Registrations page). An admin sees every license, registrations included, because the
+    // admin window has no Registrations tab (and AdminDbContext has no tenant filters, so the registration check
+    // would otherwise mean "registered with any supplier").
     private IQueryable<WaterSupplierLicenseDto> GetLicensesQuery()
     {
+        var isWaterSupplier = !_tenantProvider.HasScope(ScopeDefinitions.AdminInternal);
+
         var userLicenses = _dbContext.ProfessionalUserLicenses
             .AsNoTracking()
-            .Where(license => license.ProfessionalType != ProfessionalType.FogTransporter
+            .WhereIf(isWaterSupplier, license => license.ProfessionalType != ProfessionalType.FogTransporter
                 && _dbContext.ProfessionalWaterSuppliers.Any(registration => registration.ProfessionalId == license.ProfessionalId));
 
         var companyLicenses = _dbContext.ProfessionalLicenses
             .AsNoTracking()
-            .Where(license => license.ProfessionalType != ProfessionalType.FogTransporter
+            .WhereIf(isWaterSupplier, license => license.ProfessionalType != ProfessionalType.FogTransporter
                 && _dbContext.ProfessionalWaterSuppliers.Any(registration => registration.ProfessionalId == license.ProfessionalId));
-
-        return ProjectUserLicenses(userLicenses).Concat(ProjectCompanyLicenses(companyLicenses));
-    }
-
-    private IQueryable<WaterSupplierLicenseDto> GetAllLicensesQuery()
-    {
-        var userLicenses = _dbContext.ProfessionalUserLicenses.AsNoTracking();
-        var companyLicenses = _dbContext.ProfessionalLicenses.AsNoTracking();
 
         return ProjectUserLicenses(userLicenses).Concat(ProjectCompanyLicenses(companyLicenses));
     }

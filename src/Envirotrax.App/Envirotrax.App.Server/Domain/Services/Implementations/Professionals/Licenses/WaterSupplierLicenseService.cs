@@ -33,6 +33,7 @@ public class WaterSupplierLicenseService : IWaterSupplierLicenseService
         var licenses = await _licenseRepository.GetAllAsync(licenseFilter, pageInfo, query, cancellationToken);
 
         SetExpirationTypes(licenses);
+        SetHoursSinceLastCheck(licenses);
 
         return licenses.ToPagedData(pageInfo);
     }
@@ -51,32 +52,17 @@ public class WaterSupplierLicenseService : IWaterSupplierLicenseService
         };
     }
 
-    public async Task<IPagedData<WaterSupplierLicenseDto>> GetAllForAdminAsync(string? licenseFilter, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        var licenses = await _licenseRepository.GetAllForAdminAsync(licenseFilter, pageInfo, query, cancellationToken);
-
-        SetExpirationTypes(licenses);
-        SetHoursSinceLastCheck(licenses);
-
-        return licenses.ToPagedData(pageInfo);
-    }
-
     public async Task<LicenseAdminCountsDto> GetCountsForAdminAsync(CancellationToken cancellationToken)
     {
-        var unverified = await _licenseRepository.CountForAdminAsync("unverified", cancellationToken);
-        var expired = await _licenseRepository.CountForAdminAsync("expired", cancellationToken);
-        var expiring = await _licenseRepository.CountForAdminAsync("expiring", cancellationToken);
-
-        var insurance = await _insuranceService.CountUnverifiedForAdminAsync(cancellationToken);
-        var gauges = await _gaugeService.CountUnverifiedAsync(cancellationToken);
+        var licenseCounts = await GetCountsAsync(cancellationToken);
 
         return new LicenseAdminCountsDto
         {
-            UnverifiedCount = unverified,
-            ExpiredCount = expired,
-            ExpiringCount = expiring,
-            InsuranceCount = insurance,
-            GaugeCount = gauges
+            UnverifiedCount = licenseCounts.UnverifiedCount,
+            ExpiredCount = licenseCounts.ExpiredCount,
+            ExpiringCount = licenseCounts.ExpiringCount,
+            InsuranceCount = await _insuranceService.CountUnverifiedAsync(cancellationToken),
+            GaugeCount = await _gaugeService.CountUnverifiedAsync(cancellationToken)
         };
     }
 

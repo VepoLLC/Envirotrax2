@@ -9,12 +9,12 @@ public interface IProfessionalInsuranceService : IService<ProfessionalInsuranceD
 {
     Task<ProfessionalInsuranceDto> AddAsync(Stream fileStream, string originalFileName, ProfessionalInsuranceDto insurance);
     Task<ProfessionalInsuranceDto?> UpdateForProfessionalAsync(int professionalId, int insuranceId, ProfessionalInsuranceDto insurance, CancellationToken cancellationToken);
+    Task<ProfessionalInsuranceDto?> UpdateForAdminAsync(int id, ProfessionalInsuranceDto insurance);
     Task<ProfessionalInsuranceDto?> DeleteForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken);
     Task<IPagedData<ProfessionalInsuranceDto>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<ILookup<int, ProfessionalInsuranceDto>> GetAllByProfessionalIdsAsync(IEnumerable<int> professionalIds, CancellationToken cancellationToken);
-    Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken);
+    Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    Task<int> CountUnverifiedAsync(CancellationToken cancellationToken);
 
     Task<InsuranceCheckDto> CheckForWaterSupplierAsync(int professionalId, int waterSupplierId, ProfessionalType professionalType, CancellationToken cancellationToken);
 

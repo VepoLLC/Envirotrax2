@@ -3104,6 +3104,9 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IsManaged")
+                        .HasColumnType("bit");
+
                     b.Property<int>("ProfessionalId")
                         .HasColumnType("int");
 

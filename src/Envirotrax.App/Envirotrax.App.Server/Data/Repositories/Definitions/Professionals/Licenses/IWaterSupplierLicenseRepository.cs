@@ -7,8 +7,6 @@ public interface IWaterSupplierLicenseRepository
 {
     Task<IEnumerable<WaterSupplierLicenseDto>> GetAllAsync(string? licenseFilter, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<int> CountAsync(string? licenseFilter, CancellationToken cancellationToken);
-    Task<IEnumerable<WaterSupplierLicenseDto>> GetAllForAdminAsync(string? licenseFilter, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
-    Task<int> CountForAdminAsync(string? licenseFilter, CancellationToken cancellationToken);
     Task<IEnumerable<WaterSupplierLicenseDto>> GetUnverifiedRegistrationsAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken);
     Task<int> CountUnverifiedRegistrationsAsync(CancellationToken cancellationToken);
 }

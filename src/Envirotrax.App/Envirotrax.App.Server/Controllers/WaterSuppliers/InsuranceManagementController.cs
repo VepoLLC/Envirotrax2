@@ -29,7 +29,7 @@ public class InsuranceManagementController : WaterSupplierProtectedController
             return Forbid();
         }
 
-        var result = await _insuranceService.GetUnverifiedByWaterSupplierAsync(pageInfo, query, cancellationToken);
+        var result = await _insuranceService.GetUnverifiedAsync(pageInfo, query, cancellationToken);
 
         return Ok(result);
     }

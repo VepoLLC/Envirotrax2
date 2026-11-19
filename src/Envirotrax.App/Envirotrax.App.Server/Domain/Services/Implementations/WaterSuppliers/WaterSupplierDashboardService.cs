@@ -2,6 +2,7 @@ using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 
@@ -13,17 +14,20 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
     private readonly IBackflowComplianceReportService _complianceReportService;
     private readonly IWaterSupplierLicenseService _licenseService;
     private readonly IBackflowGaugeService _gaugeService;
+    private readonly IProfessionalInsuranceService _insuranceService;
 
     public WaterSupplierDashboardService(
         IWaterSupplierDashboardRepository repository,
         IBackflowComplianceReportService complianceReportService,
         IWaterSupplierLicenseService licenseService,
-        IBackflowGaugeService gaugeService)
+        IBackflowGaugeService gaugeService,
+        IProfessionalInsuranceService insuranceService)
     {
         _repository = repository;
         _complianceReportService = complianceReportService;
         _licenseService = licenseService;
         _gaugeService = gaugeService;
+        _insuranceService = insuranceService;
     }
 
     public async Task<WaterSupplierDashboardStatsDto> GetStatsAsync(CancellationToken cancellationToken)
@@ -36,6 +40,7 @@ public class WaterSupplierDashboardService : IWaterSupplierDashboardService
         stats.ExpiringLicenseCount = licenseCounts.ExpiringCount;
 
         stats.TestGaugeCount = await _gaugeService.CountUnverifiedAsync(cancellationToken);
+        stats.InsurancePolicyCount = await _insuranceService.CountUnverifiedAsync(cancellationToken);
         stats.TransporterRegistrationCount = await _licenseService.CountUnverifiedRegistrationsAsync(cancellationToken);
 
         return stats;

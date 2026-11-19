@@ -11,4 +11,6 @@ public class WaterSupplierUser : TenantModel<WaterSupplier>
     [AppPrimaryKey(false)]
     public int UserId { get; set; }
     public AppUser? User { get; set; }
+
+    public DateTime? DeletedTime { get; set; }
 }

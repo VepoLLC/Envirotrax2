@@ -4215,12 +4215,36 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EmailAddress")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("WaterSupplierId", "UserId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UserId");
 
@@ -6234,6 +6258,21 @@ namespace Envirotrax.App.Server.Data.Migrations
 
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Users.WaterSupplierUser", b =>
                 {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -6245,6 +6284,12 @@ namespace Envirotrax.App.Server.Data.Migrations
                         .HasForeignKey("WaterSupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("UpdatedBy");
 
                     b.Navigation("User");
 

@@ -8,4 +8,6 @@ public interface IUserRepository : IRepository<WaterSupplierUser>
     Task<IEnumerable<WaterSupplierUser>> GetAllForWaterSupplierAsync(int waterSupplierId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
     Task<WaterSupplierUser?> UpdateUserAsync(WaterSupplierUser model);
+
+    Task<WaterSupplierUser?> RestoreDeletedAsync(WaterSupplierUser user, CancellationToken cancellationToken);
 }

@@ -383,7 +383,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         var suppliersQuery = DbContext
             .WaterSupplierUsers
             .IgnoreQueryFilters()
-            .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId)
+            .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId && supplierUser.DeletedTime == null)
             .Select(supplierUser => supplierUser.WaterSupplier!);
 
         var childSupplierQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
@@ -393,7 +393,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
                                  join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
                                  on supplier.Id equals supplierUser.WaterSupplierId
 
-                                 where supplierUser.UserId == _tenantProvider.UserId
+                                 where supplierUser.UserId == _tenantProvider.UserId && supplierUser.DeletedTime == null
 
                                  select childSupplier;
 
@@ -408,7 +408,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
                                  join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
                                  on supplier.Id equals supplierUser.WaterSupplierId
 
-                                 where supplierUser.UserId == _tenantProvider.UserId
+                                 where supplierUser.UserId == _tenantProvider.UserId && supplierUser.DeletedTime == null
 
                                  select grandChild;
 

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Envirotrax.App.Server.Data.Models.Users;
 
 [RecordLogged(RecordLogTableNames.WaterSupplierUserAccounts, ProfessionalSource = RecordLogIdSource.None)]
-public class WaterSupplierUser : TenantModel<WaterSupplier>
+public class WaterSupplierUser : TenantModel<WaterSupplier>, IAuditableModel<AppUser>
 {
     [AppPrimaryKey(false)]
     public int UserId { get; set; }
@@ -26,6 +26,16 @@ public class WaterSupplierUser : TenantModel<WaterSupplier>
     public string EmailAddress { get; set; } = null!;
 
     public IEnumerable<UserRole>? UserRoles { get; set; }
+
+    public int? CreatedById { get; set; }
+    public AppUser? CreatedBy { get; set; }
+    public DateTime CreatedTime { get; set; }
+    public int? UpdatedById { get; set; }
+    public AppUser? UpdatedBy { get; set; }
+    public DateTime? UpdatedTime { get; set; }
+    public int? DeletedById { get; set; }
+    public AppUser? DeletedBy { get; set; }
+    public DateTime? DeletedTime { get; set; }
 }
 
 public class WaterSupplierUserConfiguration : IEntityTypeConfiguration<WaterSupplierUser>

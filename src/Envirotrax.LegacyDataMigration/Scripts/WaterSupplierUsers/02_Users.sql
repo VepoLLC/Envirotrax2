@@ -4,10 +4,12 @@ BEGIN TRAN
 BEGIN TRY
 
     INSERT INTO WaterSupplierUsers
-        (LegacyRecordId, ContactName, EmailAddress, UserId, WaterSupplierId)
+        (LegacyRecordId, ContactName, EmailAddress, UserId, WaterSupplierId, CreatedTime)
     SELECT ID, ContactName, UserId,
         (SELECT Id FROM AspNetUsers WHERE Email = LegacyUsers.UserID),
-        (SELECT Id FROM WaterSuppliers WHERE LegacyRecordId = LegacyUsers.WaterSupplierID)
+        (SELECT Id FROM WaterSuppliers WHERE LegacyRecordId = LegacyUsers.WaterSupplierID),
+        -- V1 does not store when a water supplier login was created.
+        GETUTCDATE()
     FROM 
     (
         SELECT Users.* FROM Vepo.dbo.WaterSupplierUserAccounts AS Users

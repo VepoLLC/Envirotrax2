@@ -11,5 +11,7 @@ public interface IBackflowTesterUserService
 
     Task<ProfessionalUserDto?> UpdateAsync(int professionalId, int userId, ProfessionalUserDto user, CancellationToken cancellationToken);
 
+    Task<ProfessionalUserDto?> UpdatePaymentBypassAsync(int professionalId, int userId, ProfessionalPaymentBypassDto paymentBypass, CancellationToken cancellationToken);
+
     Task DeleteAsync(int professionalId, int userId, CancellationToken cancellationToken);
 }

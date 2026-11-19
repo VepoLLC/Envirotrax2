@@ -1,0 +1,177 @@
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel (filterChange)="onFilterChange($event)">
+            <vp-section header="Company Search Criteria">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="contactType"
+                                                   label="Contact Type"
+                                                   type="select"
+                                                   [options]="contactTypeOptions"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="name"
+                                                   label="Name"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="contactName"
+                                                   label="Contact Name"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="emailAddress"
+                                                   label="Email Address"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="phoneNumber"
+                                                   label="Phone Number"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="cellNumber"
+                                                   label="Cell Number"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasBackflowTesting"
+                                                   label="Backflow Program"
+                                                   type="select"
+                                                   [borderColor]="moduleColors.BACKFLOW"
+                                                   [options]="yesNoOptions"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasCsiInspection"
+                                                   label="CSI Program"
+                                                   type="select"
+                                                   [borderColor]="moduleColors.CSI"
+                                                   [options]="yesNoOptions"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasFogInspection"
+                                                   label="FOG Program"
+                                                   type="select"
+                                                   [borderColor]="moduleColors.FOG"
+                                                   [options]="yesNoOptions"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="hasFogTransportation"
+                                                   label="FOG Transportation Program"
+                                                   type="select"
+                                                   [borderColor]="moduleColors.FOG"
+                                                   [options]="yesNoOptions"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="nextContactDate"
+                                                   label="Next Contact Date"
+                                                   type="daterange"
+                                                   [value]="defaultNextContactDateRange"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="lastContactDate"
+                                                   label="Last Contact Date"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section [header]="'Companies (' + (table.items?.pageInfo?.totalItems ?? 0) + ')'">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [showActionLabels]="false"
+                  [canAdd]="true"
+                  (add)="addCompany()"
+                  [canViewDetails]="true"
+                  (viewDetails)="viewCompany($event)"
+                  [canDelete]="true"
+                  (delete)="deleteCompany($event)"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getCompanies()"
+                  [(query)]="table.query"
+                  (queryChange)="getCompanies()"
+                  (queryReset)="getCompanies()" />
+    </vp-section>
+</div>
+
+<ng-template #contactTypeCell let-rowData="rowData">
+    <span class="text-nowrap">
+        <i class="fa-solid fa-user me-1" [class]="rowData?.contactTypeIconClass"></i>
+        {{ rowData?.contactTypeLabel }}
+    </span>
+</ng-template>
+
+<ng-template #programCell let-rowData="rowData">
+    <div class="d-flex gap-1">
+        <span *ngFor="let program of rowData?.programs"
+              class="d-inline-block rounded-1"
+              style="width: 1rem; height: 1rem; border: 2px solid;"
+              [style.border-color]="program.color"
+              [style.background-color]="program.fillColor"
+              [title]="program.title"></span>
+    </div>
+</ng-template>
+
+<ng-template #cityStateCell let-rowData="rowData">
+    {{ rowData?.cityState }}
+</ng-template>
+
+<ng-template #nextContactDateCell let-rowData="rowData">
+    <!-- mediumDate, the format vp-table gives its own date columns (Last Contact Date). -->
+    <span [class]="rowData?.nextContactDateClass">{{ rowData?.nextContactDate | date:'mediumDate' }}</span>
+</ng-template>

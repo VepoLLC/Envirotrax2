@@ -7,7 +7,7 @@ import { NgForm } from "@angular/forms";
 import { RoleService } from "../../../shared/services/users/role.service";
 import { UserRoleService } from "../../../shared/services/users/user-role.service";
 import { MAX_PAGE_SIZE } from "../../../shared/models/page-info";
-import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
+import { ToastService, InputOption, ModalHelperService, allSettled } from '@envirotrax/common-ui';
 
 
 @Component({
@@ -51,7 +51,7 @@ export class EditUserComponent implements OnInit {
             this.user = await this._userService.get(id);
 
             if (this.user) {
-                await Promise.all([
+                await allSettled([
                     this.loadRoles(),
                     this.loadUserRoles(id)
                 ]);
@@ -96,7 +96,7 @@ export class EditUserComponent implements OnInit {
                 const addedIds = this.selectedRoleIds.filter(id => !this._originalRoleIds.includes(id));
                 const deletedIds = this._originalRoleIds.filter(id => !this.selectedRoleIds.includes(id));
 
-                await Promise.all([
+                await allSettled([
                     ...addedIds.map(id => this._userRoleService.add({ user: { id: userId }, role: { id } })),
                     ...deletedIds.map(id => this._userRoleService.delete(userId, id))
                 ]);

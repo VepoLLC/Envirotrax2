@@ -31,6 +31,11 @@ public class BackflowTesterUserService : IBackflowTesterUserService
         return _apiClient.PutAsync<ProfessionalUserDto, ProfessionalUserDto>($"{BaseUrl}/{professionalId}/users/{userId}", user, cancellationToken);
     }
 
+    public Task<ProfessionalUserDto?> UpdatePaymentBypassAsync(int professionalId, int userId, ProfessionalPaymentBypassDto paymentBypass, CancellationToken cancellationToken)
+    {
+        return _apiClient.PutAsync<ProfessionalPaymentBypassDto, ProfessionalUserDto>($"{BaseUrl}/{professionalId}/users/{userId}/payment-bypass", paymentBypass, cancellationToken);
+    }
+
     public Task DeleteAsync(int professionalId, int userId, CancellationToken cancellationToken)
     {
         return _apiClient.DeleteAsync<object>($"{BaseUrl}/{professionalId}/users/{userId}", cancellationToken);

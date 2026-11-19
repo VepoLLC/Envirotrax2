@@ -8,5 +8,5 @@ public interface IAuthService : ITenantProvidersService
 {
     Task SetSecurityPropertiesAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? professionalId, int? impersonatedUserId);
 
-    Task ValidateImpersonationAsync(ClaimsPrincipal principal, int userId);
+    Task ValidateImpersonationAsync(ClaimsPrincipal principal, int userId, int? waterSupplierId, int? professionalId, int? impersonatedUserId);
 }

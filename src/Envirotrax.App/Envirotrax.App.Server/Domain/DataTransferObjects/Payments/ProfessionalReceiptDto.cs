@@ -24,6 +24,8 @@ public class ProfessionalReceiptDto
 
     public decimal Total { get; set; }
 
+    public bool IsPaymentBypassed { get; set; }
+
     public bool ShowCreditCard { get; set; }
 
     public bool ShowBalanceAdjustment { get; set; }

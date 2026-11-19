@@ -50,6 +50,12 @@ export class CsiInspectorUserService {
         return lastValueFrom(this._http.put<ProfessionalUser>(url, user));
     }
 
+    public updatePaymentBypass(professionalId: number, userId: number, isPaymentBypassed: boolean): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${professionalId}/users/${userId}/payment-bypass`);
+
+        return lastValueFrom(this._http.put<ProfessionalUser>(url, { isPaymentBypassed }));
+    }
+
     public delete(professionalId: number, userId: number): Promise<void> {
         const url = this._urlResolver.resolveUrl(`/api/csi/inspectors/${professionalId}/users/${userId}`);
 

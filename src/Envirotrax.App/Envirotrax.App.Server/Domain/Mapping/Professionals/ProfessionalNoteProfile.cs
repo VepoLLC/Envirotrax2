@@ -11,5 +11,9 @@ public class ProfessionalNoteProfile : Profile
         CreateMap<ProfessionalNote, ProfessionalNoteDto>()
             .ReverseMap()
             .ForMember(model => model.CreatedBy, opt => opt.Ignore());
+
+        CreateMap<ProfessionalUserNote, ProfessionalNoteDto>()
+            .ReverseMap()
+            .ForMember(model => model.CreatedBy, opt => opt.Ignore());
     }
 }

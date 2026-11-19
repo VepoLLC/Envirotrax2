@@ -12,6 +12,10 @@
     {{ gauge.isPortable ? 'Potable' : 'Non-Potable' }}
 </ng-template>
 
+<ng-template #assignedToCell let-gauge="rowData">
+    {{ gauge.professionalUser?.contactName ?? tester?.name }}
+</ng-template>
+
 <vp-section header="Gauge Management">
     <div dp-spinner-parent>
         <dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>

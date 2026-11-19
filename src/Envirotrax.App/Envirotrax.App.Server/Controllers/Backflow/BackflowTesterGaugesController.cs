@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
+using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Filters;
 using Envirotrax.Common;
@@ -41,10 +42,20 @@ namespace Envirotrax.App.Server.Controllers.Backflow
             return Ok(result);
         }
 
+        [HttpGet("{id}/users/{userId}/gauges")]
+        [HasPermission(PermissionAction.CanView)]
+        public async Task<IActionResult> GetUserGaugesAsync(int id, int userId, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+        {
+            var result = await _gaugeService.GetAllByProfessionalUserAsync(id, userId, pageInfo, query, cancellationToken);
+            return Ok(result);
+        }
+
         [HttpPost("{id}/gauges")]
         [HasPermission(PermissionAction.CanModify)]
-        public async Task<IActionResult> AddGaugeAsync([FromForm] CreateBackflowGaugeDto dto)
+        public async Task<IActionResult> AddGaugeAsync(int id, [FromForm] CreateBackflowGaugeDto dto)
         {
+            dto.Professional = new ReferencedProfessionalDto { Id = id };
+
             using var stream = dto.File.OpenReadStream();
             return Ok(await _gaugeService.AddWithFileAsync(stream, dto.File.FileName, dto));
         }

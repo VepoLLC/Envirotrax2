@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
-import { InputOption } from '@envirotrax/common-ui';
+import { InputOption, allSettled } from '@envirotrax/common-ui';
 import { State } from "../../../../shared/models/lookup/state";
 import { CreditCardPayment } from "../../../../shared/models/payments/credit-card-payment";
 import { ProfessionalUser } from "../../../../shared/models/professionals/professional-user";
@@ -34,7 +34,7 @@ export class CheckoutPaymentComponent implements OnInit {
     }
 
     public async ngOnInit(): Promise<void> {
-        const [currentUser, states] = await Promise.all([
+        const [currentUser, states] = await allSettled([
             this._professionalUserService.getMyData(),
             this._lookupService.getAllStatesAsOptions(true)
         ]);

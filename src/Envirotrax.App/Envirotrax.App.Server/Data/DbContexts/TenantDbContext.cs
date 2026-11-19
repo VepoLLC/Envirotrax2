@@ -1,5 +1,6 @@
 using Envirotrax.App.Server.Data.Models.Api;
 using Envirotrax.App.Server.Data.Models.Backflow;
+using Envirotrax.App.Server.Data.Models.Crm;
 using Envirotrax.App.Server.Data.Models.Csi;
 using Envirotrax.App.Server.Data.Models.Fog;
 using Envirotrax.App.Server.Data.Models.Logs;
@@ -38,6 +39,7 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
     public DbSet<Role> Roles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<UserImpersonationRequest> UserImpersonationRequests { get; set; }
 
     public DbSet<GisArea> GisAreas { get; set; }
     public DbSet<GisAreaCoordinate> GisAreaCoordinates { get; set; }
@@ -80,6 +82,8 @@ public partial class TenantDbContext : TenantDbContextBase<WaterSupplier, AppUse
     public DbSet<SiteSchedule> SiteSchedules { get; set; }
     public DbSet<RenewalEmailVerification> RenewalEmailVerifications { get; set; }
     public DbSet<SiteLetterLog> SiteLetterLogs { get; set; }
+
+    public DbSet<Company> Companies { get; set; }
 
     // Site is not an ITenantModel, so the base class does not filter or stamp it. The tenant
     // provider is held here so this context can apply that behavior to Site itself.

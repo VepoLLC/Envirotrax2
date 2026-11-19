@@ -10,6 +10,8 @@ namespace Envirotrax.Auth.Data.Models
     [ExcludedModel]
     public class WaterSupplier : TenantBase
     {
+        public const string EnvirotraxAdminDomain = "vepollc";
+
         [Required]
         [StringLength(255)]
         public string Name { get; set; } = null!;

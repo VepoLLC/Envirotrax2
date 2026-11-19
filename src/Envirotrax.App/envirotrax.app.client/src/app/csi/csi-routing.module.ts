@@ -5,6 +5,7 @@ import { PermissionAction, PermissionType } from "../shared/models/permission-ty
 import { CsiInspectionListComponent } from "./inspections/list/csi-inspection-list.component";
 import { CsiInspectorListComponent } from "./inspectors/list/csi-inspector-list.component";
 import { CsiInspectorDetailsComponent } from "./inspectors/details/csi-inspector-details.component";
+import { CsiInspectorUserDetailsComponent } from "./inspectors/details/users/details/csi-inspector-user-details.component";
 import { CsiInspectionDetailsComponent } from "./inspections/details/csi-inspection-details.component";
 import { CsiSystemReportComponent } from "./reports/system/csi-system-report.component";
 import { CsiComplianceManagementComponent } from "./reports/compliance/csi-compliance-management.component";
@@ -57,6 +58,20 @@ const routes: Routes = [
         path: 'inspectors/details/:id',
         title: 'Inspector Details',
         component: CsiInspectorDetailsComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.CsiInspectors,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'inspectors/details/:id/users/:userId',
+        title: 'CSI Inspector User Details',
+        component: CsiInspectorUserDetailsComponent,
         canActivate: [PermissionGuard],
         data: {
             permissions: [

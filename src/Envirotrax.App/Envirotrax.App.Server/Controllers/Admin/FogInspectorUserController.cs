@@ -1,4 +1,5 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +45,14 @@ public class FogInspectorUserController : AdminBaseController
         var updated = await _userService.UpdateSubAccountAsync(professionalId, userId, user.ContactName, user.JobTitle);
 
         return updated == null ? NotFound() : Ok(updated);
+    }
+
+    [HttpPut("{userId}/payment-bypass")]
+    public async Task<IActionResult> UpdatePaymentBypassAsync(int professionalId, int userId, [FromBody] ProfessionalPaymentBypassDto paymentBypass)
+    {
+        var updated = await _userService.UpdatePaymentBypassAsync(professionalId, userId, ProfessionalType.FogInspector, paymentBypass.IsPaymentBypassed);
+
+        return Ok(updated);
     }
 
     [HttpDelete("{userId}")]

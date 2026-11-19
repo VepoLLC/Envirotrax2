@@ -32,6 +32,24 @@ public class ProfessionalInsuranceRepository : Repository<ProfessionalInsurance>
         DbContext.Entry(model).Property(i => i.IsManaged).IsModified = false;
     }
 
+    public async Task<ProfessionalInsurance?> UpdateInsuranceAsync(ProfessionalInsurance model)
+    {
+        var insurance = await GetTrackedForUpdateAsync(model.Id, default);
+
+        if (insurance == null)
+        {
+            return null;
+        }
+
+        insurance.InsuranceNumber = model.InsuranceNumber;
+        insurance.CoverageAmount = model.CoverageAmount;
+        insurance.ExpirationDate = model.ExpirationDate;
+
+        await SaveChangesAsync(logData: true);
+
+        return insurance;
+    }
+
     public async Task<IEnumerable<ProfessionalInsurance>> GetAllByProfessionalAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         var paginated = await DbContext.Set<ProfessionalInsurance>()

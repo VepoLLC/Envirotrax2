@@ -1,12 +1,14 @@
 
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using Azure.Identity;
 using Envirotrax.Auth.Areas.OpenIdConnect.Services;
 using Envirotrax.Auth.Data;
 using Envirotrax.Auth.Data.Models;
 using Envirotrax.Auth.Domain.Services.Definitions;
 using Envirotrax.Auth.Domain.Services.Implementations;
 using Envirotrax.Common.Configuration;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Quartz;
 
@@ -129,8 +131,30 @@ namespace Envirotrax.Auth.Domain.Configuration
             return services;
         }
 
+        private static IServiceCollection AddDataProtection(IServiceCollection services, IConfiguration configuration)
+        {
+            // Persist the key ring to blob storage so every instance reads and writes the same keys,
+            // and wrap those keys with a Key Vault key so they are never stored in plain text.
+            // The blob container must already exist. The app identity needs "Storage Blob Data Contributor"
+            // on the container and the "Key Vault Crypto Service Encryption User" role (wrap/unwrap) on the key.
+            var blobUri = configuration["DataProtection:BlobUri"] ?? throw new InvalidOperationException("Data protection blob URI is required (DataProtection:BlobUri)");
+            var keyUri = configuration["DataProtection:KeyUri"] ?? throw new InvalidOperationException("Data protection Key Vault key URI is required (DataProtection:KeyUri)");
+            var credential = new DefaultAzureCredential();
+
+            services
+                .AddDataProtection()
+                // All instances behind the load balancer must share the same application name,
+                // otherwise they isolate their payloads from each other even with a shared key ring.
+                .SetApplicationName("Envirotrax.Auth")
+                .PersistKeysToAzureBlobStorage(new Uri(blobUri), credential)
+                .ProtectKeysWithAzureKeyVault(new Uri(keyUri), credential);
+
+            return services;
+        }
+
         public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
+            AddDataProtection(services, configuration);
             AddOpenIdConnect(services, configuration, environment);
 
             services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, AppUserClaimsPrincipalFactory>();

@@ -10,6 +10,7 @@ import { ProfesionalUserService } from "./professional-user.service";
 import { AuthService } from "../auth/auth.service";
 import { FeatureType } from "../../models/feature-type";
 import { ROLE_DEFINITIONS } from "../../models/role-definitions";
+import { allSettled } from "@envirotrax/common-ui";
 
 const UNPAID_FILTER: QueryProperty[] = [
     { columnName: 'transactionId', isValueNull: true }
@@ -54,7 +55,7 @@ export class CheckoutService {
             isCsiInspector,
             isFogInspector,
             isFogTransporter
-        ] = await Promise.all([
+        ] = await allSettled([
             this._authService.hasAnyRoles(ROLE_DEFINITIONS.PROFESSIONALS.ADMIN),
             this._professionalUserService.getMyData(),
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
@@ -81,7 +82,7 @@ export class CheckoutService {
                 : [...UNPAID_FILTER, { columnName: ownerColumnName, comparisonOperator: 'Eq', value: String(currentUser.id) }]
         });
 
-        const counts = await Promise.all([
+        const counts = await allSettled([
             canViewBackflow
                 ? this._backflowTestService.getAllForProfessional(COUNT_PAGE_INFO, buildQuery('bpat.id'))
                 : Promise.resolve(null),

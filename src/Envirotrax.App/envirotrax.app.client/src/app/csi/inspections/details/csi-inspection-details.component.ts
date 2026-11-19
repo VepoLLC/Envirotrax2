@@ -7,7 +7,7 @@ import { CsiInspectionService } from "../../../shared/services/csi/csi-inspectio
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { DisapproveCsiInspectionComponent } from "./disapprove/disapprove-csi-inspection.component";
 import { DownloadService } from "../../../shared/services/download.service";
-import { ModalHelperService, RecordLog } from "@envirotrax/common-ui";
+import { ModalHelperService, RecordLog, allSettled } from "@envirotrax/common-ui";
 
 @Component({
     selector: 'app-csi-inspection-details',
@@ -51,7 +51,7 @@ export class CsiInspectionDetailsComponent implements OnInit {
 
             if (id) {
                 this.id = +id;
-                await Promise.all([
+                await allSettled([
                     this.loadInspection(),
                     this.loadAssemblies(),
                     this.loadRecordLogs()

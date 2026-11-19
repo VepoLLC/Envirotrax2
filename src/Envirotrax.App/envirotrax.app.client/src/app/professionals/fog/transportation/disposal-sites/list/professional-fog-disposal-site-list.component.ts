@@ -4,7 +4,7 @@ import { PhysicalType, PHYSICAL_TYPE_LABELS } from "../../../../../shared/models
 import { ProfessionalFogDisposalSiteService } from "../../../../../shared/services/fog/professional-fog-disposal-site.service";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from "../../../../../shared/models/page-info";
-import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn } from '@envirotrax/common-ui';
+import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, allSettled } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -81,7 +81,7 @@ export class ProfessionalFogDisposalSiteListComponent implements OnInit {
         try {
             this.table.isLoading = true;
 
-            const [allSites, registeredSites] = await Promise.all([
+            const [allSites, registeredSites] = await allSettled([
                 this._siteService.getAll(this.table.items?.pageInfo || { pageSize: STANDALONE_GRID_PAGE_SIZE }, this.table.query),
                 this._siteService.getRegistered({ pageSize: MAX_PAGE_SIZE }, {})
             ]);

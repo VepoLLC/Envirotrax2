@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ToastService, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { CsiInspectorAccount, CsiInspectorAccountDetails } from '../../../shared/models/csi/csi-inspector-account';
 import { State } from '../../../shared/models/lookup/state';
@@ -74,7 +74,7 @@ export class CsiInspectorDetailsComponent implements OnInit {
         this.userId = account?.id;
         this.idPrefix = `csi-inspector-${this.professionalId}-${this.userId ?? 0}`;
 
-        await Promise.all([
+        await allSettled([
             this.loadStates(),
             this.loadDetails()
         ]);

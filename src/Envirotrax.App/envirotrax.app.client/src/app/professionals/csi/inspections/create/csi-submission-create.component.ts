@@ -17,7 +17,7 @@ import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shar
 import { MAX_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { ProfessionalSupplierService } from '../../../../shared/services/professionals/professional-supplier.service';
 import { CheckoutService } from '../../../../shared/services/professionals/checkout.service';
-import { ToastService, InputOption, ModalHelperService } from '@envirotrax/common-ui';
+import { ToastService, InputOption, ModalHelperService, allSettled } from '@envirotrax/common-ui';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { CreateCsiInspection, CsiInspectionAssembly, CsiInspectionNewAssembly } from '../../../../shared/models/csi/csi-inspection-assembly';
 import { BackflowTestResult, BYPASS_DEVICE_TYPES } from '../../../../shared/models/backflow/backflow-test-enums';
@@ -175,7 +175,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
         this.isLoading = true;
 
         try {
-            await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
+            await allSettled([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
         } finally {
             this.isLoading = false;
         }
@@ -361,7 +361,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [professional, usersPage, site, assemblies, stateOptions] = await Promise.all([
+            const [professional, usersPage, site, assemblies, stateOptions] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this.isUnlistedProperty ? undefined : this._siteService.getForProfessional(this._siteId),
@@ -406,7 +406,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
             const inspection = await this._inspectionService.getProfessionalInspection(id);
             this._siteId = inspection.site?.id ?? 0;
 
-            const [professional, usersPage, site, assemblies, stateOptions] = await Promise.all([
+            const [professional, usersPage, site, assemblies, stateOptions] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAll({ pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [{ columnName: 'isCsiInspector', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._siteService.getForProfessional(this._siteId),
@@ -433,7 +433,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
             this.selectedWaterSupplier = this.waterSuppliers.find(s => s.waterSupplier?.id === inspection.waterSupplier?.id);
             this.isSiteWaterSupplierMissing = !this.selectedWaterSupplier;
             this.buildWaterSupplierOptions();
-            await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
+            await allSettled([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
 
             this.selectedCsiUserId = inspection.inspectorUser?.id ?? 0;
             this.selectedCsiUser = this.csiUsers.find(u => u.id === this.selectedCsiUserId);
@@ -550,7 +550,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
 
         this.buildWaterSupplierOptions();
 
-        await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
+        await allSettled([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
     }
 
     private async setUnlistedWaterSupplier(): Promise<void> {
@@ -565,7 +565,7 @@ export class CsiSubmissionCreateComponent implements OnInit {
             this.model.waterSupplier = { id: this.selectedWaterSupplierId };
         }
 
-        await Promise.all([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
+        await allSettled([this.loadInsuranceCheck(), this.loadMailingInfoRedaction()]);
     }
 
     // Like V1, an existing site's location and owner contact information can't be modified while its water

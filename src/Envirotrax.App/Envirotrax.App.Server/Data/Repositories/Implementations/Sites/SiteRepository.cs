@@ -231,10 +231,20 @@ public class SiteRepository : Repository<Site>, ISiteRepository
             .WhereIf(scheduledFrom != null, schedule => schedule.ScheduleDate >= scheduledFrom)
             .WhereIf(scheduledBefore != null, schedule => schedule.ScheduleDate < scheduledBefore);
 
+        var csiRenewalFrom = criteria.CsiRenewalFrom?.Date;
+        var csiRenewalBefore = criteria.CsiRenewalTo?.Date.AddDays(1);
+
+        var fogExpirationFrom = criteria.FogInspectionExpirationFrom?.Date;
+        var fogExpirationBefore = criteria.FogInspectionExpirationTo?.Date.AddDays(1);
+
         var paginated = await GetListQuery()
             .Where(query.Filter)
             .WhereIf(criteria.WorkedOnly, GetWorkedOnFilter(professionalId))
             .WhereIf(criteria.ScheduledOnly, site => mySchedules.Any(schedule => schedule.SiteId == site.Id))
+            .WhereIf(csiRenewalFrom != null, site => site.CsiRenewalDate >= csiRenewalFrom)
+            .WhereIf(csiRenewalBefore != null, site => site.CsiRenewalDate < csiRenewalBefore)
+            .WhereIf(fogExpirationFrom != null, site => site.FogInspectionExpirationDate >= fogExpirationFrom)
+            .WhereIf(fogExpirationBefore != null, site => site.FogInspectionExpirationDate < fogExpirationBefore)
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);
 

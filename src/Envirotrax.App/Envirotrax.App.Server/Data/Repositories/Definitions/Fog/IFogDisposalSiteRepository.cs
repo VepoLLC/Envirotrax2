@@ -4,4 +4,5 @@ namespace Envirotrax.App.Server.Data.Repositories.Definitions.Fog;
 
 public interface IFogDisposalSiteRepository : IRepository<FogDisposalSite>
 {
+    Task<FogDisposalSite?> UpdateSiteAsync(FogDisposalSite model);
 }

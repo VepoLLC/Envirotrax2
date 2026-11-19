@@ -1,4 +1,5 @@
 export class WaterSupplierUser {
+    id?: number;
     contactName?: string;
     emailAddress?: string;
     cellNumber?: string;

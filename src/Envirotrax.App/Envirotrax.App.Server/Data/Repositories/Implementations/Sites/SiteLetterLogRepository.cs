@@ -81,4 +81,46 @@ public class SiteLetterLogRepository : Repository<SiteLetterLog>, ISiteLetterLog
             .Where(letterLog => letterLog.ProcessDate == processDate)
             .ExecuteDeleteAsync();
     }
+
+    // IgnoreQueryFilters: the tenant filter matches the supplier of the letter's site, not the supplier that
+    // generated the file. Scoping is restored from the generating supplier's ID, which prefixes every file it generates.
+    public async Task<List<SiteLetterLogFile>> GetGeneratedPdfFilesAsync(int generatingSupplierId, CancellationToken cancellationToken)
+    {
+        var fileNamePattern = GetGeneratedFileNamePattern(generatingSupplierId);
+
+        return await Entity
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(letterLog => letterLog.Page != SiteLetterLog.EmailPage
+                && EF.Functions.Like(letterLog.FileName, fileNamePattern))
+            .GroupBy(letterLog => new { letterLog.ProcessDate, letterLog.FileName, letterLog.FilePath })
+            .Select(group => new SiteLetterLogFile
+            {
+                ProcessDate = group.Key.ProcessDate,
+                FileName = group.Key.FileName,
+                FilePath = group.Key.FilePath,
+                LetterCount = group.Count()
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<string?> GetGeneratedPdfFilePathAsync(int generatingSupplierId, DateTime processDate, string fileName, CancellationToken cancellationToken)
+    {
+        var fileNamePattern = GetGeneratedFileNamePattern(generatingSupplierId);
+
+        return await Entity
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(letterLog => letterLog.ProcessDate == processDate
+                && letterLog.FileName == fileName
+                && letterLog.Page != SiteLetterLog.EmailPage
+                && EF.Functions.Like(letterLog.FileName, fileNamePattern))
+            .Select(letterLog => letterLog.FilePath)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    private static string GetGeneratedFileNamePattern(int generatingSupplierId)
+    {
+        return $"{generatingSupplierId} - %";
+    }
 }

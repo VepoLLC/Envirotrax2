@@ -27,6 +27,14 @@ namespace Envirotrax.App.Server.Controllers.Fog
             return Ok(result);
         }
 
+        [HttpGet("{id}/users/{userId}")]
+        [HasPermission(PermissionAction.CanView)]
+        public async Task<IActionResult> GetSubAccountAsync(int id, int userId, CancellationToken cancellationToken)
+        {
+            var result = await _userService.GetForProfessionalAsync(id, userId, cancellationToken, pu => pu.IsFogInspector);
+            return result == null ? NotFound() : Ok(result);
+        }
+
         [HttpPost("{id}/users")]
         [HasFeature(FeatureType.ManageProfessionalUsers)]
         [HasPermission(PermissionAction.CanModify)]

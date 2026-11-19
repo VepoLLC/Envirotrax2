@@ -7,6 +7,7 @@ import { BackflowTestListComponent } from "./tests/backflow-test-list.component"
 import { BackflowComplianceManagementComponent } from "./reports/compliance/backflow-compliance-management.component";
 import { BackflowTestDetailsComponent } from "./tests/details/backflow-test-details.component";
 import { BackflowTesterDetailsComponent } from "./testers/details/backflow-tester-details.component";
+import { BackflowTesterUserDetailsComponent } from "./testers/details/users/details/backflow-tester-user-details.component";
 import { BackflowOutOfServiceListComponent } from "./out-of-service/backflow-out-of-service-list.component";
 
 const routes: Routes = [
@@ -99,6 +100,20 @@ const routes: Routes = [
         path: 'testers/details/:id',
         title: 'BPAT Details',
         component: BackflowTesterDetailsComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.BackflowTesters,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'testers/details/:id/users/:userId',
+        title: 'Backflow Tester User Details',
+        component: BackflowTesterUserDetailsComponent,
         canActivate: [PermissionGuard],
         data: {
             permissions: [

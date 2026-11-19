@@ -3,6 +3,9 @@ namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.WaterSuppliers;
 
 public class WaterSupplierUserDto
 {
+    // The user's id (the App maps WaterSupplierUser.UserId here).
+    public int Id { get; set; }
+
     public string ContactName { get; set; } = null!;
 
     public string EmailAddress { get; set; } = null!;

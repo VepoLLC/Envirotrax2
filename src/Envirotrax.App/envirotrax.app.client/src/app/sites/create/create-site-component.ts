@@ -7,7 +7,7 @@ import { SiteService } from "../../shared/services/sites/site.service";
 import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { HelperService } from "../../shared/services/helpers/helper.service";
 import { Router } from "@angular/router";
-import { InputOption } from '@envirotrax/common-ui';
+import { InputOption, allSettled } from '@envirotrax/common-ui';
 import { GeneralSettingsService } from '../../shared/services/settings/general-settings.service';
 
 @Component({
@@ -49,7 +49,7 @@ export class CreateSiteComponent {
         try {
             this.isLoading = true;
 
-            await Promise.all([
+            await allSettled([
                 this.loadStates(),
                 this.loadSettings(),
                 this.generateAccountNumber()

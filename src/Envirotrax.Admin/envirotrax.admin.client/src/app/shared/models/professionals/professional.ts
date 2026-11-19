@@ -42,4 +42,8 @@ export interface ProfessionalUser {
     isBackflowTester?: boolean;
     isFogInspector?: boolean;
     isFogTransporter?: boolean;
+    isBackflowTestingPaymentBypassed?: boolean;
+    isCsiInspectionPaymentBypassed?: boolean;
+    isFogInspectionPaymentBypassed?: boolean;
+    isFogTransportationPaymentBypassed?: boolean;
 }

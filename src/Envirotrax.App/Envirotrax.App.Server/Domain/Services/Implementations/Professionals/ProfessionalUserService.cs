@@ -7,6 +7,7 @@ using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
+using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals.Licenses;
@@ -168,7 +169,24 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         dto.Id = await SendInvitationAsync(dto.EmailAddress, professional.Name, CancellationToken.None);
 
+        var restored = await RestoreDeletedUserAsync(professional.Id, dto, CancellationToken.None);
+
+        if (restored != null)
+        {
+            return restored;
+        }
+
         return await base.AddAsync(dto);
+    }
+
+    private async Task<ProfessionalUserDto?> RestoreDeletedUserAsync(int professionalId, ProfessionalUserDto dto, CancellationToken cancellationToken)
+    {
+        var model = MapToModel(dto)!;
+        model.ProfessionalId = professionalId;
+
+        var restored = await _professionalUserRepository.RestoreDeletedAsync(model, cancellationToken);
+
+        return MapToDto(restored);
     }
 
     public override async Task<ProfessionalUserDto?> DeleteAsync(int id)
@@ -196,6 +214,13 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
 
         dto.Id = await SendInvitationAsync(dto.EmailAddress, professional.Name, cancellationToken);
 
+        var restored = await RestoreDeletedUserAsync(professionalId, dto, cancellationToken);
+
+        if (restored != null)
+        {
+            return restored;
+        }
+
         var model = MapToModel(dto)!;
         model.ProfessionalId = professionalId;
 
@@ -211,6 +236,13 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         {
             return null;
         }
+
+        return MapToDto(saved);
+    }
+
+    public async Task<ProfessionalUserDto?> UpdatePaymentBypassAsync(int professionalId, int userId, ProfessionalType professionalType, bool isPaymentBypassed)
+    {
+        var saved = await _professionalUserRepository.UpdatePaymentBypassAsync(professionalId, userId, professionalType, isPaymentBypassed);
 
         return MapToDto(saved);
     }
@@ -233,6 +265,13 @@ public class ProfessionalUserService : Service<ProfessionalUser, ProfessionalUse
         var items = await _professionalUserRepository.GetAllByProfessionalAsync(professionalId, pageInfo, query, cancellationToken, roleFilter);
 
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<ProfessionalUserDto?> GetForProfessionalAsync(int professionalId, int userId, CancellationToken cancellationToken, Expression<Func<ProfessionalUser, bool>>? roleFilter = null)
+    {
+        var user = await _professionalUserRepository.GetForProfessionalAsync(professionalId, userId, cancellationToken, roleFilter);
+
+        return MapToDto(user);
     }
 
     public async Task<ProfessionalUserDto?> ResendInvitationAsync(int id, CancellationToken cancellationToken)

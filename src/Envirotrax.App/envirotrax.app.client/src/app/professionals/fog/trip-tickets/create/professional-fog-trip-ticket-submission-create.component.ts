@@ -28,7 +28,7 @@ import { LookupService } from "../../../../shared/services/lookup/lookup.service
 import { GeneralSettingsService } from "../../../../shared/services/settings/general-settings.service";
 import { PropertyType } from "../../../../shared/enums/property-type.enum";
 import { MAX_PAGE_SIZE } from "../../../../shared/models/page-info";
-import { InputOption, ModalHelperService } from "@envirotrax/common-ui";
+import { InputOption, ModalHelperService, allSettled } from "@envirotrax/common-ui";
 
 interface VerificationCheck {
     label: string;
@@ -382,7 +382,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
         try {
             this.isLoading = true;
 
-            const [professional, transporterOptions, suppliersPage, disposalSiteOptions, vehicleOptions, states] = await Promise.all([
+            const [professional, transporterOptions, suppliersPage, disposalSiteOptions, vehicleOptions, states] = await allSettled([
                 this._professionalService.getLoggedInProfessional(),
                 this._userService.getAllAsOptions(false, '', { filter: [{ columnName: 'isFogTransporter', comparisonOperator: 'Eq', value: 'true' }] }),
                 this._supplierService.getAllMy({ hasFogTransportation: true }),
@@ -485,7 +485,7 @@ export class ProfessionalFogTripTicketSubmissionCreateComponent implements OnIni
             return;
         }
 
-        const [insuranceCheck] = await Promise.all([
+        const [insuranceCheck] = await allSettled([
             waterSupplierId ? this._tripTicketService.getInsuranceCheck(waterSupplierId) : undefined,
             this.loadMailingInfoRedaction()
         ]);

@@ -16,6 +16,9 @@ import { CheckboxCellComponent, ColumnType, CurrencyCellComponent, ModalHelperSe
 export class BackflowTesterWaterSuppliersComponent implements OnInit {
     @Input() public testerId!: number;
 
+    // A user's details page lists the company's registrations without letting them be changed.
+    @Input() public readOnly: boolean = false;
+
     public canEdit: boolean = false;
 
     public table: TableViewModel<ProfessionalWaterSupplier> = {
@@ -30,7 +33,7 @@ export class BackflowTesterWaterSuppliersComponent implements OnInit {
     ) { }
 
     public async ngOnInit(): Promise<void> {
-        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
+        this.canEdit = !this.readOnly && await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.BackflowTesters);
         this.table.columns = this.getColumns();
         await this.loadWaterSuppliers();
     }

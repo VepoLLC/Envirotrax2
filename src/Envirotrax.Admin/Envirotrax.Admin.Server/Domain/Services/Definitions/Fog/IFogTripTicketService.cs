@@ -1,5 +1,6 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.Admin.Server.Domain.DataTransferObjects.Fog;
+using Envirotrax.Admin.Server.Domain.DataTransferObjects.Logs;
 
 namespace Envirotrax.Admin.Server.Domain.Services.Definitions.Fog;
 
@@ -14,4 +15,6 @@ public interface IFogTripTicketService
     Task<FogTripTicketDto?> UpdateValidationHoldAsync(int id, int waterSupplierId, bool onHold, CancellationToken cancellationToken);
 
     Task<FogTripTicketDto?> UpdateNeedsValidationAsync(int id, int waterSupplierId, bool needsValidation, CancellationToken cancellationToken);
+
+    Task<List<RecordLogDto>?> GetLogsAsync(int id, CancellationToken cancellationToken);
 }

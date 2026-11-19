@@ -27,11 +27,11 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
                 && pl.ReviewDate >= now && pl.ReviewDate <= in30Days, cancellationToken),
             AllPropertyLogCount = await _context.SiteLogs.CountAsync(cancellationToken),
 
-            WiseGuyCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsWiseGuy, cancellationToken),
-            CsiInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsCsiInspector, cancellationToken),
-            BpatCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsBackflowTester, cancellationToken),
-            FogTransporterCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogTransporter, cancellationToken),
-            FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.IsFogInspector, cancellationToken)
+            WiseGuyCount = await _context.ProfessionalUsers.CountAsync(pu => pu.DeletedTime == null && pu.IsWiseGuy, cancellationToken),
+            CsiInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.DeletedTime == null && pu.IsCsiInspector, cancellationToken),
+            BpatCount = await _context.ProfessionalUsers.CountAsync(pu => pu.DeletedTime == null && pu.IsBackflowTester, cancellationToken),
+            FogTransporterCount = await _context.ProfessionalUsers.CountAsync(pu => pu.DeletedTime == null && pu.IsFogTransporter, cancellationToken),
+            FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.DeletedTime == null && pu.IsFogInspector, cancellationToken)
         };
     }
 

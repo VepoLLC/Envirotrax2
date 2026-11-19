@@ -1,6 +1,7 @@
 using Envirotrax.App.Server.Domain.Services.Definitions.Api;
 using Envirotrax.App.Server.Domain.Services.Implementations.Api;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
+using Envirotrax.App.Server.Domain.Services.Definitions.Crm;
 using Envirotrax.App.Server.Domain.Services.Definitions.Csi;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.GisAreas;
@@ -14,6 +15,7 @@ using Envirotrax.App.Server.Domain.Services.Definitions.Sites;
 using Envirotrax.App.Server.Domain.Services.Definitions.Users;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
+using Envirotrax.App.Server.Domain.Services.Implementations.Crm;
 using Envirotrax.App.Server.Domain.Services.Implementations.Csi;
 using Envirotrax.App.Server.Domain.Services.Implementations.Fog;
 using Envirotrax.App.Server.Domain.Services.Implementations.GisAreas;
@@ -96,6 +98,7 @@ public static class ServiceRegistration
         services.AddTransient<IFogVehiclePermitService, FogVehiclePermitService>();
         services.AddTransient<IFogTransporterDisposalSiteService, FogTransporterDisposalSiteService>();
         services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
+        services.AddTransient<ICompanyService, CompanyService>();
         services.AddTransient<IFogTripTicketService, FogTripTicketService>();
         services.AddTransient<IFogTripTicketCheckoutService, FogTripTicketCheckoutService>();
         services.AddTransient<IFogTripTicketCheckoutEmailService, FogTripTicketCheckoutEmailService>();
@@ -142,6 +145,7 @@ public static class ServiceRegistration
 
         services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
         services.AddTransient<ILetterProcessService, LetterProcessService>();
+        services.AddTransient<ILetterHistoryService, LetterHistoryService>();
 
         services.Configure<GeocodingOptions>(configuration.GetSection("Geocoding"));
         services.AddHttpClient<IGeocodingService, GeocodingService>();

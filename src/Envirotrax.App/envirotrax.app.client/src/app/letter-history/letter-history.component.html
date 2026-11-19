@@ -1,0 +1,52 @@
+<dp-loading-spinner *ngIf="isLoading" />
+
+<div class="text-center mb-2">
+    <h2>Letter Generation History</h2>
+</div>
+
+<div class="d-flex justify-content-center gap-4 mb-3">
+    <div><i class="fa-solid fa-file-pdf text-danger me-1"></i>Backflow</div>
+    <div><i class="fa-solid fa-file-pdf text-primary me-1"></i>CSI</div>
+</div>
+
+@for (process of history; track process.id) {
+    <div class="mb-3">
+        <vp-section [header]="'Letters Generated: ' + (process.processDate | date:'M/d/yyyy')" [noPadding]="true">
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead>
+                        <tr class="vp-table-header">
+                            <th class="ps-3 w-100">PDF File</th>
+                            <th class="pe-3 text-end text-nowrap">File Size</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (file of process.files; track file.fileName) {
+                            <tr>
+                                <td class="ps-3">
+                                    <button type="button" class="btn btn-link p-0 text-start" (click)="openFile(process, file)">
+                                        <i class="fa-solid fa-file-pdf me-1" [ngClass]="isBackflowFile(file) ? 'text-danger' : 'text-primary'"></i>
+                                        {{ file.fileName }}
+                                    </button>
+                                </td>
+                                <td class="pe-3 text-end text-nowrap">
+                                    @if (file.fileSize != null) {
+                                        {{ file.fileSize / 1000 | number:'1.0-0' }} KB
+                                    } @else {
+                                        —
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </vp-section>
+    </div>
+}
+
+@if (!isLoading && history.length === 0) {
+    <div class="text-center py-3 text-muted">
+        No letter history exists for this account.
+    </div>
+}

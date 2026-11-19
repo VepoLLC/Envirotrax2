@@ -97,15 +97,17 @@ namespace Envirotrax.Auth.Controllers
             claimsPrincipal.SetAudiences(request.ClientId!);
 
             var userId = GetUserId(claimsPrincipal);
+            var waterSupplierId = GetWaterSupplierId(request.AcrValues);
+            var professionalId = GetProfessionalId(request.AcrValues);
 
-            await _authService.ValidateImpersonationAsync(claimsPrincipal, userId);
+            await _authService.ValidateImpersonationAsync(claimsPrincipal, userId, waterSupplierId, professionalId, GetImpersonatedUserId(request.AcrValues));
 
             await _authService.SetSecurityPropertiesAsync(
                 principal: claimsPrincipal,
                 userId: userId,
-                waterSupplierId: GetWaterSupplierId(request.AcrValues),
-                professionalId: GetProfessionalId(request.AcrValues),
-                impersonatedUserId: GetImpersonatedUserId(request.AcrValues)
+                waterSupplierId: waterSupplierId,
+                professionalId: professionalId,
+                impersonatedUserId: null
             );
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.

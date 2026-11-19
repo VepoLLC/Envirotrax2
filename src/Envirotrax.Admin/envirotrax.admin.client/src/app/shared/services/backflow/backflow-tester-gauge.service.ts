@@ -33,6 +33,10 @@ export class BackflowTesterGaugeService {
         formData.append('serialNumber', gauge.serialNumber ?? '');
         formData.append('isPortable', (gauge.isPortable ?? false).toString());
 
+        if (gauge.professionalUser?.id) {
+            formData.append('professionalUser.id', gauge.professionalUser.id.toString());
+        }
+
         if (gauge.lastCalibrationDate) {
             formData.append('lastCalibrationDate', gauge.lastCalibrationDate);
         }
@@ -51,7 +55,7 @@ export class BackflowTesterGaugeService {
     public getFileUrl(professionalId: number, gaugeId: number): Promise<string> {
         const url = this._urlResolver.resolveUrl(`/api/backflow/testers/${professionalId}/gauges/${gaugeId}/file-url`);
 
-        return lastValueFrom(this._http.get<string>(url));
+        return lastValueFrom(this._http.get(url, { responseType: 'text' }));
     }
 
     public delete(professionalId: number, gaugeId: number): Promise<void> {

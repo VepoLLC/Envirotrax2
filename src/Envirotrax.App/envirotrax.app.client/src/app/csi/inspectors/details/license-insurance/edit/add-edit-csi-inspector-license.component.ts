@@ -7,10 +7,12 @@ import { CsiInspectorSubAccountsService } from "../../../../../shared/services/c
 import { LicenseScope, ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService, InputOption } from '@envirotrax/common-ui';
+import { ToastService, InputOption, allSettled } from '@envirotrax/common-ui';
 
 export interface CsiLicenseModalData {
     inspectorId: number;
+    // Set when opened from a user's details page: the license is that user's and the User field is locked.
+    userId?: number;
     license: ProfessionalUserLicense;
 }
 
@@ -26,6 +28,7 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
     public validationErrors: string[] = [];
     public licenseTypes: InputOption<ProfessionalLicenseType>[] = [];
     public userOptions: InputOption<ProfessionalUser>[] = [];
+    public isUserFixed: boolean = false;
 
     public readonly professionalTypeOptions: InputOption<ProfessionalType>[] = Object.values(ProfessionalType)
         .filter(v => typeof v === 'number')
@@ -46,14 +49,21 @@ export class CsiInspectorAddEditLicenseComponent implements OnInit {
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
-        this.license = { ...this._modalReference.config.model!.license };
+        const { userId, license } = this._modalReference.config.model!;
+
+        this.license = { ...license };
+
+        if (userId) {
+            this.license.user ??= { id: userId };
+            this.isUserFixed = true;
+        }
     }
 
     public async ngOnInit(): Promise<void> {
         const { inspectorId } = this._modalReference.config.model!;
         try {
             this.isLoading = true;
-            const [types, users] = await Promise.all([
+            const [types, users] = await allSettled([
                 this._licensesService.getLicenseTypes(),
                 this._subAccountsService.getSubAccounts(inspectorId, { pageNumber: 1, pageSize: 1000 }, {})
             ]);

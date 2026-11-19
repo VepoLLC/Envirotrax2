@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { HelperService, InputOption, ModalHelperService, RecordLog, ToastService, ToastType } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ModalHelperService, RecordLog, ToastService, ToastType, allSettled } from '@envirotrax/common-ui';
 import { Subscription } from 'rxjs';
 import { MODULE_COLORS } from '../../shared/models/module-colors';
 import { FacilityType, GreaseTrapType, PropertyType } from '../../shared/models/sites/site';
@@ -89,7 +89,7 @@ export class SiteEditComponent implements OnInit, OnDestroy {
 
         this._siteMergedSubscription = this._siteDragDropService.onSiteMerged().subscribe(siteMerged => this.onSiteMerged(siteMerged));
 
-        await Promise.all([
+        await allSettled([
             this.loadStates(),
             this.loadSite(),
             this.loadRecordLogs()

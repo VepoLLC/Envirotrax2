@@ -193,6 +193,12 @@
                         <div class="card-value">@ReceiptFormatter.Money(Model.BalanceAdjustment)</div>
                     }
 
+                    @if (Model.IsPaymentBypassed)
+                    {
+                        <div class="card-label">Payment:</div>
+                        <div class="card-value">Bypassed</div>
+                    }
+
                     @if (Model.ShowTotal)
                     {
                         <div class="card-label">Total Amount Paid:</div>

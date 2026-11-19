@@ -5,7 +5,7 @@ import { CsiInspection } from '../../../../shared/models/csi/csi-inspection';
 import { CsiInspectionImage } from '../../../../shared/models/csi/csi-inspection-image';
 import { CsiInspectionAssembly } from '../../../../shared/models/csi/csi-inspection-assembly';
 import { CsiInspectionReason, csiInspectionReasonLabels } from '../../../../shared/enums/csi-inspection-reason.enum';
-import { ToastService, ToastType, ModalHelperService } from '@envirotrax/common-ui';
+import { ToastService, ToastType, ModalHelperService, allSettled } from '@envirotrax/common-ui';
 import { DownloadService } from '../../../../shared/services/download.service';
 import { HelperService } from '../../../../shared/services/helpers/helper.service';
 import { AuthService } from '../../../../shared/services/auth/auth.service';
@@ -164,7 +164,7 @@ export class CsiInspectionViewComponent implements OnInit {
 
         try {
             this.isLoading = true;
-            const [inspection, professionalId, assemblies] = await Promise.all([
+            const [inspection, professionalId, assemblies] = await allSettled([
                 this._inspectionService.getProfessionalInspection(Number(idParam)),
                 this._authService.getProfessionalId(),
                 this._inspectionService.getProfessionalAssemblies(Number(idParam))

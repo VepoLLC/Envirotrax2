@@ -53,7 +53,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog
 
                 dbQuery = dbQuery.Where(p =>
                     p.CompanyEmail!.Contains(userEmail) ||
-                    DbContext.ProfessionalUsers.Any(u =>
+                    DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                         u.ProfessionalId == p.Id &&
                         u.IsFogInspector &&
                         u.User!.Email!.Contains(userEmail)));
@@ -63,7 +63,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog
             {
                 var contactName = criteria.ContactName;
 
-                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u =>
+                dbQuery = dbQuery.Where(p => DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                     u.ProfessionalId == p.Id &&
                     u.IsFogInspector &&
                     u.ContactName!.Contains(contactName)));
@@ -75,7 +75,7 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.Fog
 
                 dbQuery = dbQuery.Where(p =>
                     p.CellPhoneNumber!.Contains(cellNumber) ||
-                    DbContext.ProfessionalUsers.Any(u =>
+                    DbContext.ProfessionalUsers.Any(u => u.DeletedTime == null &&
                         u.ProfessionalId == p.Id &&
                         u.IsFogInspector &&
                         u.User!.PhoneNumber!.Contains(cellNumber)));

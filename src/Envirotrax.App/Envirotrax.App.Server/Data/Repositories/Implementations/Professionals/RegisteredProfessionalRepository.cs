@@ -247,7 +247,8 @@ public class RegisteredProfessionalRepository : Repository<Professional, int, Pu
         var newAccountCutoff = now.AddMonths(-NewAccountMonths);
 
         var contacts = DbContext.ProfessionalUsers
-            .AsNoTracking();
+            .AsNoTracking()
+            .Where(contact => contact.DeletedTime == null);
 
         // V1 flagged fireline testers from any unexpired fire license on the account, regardless of
         // which state issued it, so this deliberately does not filter by the supplier's state.

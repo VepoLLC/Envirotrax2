@@ -6,7 +6,7 @@ import { ProfessionalUserLicenseService } from "../../../../../shared/services/p
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
 import { LicenseScope, ProfessionalLicenseType } from "../../../../../shared/models/professionals/licenses/professional-license-type";
 import { ProfesisonalService } from "../../../../../shared/services/professionals/professional.service";
-import { ToastService, ToastType, InputOption } from '@envirotrax/common-ui';
+import { ToastService, ToastType, InputOption, allSettled } from '@envirotrax/common-ui';
 
 @Component({
     standalone: false,
@@ -44,7 +44,7 @@ export class CreateEditLicenseComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [license, professional, licenseTypes] = await Promise.all([
+            const [license, professional, licenseTypes] = await allSettled([
                 this.getLicense(),
                 this._professionalService.getLoggedInProfessional(),
                 this._licenseService.getAllTypesAsOptions({ sort: {}, filter: [{ columnName: 'licenseScope', comparisonOperator: 'Eq', value: LicenseScope.User.toString() }] }, true)

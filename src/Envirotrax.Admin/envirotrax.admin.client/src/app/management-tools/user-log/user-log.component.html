@@ -1,0 +1,96 @@
+<div [hidden]="showResults">
+    <form #searchForm="ngForm" (ngSubmit)="search(searchForm)">
+        <vp-filter-panel>
+            <vp-section header="User Log Search Criteria">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="waterSupplierId"
+                                                   label="Water Supplier"
+                                                   type="select"
+                                                   [form]="searchForm"
+                                                   [options]="waterSupplierOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="tableName"
+                                                   label="Table Name"
+                                                   type="select"
+                                                   [required]="true"
+                                                   [form]="searchForm"
+                                                   [options]="tableNameOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="recordId"
+                                                   label="Record ID"
+                                                   type="number"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="user.email"
+                                                   label="User ID"
+                                                   [form]="searchForm" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="logType"
+                                                   label="Log Type"
+                                                   type="select"
+                                                   [value]="defaultLogType"
+                                                   [form]="searchForm"
+                                                   [options]="logTypeOptions" />
+                        </div>
+
+                        <div class="mb-2">
+                            <vp-filter-panel-field fieldName="logDate"
+                                                   label="Date Range"
+                                                   type="daterange"
+                                                   [form]="searchForm" />
+                        </div>
+                    </div>
+                </div>
+            </vp-section>
+        </vp-filter-panel>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="searchForm" />
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary vp-section-button">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<dp-loading-spinner *ngIf="table.isLoading"></dp-loading-spinner>
+
+<div *ngIf="showResults">
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary vp-section-button" (click)="showResults = false">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>
+            Search Again
+        </button>
+    </div>
+
+    <vp-section header="User Log Search Results ({{ table.items?.pageInfo?.totalItems }})">
+        <vp-table *ngIf="table.items"
+                  [columns]="table.columns!"
+                  [data]="table.items.data"
+                  [(pageInfo)]="table.items.pageInfo"
+                  (pageInfoChange)="getLogs()"
+                  [(query)]="table.query"
+                  (queryChange)="getLogs()"
+                  (queryReset)="getLogs()" />
+    </vp-section>
+</div>
+
+<ng-template #descriptionCell let-rowData="rowData">
+    <div style="white-space: pre-wrap;">{{ rowData?.description }}</div>
+</ng-template>

@@ -7,7 +7,8 @@
                 <img src="/images/logo.svg" alt="Envirotrax Logo" class="vp-logo">
             </a>
 
-            <button class="border-0 navbar-toggler"
+            <button *ngIf="isAuthenticated && menuItems.length"
+                    class="border-0 navbar-toggler"
                     type="button"
                     ata-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent"
@@ -69,24 +70,29 @@
     </nav>
 </header>
 
-<div *ngIf="isAuthenticated" class="container-fluid">
-    <div class="d-flex justify-content-end">
-        <div class="col-auto text-nowrap mt-1">
-            <button *ngIf="userEmail" type="button"
-                    class="login-box left border shadow bg-white text-body px-2 ms-1">
-                <i class="text-primary fa-solid fa-user me-1"></i>{{userEmail}}
-            </button>
-            <button type="button" class="login-box right border shadow bg-white text-body px-2 ms-1"
-                    (click)="signOut()">
-                <i class="text-primary fa-solid fa-right-from-bracket me-1"></i>Logout
-            </button>
-        </div>
+<ng-template #userAccount>
+    <div class="d-flex mw-100">
+        <button *ngIf="userEmail" type="button"
+                class="login-box left border shadow bg-white text-body text-truncate px-2 ms-1">
+            <i class="text-primary fa-solid fa-user me-1"></i>{{userEmail}}
+        </button>
+        <button type="button" class="login-box right border shadow bg-white text-body text-nowrap px-2 ms-1"
+                (click)="signOut()">
+            <i class="text-primary fa-solid fa-right-from-bracket me-1"></i>Logout
+        </button>
     </div>
+</ng-template>
+
+<div *ngIf="isAuthenticated && !showWindowContainer" class="container-fluid d-flex justify-content-end mt-1">
+    <ng-container *ngTemplateOutlet="userAccount" />
 </div>
 
 <vp-toast-container />
 
 <div id="main-content" class="container-fluid d-flex flex-fill py-2 min-h-0 flex-column">
-    <vp-window-container *ngIf="showWindowContainer" class="d-flex flex-fill flex-column min-h-0" />
+    <!-- On window pages the account buttons share a line with the minimized windows. -->
+    <vp-window-container *ngIf="showWindowContainer" class="d-flex flex-fill flex-column min-h-0">
+        <ng-container *ngIf="isAuthenticated" [ngTemplateOutlet]="userAccount" />
+    </vp-window-container>
     <router-outlet></router-outlet>
 </div>

@@ -27,34 +27,36 @@ export class ProfessionalNoteService {
     ) {
     }
 
-    public getAll(professionalType: ProfessionalType, professionalId: number, pageInfo: PageInfo, query: Query): Promise<PagedData<ProfessionalNote>> {
-        const url = this.resolveNotesUrl(professionalType, professionalId);
+    // userId: a user's own comment log instead of the company's.
+    public getAll(professionalType: ProfessionalType, professionalId: number, pageInfo: PageInfo, query: Query, userId?: number): Promise<PagedData<ProfessionalNote>> {
+        const url = this.resolveNotesUrl(professionalType, professionalId, userId);
 
         return lastValueFrom(this._http.get<PagedData<ProfessionalNote>>(url, {
             params: this._queryHelper.buildQuery(pageInfo, query)
         }));
     }
 
-    public add(professionalType: ProfessionalType, professionalId: number, note: ProfessionalNote): Promise<ProfessionalNote> {
-        const url = this.resolveNotesUrl(professionalType, professionalId);
+    public add(professionalType: ProfessionalType, professionalId: number, note: ProfessionalNote, userId?: number): Promise<ProfessionalNote> {
+        const url = this.resolveNotesUrl(professionalType, professionalId, userId);
 
         return lastValueFrom(this._http.post<ProfessionalNote>(url, note));
     }
 
-    public update(professionalType: ProfessionalType, professionalId: number, note: ProfessionalNote): Promise<ProfessionalNote> {
-        const url = this.resolveNotesUrl(professionalType, professionalId, note.id);
+    public update(professionalType: ProfessionalType, professionalId: number, note: ProfessionalNote, userId?: number): Promise<ProfessionalNote> {
+        const url = this.resolveNotesUrl(professionalType, professionalId, userId, note.id);
 
         return lastValueFrom(this._http.put<ProfessionalNote>(url, note));
     }
 
-    public delete(professionalType: ProfessionalType, professionalId: number, noteId: number): Promise<void> {
-        const url = this.resolveNotesUrl(professionalType, professionalId, noteId);
+    public delete(professionalType: ProfessionalType, professionalId: number, noteId: number, userId?: number): Promise<void> {
+        const url = this.resolveNotesUrl(professionalType, professionalId, userId, noteId);
 
         return lastValueFrom(this._http.delete<void>(url));
     }
 
-    private resolveNotesUrl(professionalType: ProfessionalType, professionalId: number, noteId?: number): string {
-        const notesUrl = `${ProfessionalNoteService._professionalUrls[professionalType]}/${professionalId}/notes`;
+    private resolveNotesUrl(professionalType: ProfessionalType, professionalId: number, userId?: number, noteId?: number): string {
+        const professionalUrl = `${ProfessionalNoteService._professionalUrls[professionalType]}/${professionalId}`;
+        const notesUrl = userId ? `${professionalUrl}/users/${userId}/notes` : `${professionalUrl}/notes`;
 
         return this._urlResolver.resolveUrl(noteId ? `${notesUrl}/${noteId}` : notesUrl);
     }

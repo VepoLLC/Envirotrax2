@@ -7,7 +7,7 @@ import { ProfessionalUser } from "../../shared/models/professionals/professional
 import { ProfesisonalService } from "../../shared/services/professionals/professional.service";
 import { ProfesionalUserService } from "../../shared/services/professionals/professional-user.service";
 import { HelperService } from "../../shared/services/helpers/helper.service";
-import { InputOption, ToastService } from '@envirotrax/common-ui';
+import { InputOption, ToastService, allSettled } from '@envirotrax/common-ui';
 import { CreditCardPaymentComponent, CreditCardToken } from "../../shared/components/credit-card-payment/credit-card-payment.component";
 import { ProfessionalAccountBalance } from "../../shared/models/professionals/professional-account-balance";
 import { createPaymentTransactionId } from "../../shared/utils/payment-transaction-id.util";
@@ -42,7 +42,7 @@ export class AccountBalanceManagementComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [states, professional, professionalUser] = await Promise.all([
+            const [states, professional, professionalUser] = await allSettled([
                 this._lookupService.getAllStatesAsOptions(true),
                 this._professionalService.getLoggedInProfessional(),
                 this._professionalUserService.getMyData()

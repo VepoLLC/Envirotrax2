@@ -20,7 +20,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { UserService } from "../../shared/services/water-suppliers/user.service";
 import { FacilityType } from '../../shared/enums/facility-type.enum';
 import { GreaseTrapType } from '../../shared/enums/grease-trap-type.enum';
-import { ToastService, ToastType, InputOption, RecordLog } from '@envirotrax/common-ui';
+import { ToastService, ToastType, InputOption, RecordLog, allSettled } from '@envirotrax/common-ui';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { PermissionAction, PermissionType } from '../../shared/models/permission-type';
 import { FeatureType } from '../../shared/models/feature-type';
@@ -127,7 +127,7 @@ export class EditSiteComponent implements OnInit {
     public async ngOnInit(): Promise<void> {
 
         await this.loadPermissions();
-        await Promise.all([
+        await allSettled([
             this.loadStates(),
             this.loadGeneralSettings()
         ]);
@@ -135,7 +135,7 @@ export class EditSiteComponent implements OnInit {
         this._acitvatedRoute.paramMap.subscribe(async params => {
             const siteId = params.get('id');
             if (siteId) {
-                await Promise.all([
+                await allSettled([
                     this.getSite(+siteId),
                     this.loadRecordLogs(+siteId),
                     this.loadTabCounts(+siteId)

@@ -25,7 +25,7 @@ import { FOG_VEHICLE_CAPACITY_TYPE_LABELS } from '../../shared/models/fog/fog-ve
 import { PHYSICAL_TYPE_LABELS } from '../../shared/models/fog/fog-disposal-site-enums';
 import { ProfessionalDashboardStats } from '../../shared/models/professionals/professional-dashboard-stats';
 import { TableViewModel } from '../../shared/models/table-view-model';
-import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn, ModalHelperService } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, FreeTextSearchSettings, TableColumn, ModalHelperService, allSettled } from '@envirotrax/common-ui';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { FogSignaturePadModalComponent, FogSignatureModel } from '../fog/inspections/create/fog-signature-pad-modal.component';
 import { AppContainerHelperService } from '../../shared/services/helpers/app-contaner-helper.service';
@@ -199,7 +199,7 @@ export class DashboardComponent implements OnInit {
         this.setupColumns();
 
         try {
-            const [hasCsi, hasFog, hasBackflow, hasFogTransportation, isCsiInspector, isFogInspector, isBackflowTester, isFogTransporter, isAdmin] = await Promise.all([
+            const [hasCsi, hasFog, hasBackflow, hasFogTransportation, isCsiInspector, isFogInspector, isBackflowTester, isFogTransporter, isAdmin] = await allSettled([
                 this._authService.hasAnyFeatures(FeatureType.CsiInspection),
                 this._authService.hasAnyFeatures(FeatureType.FogInspection),
                 this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
@@ -251,7 +251,7 @@ export class DashboardComponent implements OnInit {
                 promises.push(this.loadBackflowExpiryCounts());
             }
 
-            await Promise.all(promises);
+            await allSettled(promises);
         } finally {
             this.isLoading = false;
         }
@@ -435,13 +435,19 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    // V1 parity: a tester without admin rights sees the company's gauges plus their own on the overview.
     public async loadGauges(): Promise<void> {
         try {
             this.gaugesTable.isLoading = true;
-            this.gaugesTable.items = await this._gaugeService.getAll(
-                this.gaugesTable.items?.pageInfo || {},
-                this.gaugesTable.query
-            );
+
+            const pageInfo = this.gaugesTable.items?.pageInfo || {};
+
+            if (this.isAdmin) {
+                this.gaugesTable.items = await this._gaugeService.getAll(pageInfo, this.gaugesTable.query);
+            } else {
+                const myUser = await this._userService.getMyData();
+                this.gaugesTable.items = await this._gaugeService.getUsableByBpat(myUser.id!, pageInfo, this.gaugesTable.query);
+            }
         } finally {
             this.gaugesTable.isLoading = false;
         }

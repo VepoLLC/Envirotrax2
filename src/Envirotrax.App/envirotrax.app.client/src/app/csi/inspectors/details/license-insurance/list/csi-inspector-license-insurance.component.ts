@@ -10,9 +10,10 @@ import { PermissionAction, PermissionType } from "../../../../../shared/models/p
 import { ModalSize } from "@developer-partners/ngx-modal-dialog";
 import { ToastService, CellTemplateData, ColumnType, ModalHelperService, TableColumn, TableCustomAction } from '@envirotrax/common-ui';
 import { CsiInspectorAddEditInsuranceComponent } from "../edit/add-edit-csi-inspector-insurance.component";
-import { CsiInspectorAddEditLicenseComponent } from "../edit/add-edit-csi-inspector-license.component";
+import { CsiInspectorAddEditLicenseComponent, CsiLicenseModalData } from "../edit/add-edit-csi-inspector-license.component";
 import { Professional } from "../../../../../shared/models/professionals/professional";
 import { DownloadService } from "../../../../../shared/services/download.service";
+import { withLicenseUserFilter } from "../../../../../shared/utils/license-user-filter.util";
 
 
 @Component({
@@ -23,6 +24,11 @@ import { DownloadService } from "../../../../../shared/services/download.service
 export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     @Input() public inspectorId!: number;
     @Input() public inspector: Professional | null = null;
+
+    // Set on a user's details page: only that user's licenses, without the company's insurances.
+    @Input() public userId?: number;
+
+    public sectionHeader: string = 'License & Insurance Management';
 
     public activeTab: 'insurances' | 'licenses' = 'licenses';
 
@@ -69,6 +75,10 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     ) { }
 
     public async ngOnInit(): Promise<void> {
+        if (this.userId) {
+            this.sectionHeader = 'License Management';
+        }
+
         await this.setPermissions();
 
         this.setupColumns();
@@ -112,7 +122,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     }
 
     private getLicenseColumns(): TableColumn<ProfessionalUserLicense>[] {
-        return [
+        const columns: TableColumn<ProfessionalUserLicense>[] = [
             {
                 field: 'licenseNumber',
                 caption: 'License Number',
@@ -143,6 +153,9 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
                 type: ColumnType.date
             }
         ];
+
+        // Every license on a user's page is that user's, so the Email Address column would only repeat it.
+        return this.userId ? columns.filter(column => column.field !== 'user.emailAddress') : columns;
     }
 
     private getInsuranceColumns(): TableColumn<ProfessionalInsurance>[] {
@@ -171,18 +184,18 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
     }
 
     public addLicense(): void {
-        this._modalHelper.show<any, ProfessionalUserLicense>(CsiInspectorAddEditLicenseComponent, {
+        this._modalHelper.show<CsiLicenseModalData, ProfessionalUserLicense>(CsiInspectorAddEditLicenseComponent, {
             title: 'Add License',
-            model: { inspectorId: this.inspectorId, license: {} },
+            model: { inspectorId: this.inspectorId, userId: this.userId, license: {} },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses());
     }
 
     public editLicense(license: ProfessionalUserLicense): void {
-        this._modalHelper.show<any, ProfessionalUserLicense>(CsiInspectorAddEditLicenseComponent, {
+        this._modalHelper.show<CsiLicenseModalData, ProfessionalUserLicense>(CsiInspectorAddEditLicenseComponent, {
             title: 'Edit License',
-            model: { inspectorId: this.inspectorId, license },
+            model: { inspectorId: this.inspectorId, userId: this.userId, license },
             size: ModalSize.large,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.loadLicenses());
@@ -257,7 +270,7 @@ export class CsiInspectorLicenseInsuranceComponent implements OnInit {
             this.licensesTable.items = await this._licensesService.getLicenses(
                 this.inspectorId,
                 this.licensesTable.items?.pageInfo || {},
-                this.licensesTable.query
+                withLicenseUserFilter(this.licensesTable.query, this.userId)
             );
         } finally {
             this.licensesTable.isLoading = false;

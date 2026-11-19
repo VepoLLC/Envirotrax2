@@ -116,6 +116,31 @@ Four things are specific to notifications:
 - **`SentTime` stays NULL.** V1 records no send time; its scheduled jobs select by `CreationDate`
   and interval instead of stamping a row once it has gone out.
 
+## How backflow gauges are migrated
+
+V1 names a gauge's owner by login (`SaveBpatGauges.BpatID`), and that login is either a master account or
+a sub-account. The company is resolved through `MigrationLegacyProfessionalAccounts`, which already applies
+the master/sub-account rule. V2 gives each gauge a new `Id`; the V1 id goes into `LegacyRecordId`.
+
+Three things are worth knowing:
+
+- **A sub-account's gauge stays that person's own.** In V1 only tests submitted under that login could use
+  it, while the master's gauges were open to the whole company. V2 keeps the person in
+  `ProfessionalUserId`, found through `AspNetUsers` and `ProfessionalUsers` in the same company; a master's
+  gauge leaves it NULL, which makes it a company gauge. Gauges migrated before that column existed are
+  assigned on the next run.
+- **A sub-account gauge whose person did not migrate is skipped** instead of becoming a company gauge, which
+  would let every tester there use it. In the July 2026 copy of V1 that is 2 of 649 sub-account gauges,
+  both owned by a login that appears in `SaveBpats` twice and that the users migration therefore skipped.
+  Gauges already in V2 from an earlier run are never deleted; they stay company gauges.
+- **The Test for Accuracy report** is copied from the legacy file server into Azure Storage by
+  `BackflowGaugeService`, and `FilePath` is written only once the upload has returned.
+
+Gauges that could not be migrated, or whose report was missing, are queryable:
+
+`SELECT * FROM MigrationSkippedBackflowGauges` — the owner login has no migrated company, a sub-account
+owner has no migrated professional user, or the gauge has no report on the legacy file server.
+
 ## How backflow tests are migrated
 
 This is the largest entity in the system: 176 columns, 135 of which carry the same name in both
@@ -387,6 +412,23 @@ empty, its account or sub-account never migrated, or none of its author's water 
 
 **Note:** Re-running the migration after renewal requirements have been deleted or copied in V2 may restore
 original V1 records.
+
+## How CRM companies are migrated
+
+V1 Vepo Manager's Contact Manager keeps the companies Vepo works with in `ContactManagerContacts`.
+`Scripts/Companies` copies them to `crm.Companies`. V2 gives each company a new `Id`; the V1 id goes into
+`LegacyRecordId`, which is how the later additional contact and contact log migrations will find a company.
+
+- **Every company belongs to the Vepo LLC supplier** (domain `vepollc`). Only Vepo administrators use the
+  Contact Manager, and V2 has them as users of that supplier.
+- **`Type` is copied as it is.** The V2 `ContactType` enum keeps the V1 values: 0 Existing Client,
+  1 Prospective Client, 2 Past Client, 3 Competitor Client, 4 Technology.
+- **The state is matched by full name**, which is what V1 stores (`Texas`), or by code in case a row holds an
+  abbreviation (`TX`).
+- **Last Contacted By is a login in V1** and a user in V2. It is matched on `AspNetUsers.UserName`; a login that
+  did not migrate leaves the field blank, and the company still migrates.
+- **V1 has no FOG transportation program**, so `HasFogTransportation` starts false.
+- Blank V1 text (an empty string in a NOT NULL column) becomes NULL.
 
 ## Running it
 

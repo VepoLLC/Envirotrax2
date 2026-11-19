@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ModalReference } from '@developer-partners/ngx-modal-dialog';
-import { HelperService, InputOption, ToastService } from '@envirotrax/common-ui';
+import { HelperService, InputOption, ToastService, allSettled } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../../../shared/components/shared.components.module';
 import {
     ProfessionalLicenseType,
@@ -59,7 +59,7 @@ export class AddEditCsiInspectorLicenseComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [licenseTypes, users] = await Promise.all([
+            const [licenseTypes, users] = await allSettled([
                 this._licenseService.getTypesAsOptions(),
                 this._userService.getAllAsOptions(professionalId)
             ]);

@@ -7,7 +7,7 @@ import { LookupService } from "../../shared/services/lookup/lookup.service";
 import { AuthService } from "../../shared/services/auth/auth.service";
 import { State } from "../../shared/models/lookup/state";
 import { PermissionAction, PermissionType } from "../../shared/models/permission-type";
-import { ToastService, InputOption } from '@envirotrax/common-ui';
+import { ToastService, InputOption, allSettled } from '@envirotrax/common-ui';
 
 @Component({
     templateUrl: './account-contact-information.component.html',
@@ -35,7 +35,7 @@ export class AccountContactInformationComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            const [states, supplier, canModify] = await Promise.all([
+            const [states, supplier, canModify] = await allSettled([
                 this._stateService.getAllStatesAsOptions(true),
                 this._supplierService.getLoggedInSupplier(),
                 this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.AccountInformation)

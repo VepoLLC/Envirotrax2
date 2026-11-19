@@ -27,13 +27,19 @@ public class FogInspectionCheckoutService
         IAuthService authService,
         IFogInspectionRepository inspectionRepository,
         IProfessionalRepository professionalRepository,
+        IProfessionalUserRepository professionalUserRepository,
         IProfessionalTransactionRepository transactionRepository,
         IProfessionalPaymentService paymentService,
         IMailingInfoRedactionService mailingInfoRedactionService)
-        : base(authService, professionalRepository, transactionRepository, paymentService, mailingInfoRedactionService)
+        : base(authService, professionalRepository, professionalUserRepository, transactionRepository, paymentService, mailingInfoRedactionService)
     {
         _mapper = mapper;
         _inspectionRepository = inspectionRepository;
+    }
+
+    protected override bool IsPaymentBypassed(ProfessionalUser payer)
+    {
+        return payer.IsFogInspectionPaymentBypassed;
     }
 
     protected override Task<List<FogInspection>> GetUnpaidItemsAsync(List<int> ids, CancellationToken cancellationToken)

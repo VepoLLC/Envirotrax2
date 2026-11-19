@@ -4,10 +4,17 @@ import { ModalReference } from "@developer-partners/ngx-modal-dialog";
 import { BackflowGauge } from "../../../../../shared/models/backflow/backflow-gauge";
 import { BackflowTesterGaugeService } from "../../../../../shared/services/backflow/backflow-tester-gauge.service";
 import { HelperService } from "../../../../../shared/services/helpers/helper.service";
-import { ToastService } from '@envirotrax/common-ui';
+import { BackflowTesterUserService } from "../../../../../shared/services/backflow/backflow-tester-user.service";
+import { MAX_PAGE_SIZE } from "../../../../../shared/models/page-info";
+import { InputOption, ToastService } from '@envirotrax/common-ui';
+
+const COMPANY_OPTION_ID = 0;
 
 export interface BackflowGaugeModalData {
     testerId: number;
+    // Set when adding from a user's details page, which lists only the gauges assigned to that user.
+    userId?: number;
+    companyName: string;
     gauge: BackflowGauge;
 }
 
@@ -20,6 +27,9 @@ export class AddEditBackflowTesterGaugeComponent {
     public isLoading: boolean = false;
     public validationErrors: string[] = [];
     public calibrationFile: File | null = null;
+    public assignedToOptions: InputOption[] = [];
+    public assignedUserId = COMPANY_OPTION_ID;
+    public isUserFixed: boolean = false;
 
     public get isEditMode(): boolean {
         return !!this._modalReference.config.model?.gauge?.id;
@@ -28,10 +38,39 @@ export class AddEditBackflowTesterGaugeComponent {
     constructor(
         private readonly _modalReference: ModalReference<BackflowGaugeModalData, BackflowGauge>,
         private readonly _gaugeService: BackflowTesterGaugeService,
+        private readonly _userService: BackflowTesterUserService,
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
-        this.gauge = { ...this._modalReference.config.model!.gauge };
+        const { userId, gauge } = this._modalReference.config.model!;
+        this.gauge = { ...gauge };
+
+        if (!this.gauge.id) {
+            if (userId) {
+                this.assignedUserId = userId;
+                this.isUserFixed = true;
+            }
+
+            this.loadAssignedToOptions();
+        }
+    }
+
+    // V1 parity: a water supplier registers a gauge for the company or for one of its testers.
+    private async loadAssignedToOptions(): Promise<void> {
+        const { testerId, companyName } = this._modalReference.config.model!;
+
+        try {
+            this.isLoading = true;
+
+            const testersPage = await this._userService.getSubAccounts(testerId, { pageSize: MAX_PAGE_SIZE }, { sort: {}, filter: [] });
+
+            this.assignedToOptions = [
+                { id: COMPANY_OPTION_ID, text: companyName },
+                ...(testersPage.data ?? []).map(tester => ({ id: tester.id, text: tester.contactName ?? tester.emailAddress ?? '' }))
+            ];
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public async save(form: NgForm): Promise<void> {
@@ -44,6 +83,10 @@ export class AddEditBackflowTesterGaugeComponent {
             this.validationErrors = [];
 
             const { testerId } = this._modalReference.config.model!;
+
+            if (!this.gauge.id) {
+                this.gauge.professionalUser = this.assignedUserId !== COMPANY_OPTION_ID ? { id: this.assignedUserId } : null;
+            }
 
             const result = this.isEditMode
                 ? await this._gaugeService.update(testerId, this.gauge)

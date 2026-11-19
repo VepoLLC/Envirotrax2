@@ -1,6 +1,8 @@
 using DeveloperPartners.SortingFiltering;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Fog;
 using Envirotrax.App.Server.Domain.Services.Definitions.Fog;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envirotrax.App.Server.Controllers.Admin;
@@ -9,10 +11,12 @@ namespace Envirotrax.App.Server.Controllers.Admin;
 public class FogTripTicketController : AdminBaseController
 {
     private readonly IFogTripTicketService _tripTicketService;
+    private readonly IRecordLogService _recordLogService;
 
-    public FogTripTicketController(IFogTripTicketService tripTicketService)
+    public FogTripTicketController(IFogTripTicketService tripTicketService, IRecordLogService recordLogService)
     {
         _tripTicketService = tripTicketService;
+        _recordLogService = recordLogService;
     }
 
     [HttpGet]
@@ -53,5 +57,13 @@ public class FogTripTicketController : AdminBaseController
         var ticket = await _tripTicketService.UpdateNeedsValidationAsync(id, needsValidation, cancellationToken);
 
         return ticket == null ? NotFound() : Ok(ticket);
+    }
+
+    [HttpGet("{id}/logs")]
+    public async Task<IActionResult> GetLogsAsync(int id, CancellationToken cancellationToken)
+    {
+        var logs = await _recordLogService.GetByRecordAsync(RecordLogTableNames.FogTripTickets, id, cancellationToken);
+
+        return Ok(logs);
     }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BackflowTesterDetailsComponent } from '../backflow/testers/details/backflow-tester-details.component';
 import { CsiInspectorDetailsComponent } from '../csi/inspectors/details/csi-inspector-details.component';
 import { FogInspectorDetailsComponent } from '../fog/inspectors/details/fog-inspector-details.component';
+import { FogTransporterDetailsComponent } from '../fog/transporters/details/fog-transporter-details.component';
 import { CsiInspectorAccount } from '../shared/models/csi/csi-inspector-account';
 import { MODULE_COLORS } from '../shared/models/module-colors';
 import { ProfessionalType } from '../shared/models/professionals/licenses/professional-user-license';
@@ -20,7 +21,8 @@ export interface ProfessionalAccount {
 const ACCOUNT_WINDOW_TYPES: ProfessionalType[] = [
     ProfessionalType.Bpat,
     ProfessionalType.CsiInspector,
-    ProfessionalType.FogInspector
+    ProfessionalType.FogInspector,
+    ProfessionalType.FogTransporter
 ];
 
 @Injectable({
@@ -64,6 +66,16 @@ export class ProfessionalAccountWindowService {
 
         if (account.professionalType === ProfessionalType.FogInspector) {
             this._windowService.addWindow<FogInspectorDetailsComponent, Professional>(FogInspectorDetailsComponent, {
+                title,
+                color: MODULE_COLORS.FOG,
+                model: { id: account.professionalId }
+            });
+
+            return;
+        }
+
+        if (account.professionalType === ProfessionalType.FogTransporter) {
+            this._windowService.addWindow<FogTransporterDetailsComponent, Professional>(FogTransporterDetailsComponent, {
                 title,
                 color: MODULE_COLORS.FOG,
                 model: { id: account.professionalId }

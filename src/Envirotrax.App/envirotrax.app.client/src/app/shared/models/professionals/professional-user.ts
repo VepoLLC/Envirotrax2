@@ -3,6 +3,7 @@ import { State } from "../lookup/state";
 export interface ProfessionalUser {
     id?: number;
     emailAddress?: string;
+    phoneNumber?: string;
     contactName?: string;
     jobTitle?: string;
     signaturePath?: string;
@@ -13,6 +14,11 @@ export interface ProfessionalUser {
     isBackflowTester?: boolean;
     isFogInspector?: boolean;
     isFogTransporter?: boolean;
+
+    isBackflowTestingPaymentBypassed?: boolean;
+    isCsiInspectionPaymentBypassed?: boolean;
+    isFogInspectionPaymentBypassed?: boolean;
+    isFogTransportationPaymentBypassed?: boolean;
 
     bpatLicenseNumber?: string;
     bpatLicenseTypeName?: string;

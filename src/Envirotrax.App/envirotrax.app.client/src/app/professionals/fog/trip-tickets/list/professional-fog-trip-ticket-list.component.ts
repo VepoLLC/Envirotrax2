@@ -13,7 +13,7 @@ import { FogVehicleCapacityType } from '../../../../shared/models/fog/fog-vehicl
 import { FogTripTicketDateType, FogTripTicketStatus } from '../../../../shared/models/fog/fog-trip-ticket-enums';
 import { InterceptorType } from '../../../../shared/enums/interceptor-type.enum';
 import { PropertyType } from '../../../../shared/enums/property-type.enum';
-import { CellTemplateData, ColumnType, InputOption, TableColumn } from '@envirotrax/common-ui';
+import { CellTemplateData, ColumnType, InputOption, TableColumn, allSettled } from '@envirotrax/common-ui';
 import { AppContainerHelperService } from '../../../../shared/services/helpers/app-contaner-helper.service';
 import { MAX_PAGE_SIZE, STANDALONE_GRID_PAGE_SIZE } from '../../../../shared/models/page-info';
 import { PrintableTableService } from '../../../../shared/services/printable-table.service';
@@ -181,7 +181,7 @@ export class ProfessionalFogTripTicketListComponent implements OnInit {
     }
 
     private async loadLookups(): Promise<void> {
-        const [transporterResult, vehiclesResult, disposalSitesResult, waterSuppliers] = await Promise.all([
+        const [transporterResult, vehiclesResult, disposalSitesResult, waterSuppliers] = await allSettled([
             this._userService.getAllAsOptions(true, 'Any transporter', { filter: [{ columnName: 'isFogTransporter', value: 'true' }] }),
             this._vehicleService.getAllAsOptions(true, 'Any vehicle'),
             this._disposalSiteService.getAllRegisteredAsOptions(true, 'Any disposal site'),

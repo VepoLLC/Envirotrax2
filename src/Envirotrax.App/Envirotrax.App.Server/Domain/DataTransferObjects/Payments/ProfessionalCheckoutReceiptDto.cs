@@ -16,6 +16,8 @@ public class ProfessionalCheckoutReceiptDto<TItem>
 
     public string? CardNumber { get; set; }
 
+    public bool IsPaymentBypassed { get; set; }
+
     public List<CheckoutEmailResultDto> EmailResults { get; set; } = [];
 
     public List<TItem> Items { get; set; } = [];

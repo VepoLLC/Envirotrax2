@@ -4,7 +4,7 @@ import { GisArea, GisAreaCoordinate } from "../../../models/gis-areas/gis-area";
 import { GisAreaService } from "../../../services/gis-areas/gis-area.service";
 import { GisAreaCoordinateService } from "../../../services/gis-areas/gis-area-coordinate.service";
 import { GisMapService } from "../../../services/gis-areas/gis-map.service";
-import { MapPolygon } from "@envirotrax/common-ui";
+import { MapPolygon, allSettled } from "@envirotrax/common-ui";
 
 export interface GisAreaSelectionModel {
     currentAreaId: string;
@@ -42,7 +42,7 @@ export class GisAreaSelectionModalComponent implements OnInit {
     }
 
     private async loadDataAsync(): Promise<void> {
-        const [areas, coordinates, defaultView] = await Promise.all([
+        const [areas, coordinates, defaultView] = await allSettled([
             this._gisAreaService.getAllAreas(),
             this._coordinateService.getAll(),
             this._gisAreaService.getDefaultView()

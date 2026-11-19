@@ -4,6 +4,7 @@ import { AuthService } from "../../shared/services/auth/auth.service";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
 import { FeatureType } from "../../shared/models/feature-type";
 import { ROLE_DEFINITIONS } from "../../shared/models/role-definitions";
+import { allSettled } from "@envirotrax/common-ui";
 
 type TabType = 'backflow' | 'csi' | 'fogInspection' | 'fogTransport';
 
@@ -69,7 +70,7 @@ export class CheckoutComponent implements OnInit {
             isCsiInspector,
             isFogInspector,
             isFogTransporter
-        ] = await Promise.all([
+        ] = await allSettled([
             this._authService.hasAnyFeatures(FeatureType.BackflowTesting),
             this._authService.hasAnyFeatures(FeatureType.CsiInspection),
             this._authService.hasAnyFeatures(FeatureType.FogInspection),

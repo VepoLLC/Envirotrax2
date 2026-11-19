@@ -68,7 +68,7 @@ public class WaterSupplierLicenseService : IWaterSupplierLicenseService
         var expiring = await _licenseRepository.CountForAdminAsync("expiring", cancellationToken);
 
         var insurance = await _insuranceService.CountUnverifiedForAdminAsync(cancellationToken);
-        var gauges = await _gaugeService.CountUnverifiedForAdminAsync(cancellationToken);
+        var gauges = await _gaugeService.CountUnverifiedAsync(cancellationToken);
 
         return new LicenseAdminCountsDto
         {

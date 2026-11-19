@@ -4,12 +4,14 @@ import { PermissionGuard } from "../shared/guards/permission.guard";
 import { PermissionAction, PermissionType } from "../shared/models/permission-type";
 import { FogInspectorListComponent } from "./inspectors/list/fog-inspector-list.component";
 import { FogInspectorDetailsComponent } from "./inspectors/details/fog-inspector-details.component";
+import { FogInspectorUserDetailsComponent } from "./inspectors/details/users/details/fog-inspector-user-details.component";
 import { FogInspectionListComponent } from "./inspections/list/fog-inspection-list.component";
 import { FogInspectionViewComponent } from "./inspections/view/fog-inspection-view.component";
 import { FogTripTicketListComponent } from "./trip-tickets/list/fog-trip-ticket-list.component";
 import { FogTripTicketViewComponent } from "./trip-tickets/view/fog-trip-ticket-view.component";
 import { FogTransporterListComponent } from "./transporters/list/fog-transporter-list.component";
 import { FogTransporterDetailsComponent } from "./transporters/details/fog-transporter-details.component";
+import { FogTransporterUserDetailsComponent } from "./transporters/details/users/details/fog-transporter-user-details.component";
 import { FogVehiclePermitListComponent } from "./transporters/vehicles/list/fog-vehicle-permit-list.component";
 import { RegistrationManagementComponent } from "./transporters/registrations/registration-management.component";
 
@@ -98,6 +100,20 @@ const routes: Routes = [
         }
     },
     {
+        path: 'inspectors/details/:id/users/:userId',
+        title: 'FOG Inspector User Details',
+        component: FogInspectorUserDetailsComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogInspectors,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
         path: 'inspectors',
         title: 'Inspector Management',
         component: FogInspectorListComponent,
@@ -134,6 +150,20 @@ const routes: Routes = [
         path: 'transporters/details/:id',
         title: 'Transporter Details',
         component: FogTransporterDetailsComponent,
+        canActivate: [PermissionGuard],
+        data: {
+            permissions: [
+                {
+                    type: PermissionType.FogTransporters,
+                    action: PermissionAction.CanView
+                }
+            ]
+        }
+    },
+    {
+        path: 'transporters/details/:id/users/:userId',
+        title: 'FOG Transporter User Details',
+        component: FogTransporterUserDetailsComponent,
         canActivate: [PermissionGuard],
         data: {
             permissions: [

@@ -4,7 +4,7 @@ import { Site } from "../../../shared/models/sites/site";
 import { SiteService } from "../../../shared/services/sites/site.service";
 import { PropertyType } from "../../../shared/enums/property-type.enum";
 import { SiteSchedule } from "../../../shared/models/sites/site-schedule";
-import { ModalHelperService } from "@envirotrax/common-ui";
+import { ModalHelperService, allSettled } from "@envirotrax/common-ui";
 import { EditSiteScheduleComponent, EditSiteScheduleModel } from "../schedule/edit-site-schedule.component";
 import { SITE_SCHEDULE_TYPE_NAMES, SiteScheduleService, SiteScheduleType } from "../../../shared/services/sites/site-schedule.service";
 import { GeneralSettingsService } from "../../../shared/services/settings/general-settings.service";
@@ -46,7 +46,7 @@ export class SiteDetailsComponent implements OnInit {
         try {
             this.isLoading = true;
 
-            [this.site, this.schedules, this.scheduleTypes] = await Promise.all([
+            [this.site, this.schedules, this.scheduleTypes] = await allSettled([
                 this._siteService.getForProfessional(id),
                 this._siteScheduleService.getMySchedules(id),
                 this._siteScheduleService.getMyScheduleTypes()

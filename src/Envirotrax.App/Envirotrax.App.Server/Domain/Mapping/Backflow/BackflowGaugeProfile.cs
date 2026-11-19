@@ -17,10 +17,17 @@ public class BackflowGaugeProfile : Profile
                 {
                     Id = model.ProfessionalId
                 };
+
+                if (model.ProfessionalUserId.HasValue)
+                {
+                    dto.ProfessionalUser ??= new() { Id = model.ProfessionalUserId.Value };
+                }
             })
             .ReverseMap()
             .ForMember(g => g.Professional, opt => opt.Ignore())
             .ForMember(g => g.ProfessionalId, opt => opt.MapFrom(dto => dto.Professional != null ? dto.Professional.Id : (int?)null))
+            .ForMember(g => g.ProfessionalUser, opt => opt.Ignore())
+            .ForMember(g => g.ProfessionalUserId, opt => opt.MapFrom(dto => dto.ProfessionalUser != null ? dto.ProfessionalUser.Id : (int?)null))
             .ForMember(g => g.CreatedBy, opt => opt.Ignore());
 
         CreateMap<CreateBackflowGaugeDto, BackflowGauge>().IncludeBase<BackflowGaugeDto, BackflowGauge>();
@@ -28,6 +35,8 @@ public class BackflowGaugeProfile : Profile
         CreateMap<BackflowGauge, WaterSupplierGaugeDto>()
             .ForMember(dto => dto.SubmittedOn, opt => opt.MapFrom(g => g.CreatedTime))
             .ForMember(dto => dto.UserEmail, opt => opt.MapFrom(g => g.CreatedBy!.Email))
-            .ForMember(dto => dto.CompanyName, opt => opt.MapFrom(g => g.Professional!.Name));
+            .ForMember(dto => dto.CompanyName, opt => opt.MapFrom(g => g.Professional!.Name))
+            .ForMember(dto => dto.ContactName, opt => opt.Ignore())
+            .ForMember(dto => dto.HasFile, opt => opt.Ignore());
     }
 }

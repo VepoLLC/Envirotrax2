@@ -5,6 +5,7 @@ using System.Transactions;
 using AutoMapper;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.AutoMapper;
+using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
@@ -12,6 +13,7 @@ using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.WaterSuppliers;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
+using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.Services.Definitions.WaterSuppliers;
 using Envirotrax.Common.Data;
@@ -36,6 +38,7 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
     private readonly IGeneralSettingsService _generalSettingsService;
+    private readonly IRecordLogService _recordLogService;
 
     public ProfessionalInsuranceService(
         IMapper mapper,
@@ -43,7 +46,8 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         IFileStorageService fileStorageService,
         ITimeZoneHelperService timeZoneHelper,
         IAuthService authService,
-        IGeneralSettingsService generalSettingsService)
+        IGeneralSettingsService generalSettingsService,
+        IRecordLogService recordLogService)
         : base(mapper, repository)
     {
         _insuranceRepository = repository;
@@ -51,6 +55,7 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
         _generalSettingsService = generalSettingsService;
+        _recordLogService = recordLogService;
     }
 
     protected override ProfessionalInsuranceDto? MapToDto(ProfessionalInsurance? model)
@@ -339,6 +344,19 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return await UpdateAsync(insurance);
     }
 
+    public override async Task<ProfessionalInsuranceDto> UpdateAsync(ProfessionalInsuranceDto dto)
+    {
+        var model = MapToModel(dto)!;
+        var saved = await _insuranceRepository.UpdateInsuranceAsync(model);
+
+        if (saved == null)
+        {
+            throw new InvalidOperationException($"Insurance {dto.Id} not found.");
+        }
+
+        return MapToDto(saved)!;
+    }
+
     public override async Task<ProfessionalInsuranceDto?> DeleteAsync(int id)
     {
         using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -347,12 +365,25 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
 
             if (deleted != null)
             {
+                await _recordLogService.AddAsync(RecordLogTableNames.ProfessionalInsurances, deleted.Id, GetActingWaterSupplierId(), RecordLogType.Delete,
+                    $"Deleted insurance — InsuranceNumber: '{deleted.InsuranceNumber}', ExpirationDate: '{deleted.ExpirationDate:d}'", professionalId: deleted.Professional.Id);
+
                 await _fileStorageService.DeleteAsync(deleted.FilePath!);
                 scope.Complete();
             }
 
             return deleted;
         }
+    }
+
+    private int? GetActingWaterSupplierId()
+    {
+        if (_authService.WaterSupplierId > 0)
+        {
+            return _authService.WaterSupplierId;
+        }
+
+        return null;
     }
 
     public async Task<ProfessionalInsuranceDto?> DeleteForProfessionalAsync(int professionalId, int insuranceId, CancellationToken cancellationToken)

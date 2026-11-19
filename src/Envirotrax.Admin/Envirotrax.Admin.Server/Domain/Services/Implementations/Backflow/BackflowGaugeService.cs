@@ -16,9 +16,9 @@ public class BackflowGaugeService : IBackflowGaugeService
         _apiClient = apiClient;
     }
 
-    public Task<IPagedData<BackflowGaugeDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public Task<IPagedData<WaterSupplierGaugeDto>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
-        return _apiClient.GetAsync<BackflowGaugeDto>(BaseUrl, pageInfo, query, cancellationToken);
+        return _apiClient.GetAsync<WaterSupplierGaugeDto>(BaseUrl, pageInfo, query, cancellationToken);
     }
 
     public Task<BackflowGaugeDto?> UpdateAsync(int id, BackflowGaugeDto gauge)

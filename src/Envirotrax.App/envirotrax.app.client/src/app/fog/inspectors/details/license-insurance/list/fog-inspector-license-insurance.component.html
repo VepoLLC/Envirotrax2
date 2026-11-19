@@ -33,8 +33,8 @@
 </ng-template>
 
 
-<vp-section header="License &amp; Insurance Management">
-    <div class="text-center mb-1">
+<vp-section [header]="sectionHeader">
+    <div *ngIf="!userId" class="text-center mb-1">
         <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
             <li class="nav-item">
                 <a class="nav-link" [class.active]="activeTab === 'licenses'" (click)="setActiveTab('licenses')">

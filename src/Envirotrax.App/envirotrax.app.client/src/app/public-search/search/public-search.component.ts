@@ -2,7 +2,7 @@ import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { formatDate } from "@angular/common";
 import { ActivatedRoute, Router } from "@angular/router";
 import { NgForm } from "@angular/forms";
-import { CellTemplateData, ColumnType, InputOption, TableColumn } from "@envirotrax/common-ui";
+import { CellTemplateData, ColumnType, InputOption, TableColumn, allSettled } from "@envirotrax/common-ui";
 import { TableViewModel } from "../../shared/models/table-view-model";
 import { PagedData } from "../../shared/models/paged-data";
 import { AppContainerHelperService } from "../../shared/services/helpers/app-contaner-helper.service";
@@ -121,7 +121,7 @@ export class PublicSearchComponent implements OnInit {
         this.resetPageNumber(this.backflowTable.items);
         this.resetPageNumber(this.csiTable.items);
 
-        await Promise.all([this.getBackflowTests(), this.getCsiInspections()]);
+        await allSettled([this.getBackflowTests(), this.getCsiInspections()]);
 
         this.activeTab = 'backflow';
         this.setShowResults(true);

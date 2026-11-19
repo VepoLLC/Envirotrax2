@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { ProfessionalUser } from "../../../../../shared/models/professionals/professional-user";
 import { TableViewModel } from "../../../../../shared/models/table-view-model";
 import { FogTransporterSubAccountsService } from "../../../../../shared/services/fog/fog-transporter-user.service";
@@ -27,6 +28,7 @@ export class FogTransporterUsersComponent implements OnInit {
     constructor(
         private readonly _service: FogTransporterSubAccountsService,
         private readonly _modalHelper: ModalHelperService,
+        private readonly _router: Router,
         private readonly _authService: AuthService
     ) { }
 
@@ -74,13 +76,12 @@ export class FogTransporterUsersComponent implements OnInit {
         }).result().subscribe(() => this.loadSubAccounts());
     }
 
-    public editUser(user: ProfessionalUser): void {
-        this._modalHelper.show<FogUserModalData, ProfessionalUser>(EditFogTransporterUserComponent, {
-            title: 'Edit User Account',
-            model: { transporterId: this.transporterId, user },
-            size: ModalSize.large,
-            mode: 'disableFullScreen'
-        }).result().subscribe(() => this.loadSubAccounts());
+    // The user's details open in a new tab, so the company page stays where it was.
+    public viewUser(user: ProfessionalUser): void {
+        const url = this._router.serializeUrl(
+            this._router.createUrlTree(['/fog/transporters/details', this.transporterId, 'users', user.id])
+        );
+        window.open(url, '_blank');
     }
 
     public async loadSubAccounts(): Promise<void> {

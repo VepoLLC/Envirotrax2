@@ -9,11 +9,14 @@ using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Logs;
 using Envirotrax.App.Server.Data.Models.Professionals;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Backflow;
+using Envirotrax.App.Server.Data.Repositories.Definitions.Professionals;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions;
 using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Helpers;
 using Envirotrax.App.Server.Domain.Services.Definitions.Logs;
+using Envirotrax.Common;
+using Envirotrax.Common.Data;
 using Envirotrax.Common.Domain.Services.Defintions;
 
 namespace Envirotrax.App.Server.Domain.Services.Implementations.Backflow;
@@ -23,6 +26,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
     private static readonly string[] AllowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png", ".bmp", ".pdf"];
 
     private readonly IBackflowGaugeRepository _gaugeRepository;
+    private readonly IProfessionalUserRepository _professionalUserRepository;
     private readonly IFileStorageService _fileStorageService;
     private readonly ITimeZoneHelperService _timeZoneHelper;
     private readonly IAuthService _authService;
@@ -31,6 +35,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
     public BackflowGaugeService(
         IMapper mapper,
         IBackflowGaugeRepository repository,
+        IProfessionalUserRepository professionalUserRepository,
         IFileStorageService fileStorageService,
         ITimeZoneHelperService timeZoneHelper,
         IAuthService authService,
@@ -38,6 +43,7 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         : base(mapper, repository)
     {
         _gaugeRepository = repository;
+        _professionalUserRepository = professionalUserRepository;
         _fileStorageService = fileStorageService;
         _timeZoneHelper = timeZoneHelper;
         _authService = authService;
@@ -84,6 +90,15 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
     }
 
+    public async Task<IPagedData<BackflowGaugeDto>> GetAllByProfessionalUserAsync(int professionalId, int userId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+
+        var items = await _gaugeRepository.GetAllByProfessionalUserAsync(professionalId, userId, pageInfo, query, cancellationToken);
+        return items.Select(i => MapToDto(i)!).ToPagedData(pageInfo);
+    }
+
     public async Task<Uri?> GenerateFileUrlAsync(int id, CancellationToken cancellationToken)
     {
         var gauge = await _gaugeRepository.GetNoIncludesAsync(id, cancellationToken);
@@ -102,13 +117,86 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         if (!AllowedFileExtensions.Contains(fileExtension))
             throw new ValidationException($"Only {string.Join(", ", AllowedFileExtensions)} files are accepted.");
 
-        dto.FilePath = $"professionals/{_authService.ProfessionalId}/gauges/{Guid.NewGuid()}{fileExtension}";
+        var professionalId = IsSignedInAsProfessional() ? _authService.ProfessionalId : dto.Professional!.Id!.Value;
+
+        await SetAssignedUserAsync(dto, professionalId);
+
+        dto.FilePath = $"professionals/{professionalId}/gauges/{Guid.NewGuid()}{fileExtension}";
 
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         var added = await AddAsync(dto);
         await _fileStorageService.UploadAsync(dto.FilePath, fileStream);
         scope.Complete();
         return added;
+    }
+
+    private async Task SetAssignedUserAsync(BackflowGaugeDto dto, int professionalId)
+    {
+        if (IsTesterWithoutAdminRights())
+        {
+            dto.ProfessionalUser = new() { Id = _authService.ActingAsUserId };
+            return;
+        }
+
+        if (dto.ProfessionalUser?.Id is int userId
+            && !await _professionalUserRepository.IsBackflowTesterAsync(professionalId, userId, CancellationToken.None))
+        {
+            throw new AppValidationException("The gauge can only be assigned to a backflow tester of this company.");
+        }
+    }
+
+    private bool IsSignedInAsProfessional()
+    {
+        return _authService.ProfessionalId > 0 && !_authService.HasAnyScopes(ScopeDefinitions.AdminInternal);
+    }
+
+    private bool IsTesterWithoutAdminRights()
+    {
+        return IsSignedInAsProfessional() && !_authService.HasAnyRole(RoleDefinitions.Professionals.Admin);
+    }
+
+    public async Task<IPagedData<BackflowGaugeDto>> GetUsableByBpatAsync(int bpatUserId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    {
+        EnsureCanActAsBpat(bpatUserId);
+
+        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
+
+        var gauges = await _gaugeRepository.GetCompanyAndUserGaugesAsync(bpatUserId, pageInfo, query, cancellationToken);
+
+        return gauges.Select(gauge => MapToDto(gauge)!).ToPagedData(pageInfo);
+    }
+
+    public async Task<BackflowGaugeDto> GetValidGaugeForBpatAsync(int gaugeId, int bpatUserId, CancellationToken cancellationToken)
+    {
+        EnsureCanActAsBpat(bpatUserId);
+
+        var gauge = MapToDto(await _gaugeRepository.GetCompanyOrUserGaugeAsync(gaugeId, bpatUserId, cancellationToken));
+
+        if (gauge?.LastCalibrationDate == null || gauge.ExpirationType == GaugeExpirationType.Expired)
+        {
+            throw new AppValidationException("Please select a valid test gauge.");
+        }
+
+        return gauge;
+    }
+
+    private void EnsureCanActAsBpat(int bpatUserId)
+    {
+        if (IsTesterWithoutAdminRights() && bpatUserId != _authService.ActingAsUserId)
+        {
+            throw new AppValidationException("You can only use the gauges available to your own BPAT account.");
+        }
+    }
+
+    public async Task<int> CountUsableByCurrentUserAsync(CancellationToken cancellationToken)
+    {
+        if (IsTesterWithoutAdminRights())
+        {
+            return await _gaugeRepository.CountCompanyAndUserGaugesAsync(_authService.ActingAsUserId, cancellationToken);
+        }
+
+        return await CountAsync(cancellationToken);
     }
 
     public override async Task<BackflowGaugeDto?> DeleteAsync(int id)
@@ -125,13 +213,30 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
         return deleted;
     }
 
-    public async Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<WaterSupplierGaugeDto>> GetUnverifiedAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<BackflowGauge, WaterSupplierGaugeDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<BackflowGauge, WaterSupplierGaugeDto>(Mapper);
 
-        var items = (await _gaugeRepository.GetUnverifiedByWaterSupplierAsync(pageInfo, query, cancellationToken)).ToList();
-        var professionalIds = items.Select(g => g.ProfessionalId).Distinct().ToList();
+        var items = (await _gaugeRepository.GetUnverifiedAsync(pageInfo, query, cancellationToken)).ToList();
+        var dtos = await MapToWaterSupplierDtosAsync(items, cancellationToken);
+
+        return dtos.ToPagedData(pageInfo);
+    }
+
+    public Task<int> CountUnverifiedAsync(CancellationToken cancellationToken)
+    {
+        return _gaugeRepository.CountUnverifiedAsync(cancellationToken);
+    }
+
+    private async Task<IEnumerable<WaterSupplierGaugeDto>> MapToWaterSupplierDtosAsync(List<BackflowGauge> gauges, CancellationToken cancellationToken)
+    {
+        if (gauges.Count == 0)
+        {
+            return [];
+        }
+
+        var professionalIds = gauges.Select(g => g.ProfessionalId).Distinct().ToList();
 
         var professionalUsers = (await _gaugeRepository.GetProfessionalUsersAsync(professionalIds, cancellationToken)).ToList();
         var byAccount = professionalUsers.ToDictionary(pu => (pu.ProfessionalId, pu.UserId));
@@ -140,40 +245,16 @@ public class BackflowGaugeService : Service<BackflowGauge, BackflowGaugeDto>, IB
             .GroupBy(pu => pu.ProfessionalId)
             .ToDictionary(group => group.Key, group => group.First());
 
-        var dtos = items.Select(g => new WaterSupplierGaugeDto
+        // The profile maps every column, so UserEmail is the CreatedBy email that sorting and filtering also use.
+        return gauges.Select(g =>
         {
-            Id = g.Id,
-            ProfessionalId = g.ProfessionalId,
-            SubmittedOn = g.CreatedTime,
-            UserEmail = g.CreatedBy?.Email ?? ResolveSubmitter(g, byAccount, admins)?.User?.Email,
-            CompanyName = g.Professional?.Name,
-            Manufacturer = g.Manufacturer,
-            Model = g.Model,
-            SerialNumber = g.SerialNumber,
-            IsPortable = g.IsPortable
-        });
+            var dto = Mapper.Map<WaterSupplierGaugeDto>(g);
 
-        return dtos.ToPagedData(pageInfo);
-    }
+            dto.ContactName = ResolveSubmitter(g, byAccount, admins)?.ContactName;
+            dto.HasFile = !string.IsNullOrWhiteSpace(g.FilePath);
 
-    public Task<int> GetUnverifiedCountByWaterSupplierAsync(CancellationToken cancellationToken)
-    {
-        return _gaugeRepository.GetUnverifiedCountByWaterSupplierAsync(cancellationToken);
-    }
-
-    public async Task<IPagedData<BackflowGaugeDto>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
-    {
-        query.Sort = query.ConvertSortProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<BackflowGauge, BackflowGaugeDto>(Mapper);
-
-        var gauges = await _gaugeRepository.GetUnverifiedForAdminAsync(pageInfo, query, cancellationToken);
-
-        return gauges.Select(gauge => MapToDto(gauge)!).ToPagedData(pageInfo);
-    }
-
-    public Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken)
-    {
-        return _gaugeRepository.CountUnverifiedForAdminAsync(cancellationToken);
+            return dto;
+        }).ToList();
     }
 
     private static ProfessionalUser? ResolveSubmitter(

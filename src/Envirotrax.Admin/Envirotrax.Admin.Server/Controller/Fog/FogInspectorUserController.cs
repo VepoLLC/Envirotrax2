@@ -39,6 +39,14 @@ public class FogInspectorUserController : AdminBaseController
         return updated == null ? NotFound() : Ok(updated);
     }
 
+    [HttpPut("{userId}/payment-bypass")]
+    public async Task<IActionResult> UpdatePaymentBypassAsync(int professionalId, int userId, [FromBody] ProfessionalPaymentBypassDto paymentBypass, CancellationToken cancellationToken)
+    {
+        var updated = await _userService.UpdatePaymentBypassAsync(professionalId, userId, paymentBypass, cancellationToken);
+
+        return updated == null ? NotFound() : Ok(updated);
+    }
+
     [HttpDelete("{userId}")]
     public async Task<IActionResult> DeleteAsync(int professionalId, int userId, CancellationToken cancellationToken)
     {

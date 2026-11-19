@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { ColumnType, ModalHelperService, TableColumn, TableCustomAction, TableViewModel, ToastService, ToastType } from '@envirotrax/common-ui';
+import { CheckboxCellComponent, ColumnType, ModalHelperService, TableColumn, TableCustomAction, TableViewModel, ToastService, ToastType } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../../../shared/components/shared.components.module';
 import { ProfessionalUser } from '../../../../../shared/models/professionals/professional';
 import { AuthService } from '../../../../../shared/services/auth/auth.service';
@@ -32,6 +32,11 @@ export class CsiInspectorUserListComponent implements OnInit {
             text: 'Login',
             iconClass: 'fa-solid fa-right-to-bracket',
             action: user => this.loginAsUser(user)
+        },
+        {
+            text: 'Turn On/Off Payment Bypass',
+            iconClass: 'fa-solid fa-hand-holding-dollar',
+            action: user => this.updatePaymentBypass(user, !user.isCsiInspectionPaymentBypassed)
         }
     ];
 
@@ -75,6 +80,29 @@ export class CsiInspectorUserListComponent implements OnInit {
         this._authService.loginAsProfessionalUser(this.professionalId, user.id!);
     }
 
+    public updatePaymentBypass(user: ProfessionalUser, isPaymentBypassed: boolean): void {
+        const message = isPaymentBypassed
+            ? `Are you sure that you want to turn on payment bypass for ${user.contactName}? Their CSI inspection checkouts will be free.`
+            : `Are you sure that you want to turn off payment bypass for ${user.contactName}? Their CSI inspection checkouts will require payment.`;
+
+        this._modalHelper.confirm({ messages: [message] }).result().subscribe(async () => {
+            try {
+                this.table.isLoading = true;
+
+                await this._userService.updatePaymentBypass(this.professionalId, user.id!, isPaymentBypassed);
+
+                this._toastService.show({
+                    text: isPaymentBypassed ? 'Payment bypass turned on.' : 'Payment bypass turned off.',
+                    type: ToastType.Success
+                });
+            } finally {
+                this.table.isLoading = false;
+            }
+
+            await this.getUsers();
+        });
+    }
+
     public deleteUser(user: ProfessionalUser): void {
         this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
             try {
@@ -107,7 +135,8 @@ export class CsiInspectorUserListComponent implements OnInit {
         return [
             { field: 'emailAddress', caption: 'User ID', type: ColumnType.text },
             { field: 'contactName', caption: 'Contact Name', type: ColumnType.text },
-            { field: 'jobTitle', caption: 'Job Title', type: ColumnType.text }
+            { field: 'jobTitle', caption: 'Job Title', type: ColumnType.text },
+            { field: 'isCsiInspectionPaymentBypassed', caption: 'Payment Bypass', cellComponent: CheckboxCellComponent, type: ColumnType.text }
         ];
     }
 }

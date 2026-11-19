@@ -16,6 +16,9 @@ import { CheckboxCellComponent, ColumnType, CurrencyCellComponent, ModalHelperSe
 export class FogInspectorWaterSuppliersComponent implements OnInit {
     @Input() public inspectorId!: number;
 
+    // A user's details page lists the company's registrations without letting them be changed.
+    @Input() public readOnly: boolean = false;
+
     public canEdit: boolean = false;
 
     public table: TableViewModel<ProfessionalWaterSupplier> = {
@@ -30,7 +33,7 @@ export class FogInspectorWaterSuppliersComponent implements OnInit {
     ) { }
 
     public async ngOnInit(): Promise<void> {
-        this.canEdit = await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.FogInspectors);
+        this.canEdit = !this.readOnly && await this._authService.hasAnyPermisison(PermissionAction.CanModify, PermissionType.FogInspectors);
         this.setupColumns();
         await this.loadWaterSuppliers();
     }

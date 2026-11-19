@@ -13,6 +13,13 @@ import { resolveWindowColors, WindowColors } from "./window-colors";
         min-width: 0;
     }
 
+    /* A float, not a flex item: minimized windows fill the space beside the projected content (the account buttons)
+       and wrap to the next line, at full width, once they reach it. */
+    .vp-window-bar-end {
+        float: right;
+        max-width: 100%;
+    }
+
     .vp-window-wrapper {
         min-width: calc(50% - 0.5rem);
     }

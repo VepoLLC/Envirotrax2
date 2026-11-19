@@ -261,6 +261,38 @@ namespace Envirotrax.Auth.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.UserImpersonationRequest", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SourceUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("SourceUserId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.ToTable("UserImpersonationRequests", t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
             modelBuilder.Entity("Envirotrax.Auth.Data.Models.UserInvitation", b =>
                 {
                     b.Property<int>("Id")
@@ -791,6 +823,33 @@ namespace Envirotrax.Auth.Data.Migrations
                         .HasForeignKey("WaterSupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.Auth.Data.Models.UserImpersonationRequest", b =>
+                {
+                    b.HasOne("Envirotrax.Auth.Data.Models.AppUser", "SourceUser")
+                        .WithMany()
+                        .HasForeignKey("SourceUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.Auth.Data.Models.AppUser", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.Auth.Data.Models.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SourceUser");
+
+                    b.Navigation("TargetUser");
 
                     b.Navigation("WaterSupplier");
                 });

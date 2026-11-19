@@ -29,7 +29,7 @@ public class GaugeManagementController : WaterSupplierProtectedController
             return Forbid();
         }
 
-        var result = await _gaugeService.GetUnverifiedByWaterSupplierAsync(pageInfo, query, cancellationToken);
+        var result = await _gaugeService.GetUnverifiedAsync(pageInfo, query, cancellationToken);
 
         return Ok(result);
     }

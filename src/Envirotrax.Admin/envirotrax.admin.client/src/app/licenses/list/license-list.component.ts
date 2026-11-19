@@ -173,12 +173,14 @@ export class LicenseListComponent implements OnInit {
         license.hoursSinceLastCheck = 0;
         license.lastCheckedText = this.getLastCheckedText(0);
 
-        this._modalHelper.show<TceqLicenseCheckModalData, void>(TceqLicenseCheckComponent, {
+        this._modalHelper.show<TceqLicenseCheckModalData, string>(TceqLicenseCheckComponent, {
             title: license.licenseNumber!,
             model: { license, tceqLicense },
             size: ModalSize.large,
             mode: 'disableFullScreen'
-        }).result().subscribe(async () => {
+        }).result().subscribe(async expirationDate => {
+            license.expirationDate = expirationDate;
+
             await this.saveLicense(license);
         });
     }

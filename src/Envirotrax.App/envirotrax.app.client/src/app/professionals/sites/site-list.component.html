@@ -12,6 +12,20 @@
                         imageSrc="/images/icons/bstatus-green-off.png"
                         text="Inactive"
                         [showText]="false" />
+
+        <ng-container *ngIf="isCsiInspector">
+            <ng-container *ngIf="site.needsCsiInspection">
+                <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png"
+                                text="Needs CSI"
+                                [showText]="false" />
+                {{site.csiRenewalDate | date}}
+            </ng-container>
+
+            <vp-status-icon *ngIf="!site.needsCsiInspection"
+                            imageSrc="/images/icons/bstatus-red-off.png"
+                            text="Does not need CSI"
+                            [showText]="false" />
+        </ng-container>
     </div>
 </ng-template>
 
@@ -106,20 +120,90 @@
                                                    labelStyle="horizontal"
                                                    [form]="searchForm" />
 
-                            <vp-filter-panel-field *ngIf="canFilterByCsiInspection"
-                                                   fieldName="needsCsiInspection"
-                                                   label="Needs CSI Inspection:"
-                                                   labelStyle="horizontal"
-                                                   type="select"
-                                                   [form]="searchForm"
-                                                   [options]="yesNoOptions" />
-
                             <vp-filter-panel-field fieldName="workedOnly"
                                                    label="Property Filter:"
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
                                                    [options]="propertyFilterOptions" />
+
+                            <ng-container *ngIf="isCsiInspector">
+                                <vp-filter-panel-field fieldName="needsCsiInspection"
+                                                       label="Needs CSI Inspection:"
+                                                       labelStyle="horizontal"
+                                                       type="select"
+                                                       [form]="searchForm"
+                                                       [options]="yesNoOptions" />
+
+                                <vp-filter-panel-field *ngIf="isNeedsCsiInspection"
+                                                       fieldName="csiRenewalDateType"
+                                                       label="CSI Renewal Date:"
+                                                       labelStyle="horizontal"
+                                                       type="select"
+                                                       [form]="searchForm"
+                                                       [options]="dateTypeOptions" />
+
+                                <vp-filter-panel-field *ngIf="isCsiRenewalDateRange"
+                                                       fieldName="csiRenewalFrom"
+                                                       label="From Date:"
+                                                       labelStyle="horizontal"
+                                                       type="date"
+                                                       [form]="searchForm" />
+
+                                <vp-filter-panel-field *ngIf="isCsiRenewalDateRange"
+                                                       fieldName="csiRenewalTo"
+                                                       label="To Date:"
+                                                       labelStyle="horizontal"
+                                                       type="date"
+                                                       [form]="searchForm" />
+                            </ng-container>
+                        </vp-field-grid>
+
+                        <div class="d-xl-flex justify-content-end">
+                            <small class="text-muted">* Water suppliers marked with an asterisk are private and
+                                cannot be searched.</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <vp-field-grid>
+                            <ng-container *ngIf="isFogInspector">
+                                <vp-filter-panel-field fieldName="needsFogInspection"
+                                                       label="Needs FOG Inspection:"
+                                                       labelStyle="horizontal"
+                                                       type="select"
+                                                       [form]="searchForm"
+                                                       [options]="yesNoOptions" />
+
+                                <vp-filter-panel-field *ngIf="isNeedsFogInspection"
+                                                       fieldName="fogInspectionExpirationDateType"
+                                                       label="FOG Inspection Expiration Date:"
+                                                       labelStyle="horizontal"
+                                                       type="select"
+                                                       [form]="searchForm"
+                                                       [options]="dateTypeOptions" />
+
+                                <vp-filter-panel-field *ngIf="isFogInspectionExpirationDateRange"
+                                                       fieldName="fogInspectionExpirationFrom"
+                                                       label="From Date:"
+                                                       labelStyle="horizontal"
+                                                       type="date"
+                                                       [form]="searchForm" />
+
+                                <vp-filter-panel-field *ngIf="isFogInspectionExpirationDateRange"
+                                                       fieldName="fogInspectionExpirationTo"
+                                                       label="To Date:"
+                                                       labelStyle="horizontal"
+                                                       type="date"
+                                                       [form]="searchForm" />
+
+                                <vp-filter-panel-field fieldName="greaseTrapType"
+                                                       label="Has Grease Trap:"
+                                                       labelStyle="horizontal"
+                                                       type="select"
+                                                       [form]="searchForm"
+                                                       [options]="greaseTrapOptions" />
+                            </ng-container>
 
                             <vp-filter-panel-field fieldName="scheduledOnly"
                                                    label="Scheduled Properties:"
@@ -134,27 +218,22 @@
                                                    labelStyle="horizontal"
                                                    type="select"
                                                    [form]="searchForm"
-                                                   [options]="scheduledDateTypeOptions" />
+                                                   [options]="dateTypeOptions" />
 
                             <vp-filter-panel-field *ngIf="isScheduledDateRange"
                                                    fieldName="scheduledFrom"
-                                                   label="From:"
+                                                   label="From Date:"
                                                    labelStyle="horizontal"
                                                    type="date"
                                                    [form]="searchForm" />
 
                             <vp-filter-panel-field *ngIf="isScheduledDateRange"
                                                    fieldName="scheduledTo"
-                                                   label="To:"
+                                                   label="To Date:"
                                                    labelStyle="horizontal"
                                                    type="date"
                                                    [form]="searchForm" />
                         </vp-field-grid>
-
-                        <div class="d-xl-flex justify-content-end">
-                            <small class="text-muted">* Water suppliers marked with an asterisk are private and
-                                cannot be searched.</small>
-                        </div>
                     </div>
                 </div>
             </vp-section>
@@ -178,18 +257,24 @@
                             <vp-field-grid-row>
                                 <vp-field-grid-label>Address:</vp-field-grid-label>
                                 <vp-field-grid-control>
-                                    <div class="d-flex gap-1">
-                                        <vp-filter-panel-field fieldName="streetNumber"
-                                                               label="Street #:"
-                                                               [form]="searchForm" />
+                                    <div class="row g-1">
+                                        <div class="col-3">
+                                            <vp-filter-panel-field fieldName="streetNumber"
+                                                                   label="Street #:"
+                                                                   [form]="searchForm" />
+                                        </div>
 
-                                        <vp-filter-panel-field fieldName="streetName"
-                                                               label="Street Name:"
-                                                               [form]="searchForm" />
+                                        <div class="col-6">
+                                            <vp-filter-panel-field fieldName="streetName"
+                                                                   label="Street Name:"
+                                                                   [form]="searchForm" />
+                                        </div>
 
-                                        <vp-filter-panel-field fieldName="propertyNumber"
-                                                               label="Suite/Apt #:"
-                                                               [form]="searchForm" />
+                                        <div class="col-3">
+                                            <vp-filter-panel-field fieldName="propertyNumber"
+                                                                   label="Suite/Apt #:"
+                                                                   [form]="searchForm" />
+                                        </div>
                                     </div>
                                 </vp-field-grid-control>
                             </vp-field-grid-row>
@@ -218,18 +303,24 @@
                             <vp-field-grid-row>
                                 <vp-field-grid-label>Address:</vp-field-grid-label>
                                 <vp-field-grid-control>
-                                    <div class="d-flex gap-1">
-                                        <vp-filter-panel-field fieldName="mailingStreetNumber"
-                                                               label="Street #:"
-                                                               [form]="searchForm" />
+                                    <div class="row g-1">
+                                        <div class="col-3">
+                                            <vp-filter-panel-field fieldName="mailingStreetNumber"
+                                                                   label="Street #:"
+                                                                   [form]="searchForm" />
+                                        </div>
 
-                                        <vp-filter-panel-field fieldName="mailingStreetName"
-                                                               label="Street Name:"
-                                                               [form]="searchForm" />
+                                        <div class="col-6">
+                                            <vp-filter-panel-field fieldName="mailingStreetName"
+                                                                   label="Street Name:"
+                                                                   [form]="searchForm" />
+                                        </div>
 
-                                        <vp-filter-panel-field fieldName="mailingNumber"
-                                                               label="Suite/Apt #:"
-                                                               [form]="searchForm" />
+                                        <div class="col-3">
+                                            <vp-filter-panel-field fieldName="mailingNumber"
+                                                                   label="Suite/Apt #:"
+                                                                   [form]="searchForm" />
+                                        </div>
                                     </div>
                                 </vp-field-grid-control>
                             </vp-field-grid-row>
@@ -295,6 +386,10 @@
                     <div class="col-auto mb-2">
                         <vp-status-icon imageSrc="/images/icons/bstatus-green-on.png" text="Active" />
                         <vp-status-icon imageSrc="/images/icons/bstatus-green-off.png" text="Inactive" />
+                    </div>
+                    <div *ngIf="isCsiInspector" class="col-auto mb-2">
+                        <vp-status-icon imageSrc="/images/icons/bstatus-red-on.png" text="Needs CSI" />
+                        <vp-status-icon imageSrc="/images/icons/bstatus-red-off.png" text="Does not need CSI" />
                     </div>
                     <div class="col-auto mb-2">
                         <vp-status-icon iconClass="fa-solid fa-house text-primary" text="Residential" />

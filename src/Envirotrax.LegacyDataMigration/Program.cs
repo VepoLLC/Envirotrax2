@@ -80,8 +80,10 @@ services.AddTransient<NotificationSettingService>();
 services.AddTransient<NotificationService>();
 services.AddTransient<ApiAccountService>();
 services.AddTransient<BackflowRenewalRequirementService>();
+services.AddTransient<BackflowComplianceSnapshotService>();
 services.AddTransient<SiteScheduleService>();
 services.AddTransient<RecordLogService>();
+services.AddTransient<CompanyService>();
 
 var provider = services.BuildServiceProvider();
 
@@ -184,8 +186,16 @@ await apiAccountService.MigrateAsync();
 var backflowRenewalRequirementService = provider.GetRequiredService<BackflowRenewalRequirementService>();
 await backflowRenewalRequirementService.MigrateAsync();
 
+var backflowComplianceSnapshotService = provider.GetRequiredService<BackflowComplianceSnapshotService>();
+await backflowComplianceSnapshotService.MigrateAsync();
+
 var siteScheduleService = provider.GetRequiredService<SiteScheduleService>();
 await siteScheduleService.MigrateAsync();
 
 var recordLogService = provider.GetRequiredService<RecordLogService>();
 await recordLogService.MigrateAsync();
+
+// After the users and the water suppliers: a company belongs to the Vepo LLC supplier, and its Last Contacted By
+// is a Vepo administrator found by login.
+var companyService = provider.GetRequiredService<CompanyService>();
+await companyService.MigrateAsync();

@@ -89,6 +89,14 @@ export class AuthService {
         return user?.profile?.email;
     }
 
+    // The token subject is the AspNetUsers id the App stamps on records as the acting user.
+    public async getUserId(): Promise<number | undefined> {
+        const user = await this._userManager.getUser();
+        const subject = Number(user?.profile?.sub);
+
+        return Number.isInteger(subject) && subject > 0 ? subject : undefined;
+    }
+
     public async hasAnyRoles(...roles: string[]): Promise<boolean> {
         const userRoles = await this.getProfileField('role');
 

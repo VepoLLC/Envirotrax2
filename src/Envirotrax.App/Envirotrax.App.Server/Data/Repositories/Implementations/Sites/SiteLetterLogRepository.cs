@@ -75,6 +75,22 @@ public class SiteLetterLogRepository : Repository<SiteLetterLog>, ISiteLetterLog
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<SiteLetterLogFile>> GetPdfFilesAsync(DateTime processDate, CancellationToken cancellationToken)
+    {
+        return await Entity
+            .Where(letterLog => letterLog.ProcessDate == processDate && letterLog.Page != SiteLetterLog.EmailPage)
+            .GroupBy(letterLog => new { letterLog.FileName, letterLog.FilePath })
+            .OrderBy(group => group.Key.FileName)
+            .Select(group => new SiteLetterLogFile
+            {
+                ProcessDate = processDate,
+                FileName = group.Key.FileName,
+                FilePath = group.Key.FilePath,
+                LetterCount = group.Count()
+            })
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<int> DeleteByProcessDateAsync(DateTime processDate)
     {
         return await Entity

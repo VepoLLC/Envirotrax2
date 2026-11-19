@@ -16,6 +16,7 @@ export class LetterCounts {
 }
 
 export class GeneratedLetters {
+    processId: string = '';
     processDate: string = '';
     counts: LetterCounts = new LetterCounts();
     emailCount: number = 0;

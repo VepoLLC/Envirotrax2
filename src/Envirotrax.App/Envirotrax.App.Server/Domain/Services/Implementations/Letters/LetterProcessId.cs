@@ -5,10 +5,16 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Letters;
 public static class LetterProcessId
 {
     private const string Format = "yyyy-MM-dd HH-mm-ss";
+    private const string LettersFolder = "letters";
 
     public static string FromProcessDate(DateTime processDate)
     {
         return processDate.ToString(Format, CultureInfo.InvariantCulture);
+    }
+
+    public static string GetFolderPath(DateTime processDate)
+    {
+        return $"{LettersFolder}/{FromProcessDate(processDate)}";
     }
 
     public static bool TryGetProcessDate(string processId, out DateTime processDate)

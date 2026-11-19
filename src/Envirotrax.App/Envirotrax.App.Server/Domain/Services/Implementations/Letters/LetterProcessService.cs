@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Envirotrax.App.Server.Data.Repositories.Definitions.Sites;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Letters;
 using Envirotrax.App.Server.Domain.Services.Definitions;
@@ -7,6 +8,9 @@ namespace Envirotrax.App.Server.Domain.Services.Implementations.Letters;
 
 public class LetterProcessService : ILetterProcessService
 {
+    private const string ZipFileNameFormat = "Vepo PDF's Generated for {0}.zip";
+    private const int ZipFileBufferSize = 81920;
+
     private readonly ISiteLetterLogRepository _siteLetterLogRepository;
     private readonly IFileStorageService _fileStorageService;
 
@@ -91,6 +95,81 @@ public class LetterProcessService : ILetterProcessService
             await _fileStorageService.DeleteAsync(filePath);
         }
 
+        await _fileStorageService.DeleteAsync(GetZipFilePath(processDate));
+
         return true;
+    }
+
+    public async Task<bool> CreateZipFileAsync(string processId)
+    {
+        if (!LetterProcessId.TryGetProcessDate(processId, out var processDate))
+        {
+            return false;
+        }
+
+        await TryCreateZipFileAsync(processDate);
+
+        return true;
+    }
+
+    public async Task<Uri?> GenerateZipFileUrlAsync(string processId, CancellationToken cancellationToken)
+    {
+        if (!LetterProcessId.TryGetProcessDate(processId, out var processDate))
+        {
+            return null;
+        }
+
+        var zipFilePath = GetZipFilePath(processDate);
+        var zipFileExists = await _fileStorageService.ExistsAsync(zipFilePath, cancellationToken);
+
+        if (!zipFileExists)
+        {
+            var isCreated = await TryCreateZipFileAsync(processDate);
+
+            if (!isCreated)
+            {
+                return null;
+            }
+        }
+
+        return await _fileStorageService.GenerateSasUrlAsync(zipFilePath);
+    }
+
+    private async Task<bool> TryCreateZipFileAsync(DateTime processDate)
+    {
+        var pdfFiles = await _siteLetterLogRepository.GetPdfFilesAsync(processDate, CancellationToken.None);
+
+        if (pdfFiles.Count == 0)
+        {
+            return false;
+        }
+
+        await using var zipStream = new FileStream(Path.GetTempFileName(), FileMode.Create, FileAccess.ReadWrite, FileShare.None, ZipFileBufferSize, FileOptions.DeleteOnClose);
+
+        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+        {
+            foreach (var pdfFile in pdfFiles)
+            {
+                var entry = archive.CreateEntry(pdfFile.FileName, CompressionLevel.Fastest);
+
+                await using var entryStream = entry.Open();
+
+                await _fileStorageService.DownloadAsync(pdfFile.FilePath, entryStream);
+            }
+        }
+
+        zipStream.Position = 0;
+
+        await _fileStorageService.UploadAsync(GetZipFilePath(processDate), zipStream);
+
+        return true;
+    }
+
+    private static string GetZipFilePath(DateTime processDate)
+    {
+        var processId = LetterProcessId.FromProcessDate(processDate);
+        var zipFileName = string.Format(ZipFileNameFormat, processId);
+
+        return $"{LetterProcessId.GetFolderPath(processDate)}/{zipFileName}";
     }
 }

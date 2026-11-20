@@ -14,6 +14,8 @@ public class CsiInspectionDto
 
     public bool InspectionResult { get; set; }
 
+    public int ReasonForInspection { get; set; }
+
     public string? TransactionId { get; set; }
 
     public int PropertyType { get; set; }

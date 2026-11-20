@@ -508,6 +508,28 @@ public class SiteRepository : Repository<Site>, ISiteRepository
                 || DbContext.FogTripTickets.Any(ticket => ticket.SiteId == site.Id && ticket.DeletedTime == null), cancellationToken);
     }
 
+    public Task<SiteRecordCounts?> GetRecordCountsAsync(int siteId, CancellationToken cancellationToken)
+    {
+        var backflowTests = DbContext.BackflowTests.Where(test => test.DeletedTime == null);
+        var paidOutOfServiceTests = backflowTests.Where(test => test.OutOfService && !string.IsNullOrEmpty(test.TransactionId));
+        var paidCsiInspections = DbContext.CsiInspections.Where(inspection => inspection.DeletedTime == null && !string.IsNullOrEmpty(inspection.TransactionId));
+        var paidFogTripTickets = DbContext.FogTripTickets.Where(ticket => ticket.DeletedTime == null && !string.IsNullOrEmpty(ticket.TransactionId));
+        var paidFogInspections = DbContext.FogInspections.Where(inspection => inspection.DeletedTime == null && !string.IsNullOrEmpty(inspection.TransactionId));
+
+        return Entity
+            .Where(site => site.Id == siteId)
+            .Select(site => new SiteRecordCounts
+            {
+                SiteLogCount = DbContext.SiteLogs.Count(log => log.SiteId == site.Id),
+                CsiInspectionCount = paidCsiInspections.Count(inspection => inspection.SiteId == site.Id),
+                BackflowTestCount = backflowTests.Count(test => test.SiteId == site.Id),
+                OutOfServiceCount = paidOutOfServiceTests.Count(test => test.SiteId == site.Id),
+                FogTripTicketCount = paidFogTripTickets.Count(ticket => ticket.SiteId == site.Id),
+                FogInspectionCount = paidFogInspections.Count(inspection => inspection.SiteId == site.Id)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds)
     {
         var sites = await Entity

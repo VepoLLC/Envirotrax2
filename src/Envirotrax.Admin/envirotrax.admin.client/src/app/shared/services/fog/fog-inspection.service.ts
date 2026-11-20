@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
 import { FogInspection, FogInspectionUpdateRequest } from "../../models/fog/fog-inspection";
+import { FogPaymentStatus } from "../../models/fog/fog-payment-status";
 
 @Injectable({
     providedIn: 'root'
@@ -16,12 +17,16 @@ export class FogInspectionService {
 
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query): Promise<PagedData<FogInspection>> {
+    public async getAll(pageInfo: PageInfo, query: Query, paymentStatus?: FogPaymentStatus | null): Promise<PagedData<FogInspection>> {
         const url = this._urlResolver.resolveUrl('/api/fog/inspections');
 
-        const observable = this._http.get<PagedData<FogInspection>>(url, {
-            params: this._queryHelper.buildQuery(pageInfo, query)
-        });
+        let params = this._queryHelper.buildQuery(pageInfo, query);
+
+        if (paymentStatus != null) {
+            params = params.append('paymentStatus', String(paymentStatus));
+        }
+
+        const observable = this._http.get<PagedData<FogInspection>>(url, { params });
 
         return await lastValueFrom(observable);
     }

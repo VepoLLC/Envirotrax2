@@ -113,6 +113,26 @@ public class SiteService : Service<Site, SiteDto>, ISiteService
         };
     }
 
+    public async Task<SiteRecordCountsDto?> GetRecordCountsAsync(int siteId, CancellationToken cancellationToken)
+    {
+        var counts = await _siteRepository.GetRecordCountsAsync(siteId, cancellationToken);
+
+        if (counts == null)
+        {
+            return null;
+        }
+
+        return new SiteRecordCountsDto
+        {
+            SiteLogCount = counts.SiteLogCount,
+            CsiInspectionCount = counts.CsiInspectionCount,
+            BackflowTestCount = counts.BackflowTestCount,
+            OutOfServiceCount = counts.OutOfServiceCount,
+            FogTripTicketCount = counts.FogTripTicketCount,
+            FogInspectionCount = counts.FogInspectionCount
+        };
+    }
+
     // Mirrors V1's site_search.aspx.vb: creating a site always logs a fixed "New site record" entry
     // (no field-level diff — V1 doesn't diff on create either, since there's no prior row to compare against).
     public override async Task<SiteDto> AddAsync(SiteDto dto)

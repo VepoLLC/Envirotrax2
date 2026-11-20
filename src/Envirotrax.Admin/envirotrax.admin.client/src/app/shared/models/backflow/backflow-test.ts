@@ -53,17 +53,22 @@ export class BackflowTest {
     createdTime?: string;
     testDate?: string;
     expirationDate?: string;
+    renewalRequired?: boolean;
     testResult?: BackflowTestResult;
     isCurrent?: boolean;
     outOfService?: boolean;
     disapproved?: boolean;
     rejected?: boolean;
     transactionId?: string;
+    transactionDate?: string;
     serialNumber?: string;
     serialNumber2?: string;
     manufacturer?: string;
     model?: string;
     size?: string;
+    manufacturer2?: string;
+    model2?: string;
+    size2?: string;
     deviceType?: string;
     hazardType?: string;
     locationDescription?: string;
@@ -87,6 +92,13 @@ export class BackflowTest {
     validationHazardTypeChanged?: boolean;
     validationCreatedFromCsi?: boolean;
     validationOnHold?: boolean;
+}
+
+export interface BackflowTestRow extends BackflowTest {
+    assemblyDescription: string;
+    bypassAssemblyDescription: string;
+    expirationColor: string;
+    expirationTextClass: string;
 }
 
 export class BackflowTestReviewer {

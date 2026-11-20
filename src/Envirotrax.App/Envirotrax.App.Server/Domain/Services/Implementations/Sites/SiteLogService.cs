@@ -18,12 +18,14 @@ public class SiteLogService : ISiteLogService
 
     private readonly IMapper _mapper;
     private readonly ISiteLogRepository _repository;
+    private readonly ISiteRepository _siteRepository;
     private readonly IFileStorageService _fileStorageService;
 
-    public SiteLogService(IMapper mapper, ISiteLogRepository repository, IFileStorageService fileStorageService)
+    public SiteLogService(IMapper mapper, ISiteLogRepository repository, ISiteRepository siteRepository, IFileStorageService fileStorageService)
     {
         _mapper = mapper;
         _repository = repository;
+        _siteRepository = siteRepository;
         _fileStorageService = fileStorageService;
     }
 
@@ -52,6 +54,38 @@ public class SiteLogService : ISiteLogService
     public Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken)
     {
         return _repository.CountBySiteAsync(siteId, cancellationToken);
+    }
+
+    public async Task<SiteLogDto?> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var log = await _repository.GetAsync(id, cancellationToken);
+
+        if (log == null)
+        {
+            return null;
+        }
+
+        return MapToDto(log);
+    }
+
+    public async Task<SiteLogDto?> AddForAdminAsync(int siteId, SiteLogDto dto)
+    {
+        var site = await _siteRepository.GetAsync(siteId, CancellationToken.None);
+
+        if (site == null)
+        {
+            return null;
+        }
+
+        dto.Site = new ReferencedSiteDto { Id = siteId };
+
+        var entity = _mapper.Map<SiteLog>(dto);
+        entity.SiteId = siteId;
+        entity.WaterSupplierId = site.WaterSupplierId;
+
+        var saved = await _repository.AddAsync(entity);
+
+        return MapToDto(saved);
     }
 
     public async Task<IEnumerable<SiteLogDto>> GetBySitesAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken)

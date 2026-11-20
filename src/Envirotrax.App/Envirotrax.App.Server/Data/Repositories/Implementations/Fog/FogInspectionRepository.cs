@@ -54,6 +54,36 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
 
     public override Task<IEnumerable<FogInspection>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
+        PrepareSearchQuery(query);
+
+        return base.GetAllAsync(pageInfo, query, cancellationToken);
+    }
+
+    public async Task<IEnumerable<FogInspection>> SearchForAdminAsync(PageInfo pageInfo, Query query, FogPaymentStatus? paymentStatus, CancellationToken cancellationToken)
+    {
+        PrepareSearchQuery(query);
+
+        var dbQuery = GetListQuery().Where(query.Filter);
+
+        if (paymentStatus == FogPaymentStatus.Paid)
+        {
+            dbQuery = dbQuery.Where(inspection => inspection.TransactionId != null && inspection.TransactionId != string.Empty);
+        }
+
+        if (paymentStatus == FogPaymentStatus.Unpaid)
+        {
+            dbQuery = dbQuery.Where(inspection => inspection.TransactionId == null || inspection.TransactionId == string.Empty);
+        }
+
+        var paginated = await dbQuery
+            .OrderBy(query.Sort)
+            .PaginateAsync(pageInfo, cancellationToken);
+
+        return await paginated.ToListAsync(cancellationToken);
+    }
+
+    private void PrepareSearchQuery(Query query)
+    {
         if (query.Sort.IsNullOrEmpty())
         {
             query.Sort[nameof(FogInspection.Id)] = SortOperator.Asc;
@@ -61,8 +91,6 @@ public class FogInspectionRepository : Repository<FogInspection>, IFogInspection
 
         WaterSupplierAccountNumberSearch.ApplyThroughSite(query, nameof(FogInspection.Site));
         CreatedTimeDaySearch.Apply(query, _timeZoneHelper.GetUserTimeZone());
-
-        return base.GetAllAsync(pageInfo, query, cancellationToken);
     }
 
     public async Task<IEnumerable<FogInspection>> SearchForProfessionalAsync(

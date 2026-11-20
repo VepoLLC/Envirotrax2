@@ -9,6 +9,8 @@ public interface ISiteLogService
     Task<IEnumerable<SiteLogDto>> GetBySitesAsync(IEnumerable<int> siteIds, CancellationToken cancellationToken);
     Task<IPagedData<SiteLogDto>> GetForManagementAsync(PageInfo pageInfo, Query query, string? logTypeFilter, CancellationToken cancellationToken);
     Task<int> CountBySiteAsync(int siteId, CancellationToken cancellationToken);
+    Task<SiteLogDto?> GetAsync(int id, CancellationToken cancellationToken);
+    Task<SiteLogDto?> AddForAdminAsync(int siteId, SiteLogDto dto);
     Task<string?> GetAttachmentUrlAsync(int logId, CancellationToken cancellationToken);
     Task<SiteLogDto> AddAsync(int siteId, SiteLogDto dto, Stream? fileStream, string? fileName);
     Task<SiteLogDto?> UpdateAsync(SiteLogDto dto, Stream? fileStream, string? fileName);

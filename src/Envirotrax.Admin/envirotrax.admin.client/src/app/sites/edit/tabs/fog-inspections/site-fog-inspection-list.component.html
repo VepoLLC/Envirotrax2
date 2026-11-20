@@ -1,0 +1,32 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading" />
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canViewDetails]="true"
+              (viewDetails)="viewDetails($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getInspections()"
+              [(query)]="table.query"
+              (queryChange)="getInspections()"
+              (queryReset)="getInspections()" />
+</div>
+
+<ng-template #inspectionDateCell let-rowData="rowData">
+    <div>{{ rowData?.inspectionDate | date:'M/d/yyyy' }}</div>
+    <div>{{ rowData?.inspectionDate | date:'h:mm a' }}</div>
+</ng-template>
+
+<ng-template #interceptorCell let-rowData="rowData">
+    <div>{{ rowData?.interceptorTypeDescription }}</div>
+    <div>{{ rowData?.interceptorCapacityDescription }}</div>
+    <div>{{ rowData?.interceptorLocationDescription }}</div>
+</ng-template>
+
+<ng-template #inspectorCell let-rowData="rowData">
+    <div>{{ rowData?.inspectorCompanyName }}</div>
+    <div>{{ rowData?.inspectorContactName }}</div>
+    <div>{{ rowData?.inspectorAddress }}</div>
+    <div>{{ rowData?.inspectorCityStateZip }}</div>
+</ng-template>

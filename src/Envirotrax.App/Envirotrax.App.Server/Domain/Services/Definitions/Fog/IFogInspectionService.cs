@@ -32,6 +32,8 @@ public interface IFogInspectionService : IService<FogInspection, FogInspectionDt
     Task<IPagedData<FogInspectionDto>> SearchForProfessionalAsync(
         PageInfo pageInfo, Query query, bool latestOnly, CancellationToken cancellationToken);
 
+    Task<IPagedData<FogInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, FogPaymentStatus? paymentStatus, CancellationToken cancellationToken);
+
     Task<FogInspectionDto?> GetForProfessionalAsync(int id, CancellationToken cancellationToken);
 
     Task<byte[]> GeneratePdfAsync(FogInspectionDto inspection);

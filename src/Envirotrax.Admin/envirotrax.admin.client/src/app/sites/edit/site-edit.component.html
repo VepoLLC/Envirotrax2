@@ -3,10 +3,34 @@
 @if (!isLoading && editableSite) {
     <form #form="ngForm" (dragover)="allowSiteDrop($event)" (drop)="dropSite($event)">
         <div class="text-center mb-3">
-            <ul class="vp-tabs nav nav-pills d-inline-flex">
+            <ul class="vp-tabs nav nav-pills d-inline-flex flex-wrap justify-content-center">
                 <li class="nav-item">
                     <a class="nav-link" role="button" [class.active]="selectedTab === 'details'"
                        (click)="onTabChange('details')">Details</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" role="button" [class.active]="selectedTab === 'siteLogs'"
+                       (click)="onTabChange('siteLogs')">{{ siteLogTabTitle }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" role="button" [class.active]="selectedTab === 'csiInspections'"
+                       (click)="onTabChange('csiInspections')">{{ csiInspectionTabTitle }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" role="button" [class.active]="selectedTab === 'backflowTests'"
+                       (click)="onTabChange('backflowTests')">{{ backflowTestTabTitle }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" role="button" [class.active]="selectedTab === 'outOfService'"
+                       (click)="onTabChange('outOfService')">{{ outOfServiceTabTitle }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" role="button" [class.active]="selectedTab === 'fogTripTickets'"
+                       (click)="onTabChange('fogTripTickets')">{{ fogTripTicketTabTitle }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" role="button" [class.active]="selectedTab === 'fogInspections'"
+                       (click)="onTabChange('fogInspections')">{{ fogInspectionTabTitle }}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" role="button" [class.active]="selectedTab === 'logs'"
@@ -30,6 +54,42 @@
                 <app-site-gis-section [site]="editableSite" [form]="form"></app-site-gis-section>
             </div>
         </div>
+
+        @if (initializedTabs.siteLogs) {
+            <div class="mt-3" [hidden]="selectedTab !== 'siteLogs'">
+                <app-site-log-list [siteId]="siteId!" [waterSupplierId]="waterSupplierId!" (logsChanged)="loadCounts()" />
+            </div>
+        }
+
+        @if (initializedTabs.csiInspections) {
+            <div class="mt-3" [hidden]="selectedTab !== 'csiInspections'">
+                <app-site-csi-inspection-list [siteId]="siteId!" />
+            </div>
+        }
+
+        @if (initializedTabs.backflowTests) {
+            <div class="mt-3" [hidden]="selectedTab !== 'backflowTests'">
+                <app-site-backflow-test-list #backflowTestList [siteId]="siteId!" />
+            </div>
+        }
+
+        @if (initializedTabs.outOfService) {
+            <div class="mt-3" [hidden]="selectedTab !== 'outOfService'">
+                <app-site-backflow-test-list #outOfServiceList [siteId]="siteId!" [outOfService]="true" />
+            </div>
+        }
+
+        @if (initializedTabs.fogTripTickets) {
+            <div class="mt-3" [hidden]="selectedTab !== 'fogTripTickets'">
+                <app-site-fog-trip-ticket-list [siteId]="siteId!" />
+            </div>
+        }
+
+        @if (initializedTabs.fogInspections) {
+            <div class="mt-3" [hidden]="selectedTab !== 'fogInspections'">
+                <app-site-fog-inspection-list [siteId]="siteId!" />
+            </div>
+        }
 
         <div class="mt-3" [hidden]="selectedTab !== 'logs'">
             <vp-record-log-list [logs]="recordLogs" [isLoading]="isLoadingRecordLogs" [recordLabel]="'site'" />

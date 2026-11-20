@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { FogCompliancyStatus, Site } from "../../models/sites/site";
 import { SiteDetail } from "../../models/sites/site-detail";
+import { SiteRecordCounts } from "../../models/sites/site-record-counts";
 import { SiteGisUpdate, SiteMerge, SiteUpdate, SiteWaterSupplierUpdate } from "../../models/sites/site-update";
 import { lastValueFrom } from "rxjs";
 
@@ -96,6 +97,14 @@ export class SiteService {
         const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/logs`);
 
         const observable = this._http.get<RecordLog[]>(url);
+
+        return await lastValueFrom(observable);
+    }
+
+    public async getCounts(siteId: number): Promise<SiteRecordCounts> {
+        const url = this._urlResolver.resolveUrl(`/api/sites/${siteId}/counts`);
+
+        const observable = this._http.get<SiteRecordCounts>(url);
 
         return await lastValueFrom(observable);
     }

@@ -26,6 +26,7 @@ public interface ISiteRepository : IRepository<Site>
     Task ClearNeedsRenewalCheckAsync(int siteId);
     Task SetNeedsRenewalCheckAsync(int siteId);
     Task<bool> HasRecordsAsync(int siteId, CancellationToken cancellationToken);
+    Task<SiteRecordCounts?> GetRecordCountsAsync(int siteId, CancellationToken cancellationToken);
     Task ClearNeedsCsiInspectionAsync(IReadOnlyCollection<int> siteIds);
     Task UpdateLastTripTicketDatesAsync(IReadOnlyDictionary<int, DateTime> lastTripTicketDates);
     Task<IEnumerable<Site>> GetAllPendingRenewalAsync(int batchSize);

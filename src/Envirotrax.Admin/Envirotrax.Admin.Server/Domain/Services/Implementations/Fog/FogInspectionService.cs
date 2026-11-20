@@ -17,9 +17,16 @@ public class FogInspectionService : IFogInspectionService
         _apiClient = apiClient;
     }
 
-    public Task<IPagedData<FogInspectionDto>> SearchAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public Task<IPagedData<FogInspectionDto>> SearchAsync(PageInfo pageInfo, Query query, FogPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
-        return _apiClient.GetAsync<FogInspectionDto>(BaseUrl, pageInfo, query, cancellationToken);
+        var additionalParameters = new Dictionary<string, string>();
+
+        if (paymentStatus.HasValue)
+        {
+            additionalParameters["paymentStatus"] = ((int)paymentStatus.Value).ToString();
+        }
+
+        return _apiClient.GetAsync<FogInspectionDto>(BaseUrl, pageInfo, query, additionalParameters, cancellationToken);
     }
 
     public Task<FogInspectionDto?> GetAsync(int id, CancellationToken cancellationToken)

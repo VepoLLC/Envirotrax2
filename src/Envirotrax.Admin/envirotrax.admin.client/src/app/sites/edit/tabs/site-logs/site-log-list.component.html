@@ -1,0 +1,49 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading" />
+
+    <div class="d-flex justify-content-end mb-2">
+        <button type="button" class="btn btn-primary" [disabled]="table.isLoading" (click)="addLog()">
+            <i class="fa-solid fa-plus me-1"></i>Add Log Record
+        </button>
+    </div>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canEdit]="true"
+              (edit)="editLog($event)"
+              [canDelete]="true"
+              (delete)="deleteLog($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getLogs()"
+              [(query)]="table.query"
+              (queryChange)="getLogs()"
+              (queryReset)="getLogs()" />
+</div>
+
+<ng-template #logTypeCell let-rowData="rowData">
+    @if (rowData?.logType === siteLogType.Note) {
+        <i class="fa-regular fa-file-lines" title="Note"></i>
+    } @else if (rowData?.logType === siteLogType.Reminder) {
+        <i class="fa-regular fa-clock" title="Reminder"></i>
+    } @else {
+        <i class="fa-regular fa-clock text-secondary" title="Completed Reminder"></i>
+    }
+</ng-template>
+
+<ng-template #logDateCell let-rowData="rowData">
+    {{ rowData?.createdTime | date:'M/d/yyyy' }}
+</ng-template>
+
+<ng-template #descriptionCell let-rowData="rowData">
+    <div style="white-space: pre-wrap;">{{ rowData?.noteText }}</div>
+    @if (rowData?.assemblyDescription) {
+        <div class="mt-2">Tagged Assembly: {{ rowData.assemblyDescription }}</div>
+    }
+</ng-template>
+
+<ng-template #reviewDateCell let-rowData="rowData">
+    @if (rowData?.logType !== siteLogType.Note) {
+        {{ rowData?.reviewDate | date:'M/d/yyyy' }}
+    }
+</ng-template>

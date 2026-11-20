@@ -431,6 +431,18 @@ public class FogInspectionService : Service<FogInspection, FogInspectionDto>, IF
         return await _mailingInfoRedactionService.RedactAsync(dtos, cancellationToken);
     }
 
+    public async Task<IPagedData<FogInspectionDto>> SearchForAdminAsync(PageInfo pageInfo, Query query, FogPaymentStatus? paymentStatus, CancellationToken cancellationToken)
+    {
+        query.Sort = query.ConvertSortProperties<FogInspection, FogInspectionDto>(Mapper);
+        query.Filter = query.ConvertFilterProperties<FogInspection, FogInspectionDto>(Mapper);
+
+        var inspections = await _repository.SearchForAdminAsync(pageInfo, query, paymentStatus, cancellationToken);
+
+        return inspections
+            .Select(m => MapToDto(m)!)
+            .ToPagedData(pageInfo);
+    }
+
     private async Task PopulateImageUrlsAsync(FogInspectionDto dto)
     {
         var images = new (string? Path, Action<string> SetUrl)[]

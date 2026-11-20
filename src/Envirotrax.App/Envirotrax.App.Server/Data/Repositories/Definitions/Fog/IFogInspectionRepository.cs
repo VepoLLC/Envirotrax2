@@ -11,6 +11,8 @@ public interface IFogInspectionRepository : IRepository<FogInspection>
         PageInfo pageInfo, Query query,
         bool latestOnly, CancellationToken cancellationToken);
 
+    Task<IEnumerable<FogInspection>> SearchForAdminAsync(PageInfo pageInfo, Query query, FogPaymentStatus? paymentStatus, CancellationToken cancellationToken);
+
     Task<FogInspection?> UpdateForProfessionalAsync(
         FogInspection model,
         string? newExteriorImagePath,

@@ -24,4 +24,6 @@ public interface ISiteService
     Task MergeAsync(int siteId, int waterSupplierId, SiteMergeDto dto);
 
     Task<List<RecordLogDto>?> GetLogsAsync(int siteId, CancellationToken cancellationToken);
+
+    Task<SiteRecordCountsDto?> GetCountsAsync(int siteId, CancellationToken cancellationToken);
 }

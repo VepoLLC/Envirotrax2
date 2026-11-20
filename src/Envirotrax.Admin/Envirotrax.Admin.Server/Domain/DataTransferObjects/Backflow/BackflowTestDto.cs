@@ -17,6 +17,8 @@ public class BackflowTestDto
 
     public DateTime? ExpirationDate { get; set; }
 
+    public bool RenewalRequired { get; set; }
+
     public int TestResult { get; set; }
 
     public bool IsCurrent { get; set; }
@@ -40,6 +42,12 @@ public class BackflowTestDto
     public string? Model { get; set; }
 
     public string? Size { get; set; }
+
+    public string? Manufacturer2 { get; set; }
+
+    public string? Model2 { get; set; }
+
+    public string? Size2 { get; set; }
 
     public string? DeviceType { get; set; }
 

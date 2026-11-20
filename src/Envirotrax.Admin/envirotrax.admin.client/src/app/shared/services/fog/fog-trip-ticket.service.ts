@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { PagedData, PageInfo, Query, QueryHelperService, RecordLog, UrlResolverService } from "@envirotrax/common-ui";
 import { lastValueFrom } from "rxjs";
 import { FogTripTicket, FogTripTicketUpdateRequest } from "../../models/fog/fog-trip-ticket";
+import { FogPaymentStatus } from "../../models/fog/fog-payment-status";
 
 export interface FogTripTicketSearchCriteria {
     userEmail?: string | null;
@@ -20,7 +21,7 @@ export class FogTripTicketService {
 
     }
 
-    public async getAll(pageInfo: PageInfo, query: Query, criteria: FogTripTicketSearchCriteria): Promise<PagedData<FogTripTicket>> {
+    public async getAll(pageInfo: PageInfo, query: Query, criteria: FogTripTicketSearchCriteria, paymentStatus?: FogPaymentStatus | null): Promise<PagedData<FogTripTicket>> {
         const url = this._urlResolver.resolveUrl('/api/fog/trip-tickets');
 
         let params = this._queryHelper.buildQuery(pageInfo, query);
@@ -29,6 +30,10 @@ export class FogTripTicketService {
             if (value) {
                 params = params.append(name, value);
             }
+        }
+
+        if (paymentStatus != null) {
+            params = params.append('paymentStatus', String(paymentStatus));
         }
 
         const observable = this._http.get<PagedData<FogTripTicket>>(url, { params });

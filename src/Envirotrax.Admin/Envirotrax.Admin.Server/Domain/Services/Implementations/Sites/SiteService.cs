@@ -67,4 +67,9 @@ public class SiteService : ISiteService
     {
         return _apiClient.GetAsync<List<RecordLogDto>>($"/api/admin/sites/{siteId}/logs", cancellationToken);
     }
+
+    public Task<SiteRecordCountsDto?> GetCountsAsync(int siteId, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<SiteRecordCountsDto>($"/api/admin/sites/{siteId}/counts", cancellationToken);
+    }
 }

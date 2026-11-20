@@ -1,0 +1,49 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading" />
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canViewDetails]="true"
+              (viewDetails)="viewDetails($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getTripTickets()"
+              [(query)]="table.query"
+              (queryChange)="getTripTickets()"
+              (queryReset)="getTripTickets()" />
+</div>
+
+<ng-template #transporterCell let-rowData="rowData">
+    <div>{{ rowData?.transporterCompanyName }}</div>
+    <div>{{ rowData?.transporterContactName }}</div>
+    <div>{{ rowData?.transporterAddress }}</div>
+    <div>{{ rowData?.transporterCityStateZip }}</div>
+    <div>License #: {{ rowData?.transporterLicenseNumber }}</div>
+</ng-template>
+
+<ng-template #receiverCell let-rowData="rowData">
+    <div>{{ rowData?.receiverCompanyName }}</div>
+    <div>{{ rowData?.receiverContactName }}</div>
+    <div>{{ rowData?.receiverAddress }}</div>
+    <div>{{ rowData?.receiverCityStateZip }}</div>
+    <div>Registration #: {{ rowData?.receiverRegistrationNumber }}</div>
+</ng-template>
+
+<ng-template #wasteCell let-rowData="rowData">
+    <dl class="row mb-0">
+        <dt class="col-6">Interceptor:</dt>
+        <dd class="col-6 mb-0">{{ rowData?.interceptorTypeDescription }}</dd>
+
+        <dt class="col-6">Interceptor Capacity:</dt>
+        <dd class="col-6 mb-0">{{ rowData?.interceptorCapacityDescription }}</dd>
+
+        <dt class="col-6">Waste Removed:</dt>
+        <dd class="col-6 mb-0">{{ rowData?.wasteRemovedDescription }}</dd>
+
+        <dt class="col-6">Waste Removal Date:</dt>
+        <dd class="col-6 mb-0">{{ rowData?.interceptorWasteRemovedDate | date:'M/d/yyyy h:mm a' }}</dd>
+
+        <dt class="col-6">Waste Delivered:</dt>
+        <dd class="col-6 mb-0">{{ rowData?.receiverWasteDeliveredDate | date:'M/d/yyyy h:mm a' }}</dd>
+    </dl>
+</ng-template>

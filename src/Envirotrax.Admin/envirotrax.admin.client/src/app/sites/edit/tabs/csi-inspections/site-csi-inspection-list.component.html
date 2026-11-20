@@ -1,0 +1,36 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading" />
+
+    <div class="d-flex justify-content-center gap-4 mb-3">
+        <div><i class="fa-solid fa-square text-success me-1"></i>Passed Inspection</div>
+        <div><i class="fa-regular fa-square text-success me-1"></i>Failed Inspection</div>
+    </div>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canViewDetails]="true"
+              (viewDetails)="viewDetails($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getInspections()"
+              [(query)]="table.query"
+              (queryChange)="getInspections()"
+              (queryReset)="getInspections()" />
+</div>
+
+<ng-template #resultCell let-rowData="rowData">
+    <i class="fa-square text-success"
+       [class.fa-solid]="rowData?.inspectionResult"
+       [class.fa-regular]="!rowData?.inspectionResult"
+       [title]="rowData?.inspectionResult ? 'Passed Inspection' : 'Failed Inspection'"></i>
+</ng-template>
+
+<ng-template #inspectionDateCell let-rowData="rowData">
+    <span class="text-nowrap">{{ rowData?.inspectionDate | date:'M/d/yyyy h:mm a' }}</span>
+</ng-template>
+
+<ng-template #inspectorCell let-rowData="rowData">
+    <div>{{ rowData?.inspectorCompanyName }}</div>
+    <div>{{ rowData?.inspectorContactName }}</div>
+    <div>{{ rowData?.inspectorLicenseType }}: {{ rowData?.inspectorLicenseNumber }}</div>
+</ng-template>

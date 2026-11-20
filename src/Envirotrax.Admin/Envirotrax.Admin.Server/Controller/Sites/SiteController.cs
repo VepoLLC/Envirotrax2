@@ -93,4 +93,17 @@ public class SiteController : AdminBaseController
 
         return Ok(logs);
     }
+
+    [HttpGet("{id}/counts")]
+    public async Task<IActionResult> GetCountsAsync(int id, CancellationToken cancellationToken)
+    {
+        var counts = await _siteService.GetCountsAsync(id, cancellationToken);
+
+        if (counts == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(counts);
+    }
 }

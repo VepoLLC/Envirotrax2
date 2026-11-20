@@ -123,6 +123,16 @@ public class FogTripTicketRepository : Repository<FogTripTicket>, IFogTripTicket
                     && u.User!.Email!.Contains(userEmail)));
         }
 
+        if (criteria.PaymentStatus == FogPaymentStatus.Paid)
+        {
+            dbQuery = dbQuery.Where(t => t.TransactionId != null && t.TransactionId != string.Empty);
+        }
+
+        if (criteria.PaymentStatus == FogPaymentStatus.Unpaid)
+        {
+            dbQuery = dbQuery.Where(t => t.TransactionId == null || t.TransactionId == string.Empty);
+        }
+
         var paginated = await dbQuery
             .OrderBy(query.Sort)
             .PaginateAsync(pageInfo, cancellationToken);

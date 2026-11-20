@@ -18,8 +18,13 @@ import { WaterSupplierLookupComponent } from '../../shared/components/lookups/wa
 import { WindowReference } from '../../window/window-config';
 import { SiteEditSectionsModule } from './sections/site-edit-sections.module';
 import { SiteMergeConfirmationComponent, SiteMergeConfirmationModel } from './merge/site-merge-confirmation.component';
+import { SiteLogListComponent } from './tabs/site-logs/site-log-list.component';
+import { SiteCsiInspectionListComponent } from './tabs/csi-inspections/site-csi-inspection-list.component';
+import { SiteBackflowTestListComponent } from './tabs/backflow-tests/site-backflow-test-list.component';
+import { SiteFogTripTicketListComponent } from './tabs/fog-trip-tickets/site-fog-trip-ticket-list.component';
+import { SiteFogInspectionListComponent } from './tabs/fog-inspections/site-fog-inspection-list.component';
 
-type SiteEditTab = 'details' | 'logs';
+type SiteEditTab = 'details' | 'siteLogs' | 'csiInspections' | 'backflowTests' | 'outOfService' | 'fogTripTickets' | 'fogInspections' | 'logs';
 
 /**
  * Edit Site page/window coordinator.
@@ -35,7 +40,17 @@ type SiteEditTab = 'details' | 'logs';
 @Component({
     templateUrl: './site-edit.component.html',
     standalone: true,
-    imports: [CommonModule, FormsModule, SharedComponentsModule, SiteEditSectionsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        SharedComponentsModule,
+        SiteEditSectionsModule,
+        SiteLogListComponent,
+        SiteCsiInspectionListComponent,
+        SiteBackflowTestListComponent,
+        SiteFogTripTicketListComponent,
+        SiteFogInspectionListComponent
+    ],
 })
 export class SiteEditComponent implements OnInit, OnDestroy {
     private _siteMergedSubscription?: Subscription;
@@ -45,11 +60,41 @@ export class SiteEditComponent implements OnInit, OnDestroy {
     // future Save flow.
     @ViewChild('form') public form?: NgForm;
 
+    @ViewChild(SiteLogListComponent) public siteLogList?: SiteLogListComponent;
+
+    @ViewChild(SiteCsiInspectionListComponent) public csiInspectionList?: SiteCsiInspectionListComponent;
+
+    @ViewChild('backflowTestList') public backflowTestList?: SiteBackflowTestListComponent;
+
+    @ViewChild('outOfServiceList') public outOfServiceList?: SiteBackflowTestListComponent;
+
+    @ViewChild(SiteFogTripTicketListComponent) public fogTripTicketList?: SiteFogTripTicketListComponent;
+
+    @ViewChild(SiteFogInspectionListComponent) public fogInspectionList?: SiteFogInspectionListComponent;
+
     public isLoading: boolean = false;
     public isSaving: boolean = false;
 
     public selectedTab: SiteEditTab = 'details';
     public recordLogTabTitle: string = 'Record Log';
+
+    public siteLogTabTitle: string = 'Site Log';
+    public csiInspectionTabTitle: string = 'CSI Inspections';
+    public backflowTestTabTitle: string = 'Backflow Tests';
+    public outOfServiceTabTitle: string = 'Backflow OOS';
+    public fogTripTicketTabTitle: string = 'FOG Trip Tickets';
+    public fogInspectionTabTitle: string = 'Fog Inspections';
+
+    public initializedTabs: Record<SiteEditTab, boolean> = {
+        details: true,
+        siteLogs: false,
+        csiInspections: false,
+        backflowTests: false,
+        outOfService: false,
+        fogTripTickets: false,
+        fogInspections: false,
+        logs: true
+    };
 
     public recordLogs: RecordLog[] = [];
     public isLoadingRecordLogs: boolean = false;
@@ -92,7 +137,8 @@ export class SiteEditComponent implements OnInit, OnDestroy {
         await allSettled([
             this.loadStates(),
             this.loadSite(),
-            this.loadRecordLogs()
+            this.loadRecordLogs(),
+            this.loadCounts()
         ]);
     }
 
@@ -102,6 +148,52 @@ export class SiteEditComponent implements OnInit, OnDestroy {
 
     public onTabChange(tab: SiteEditTab): void {
         this.selectedTab = tab;
+        this.initializedTabs[tab] = true;
+    }
+
+    public async loadCounts(): Promise<void> {
+        if (this.siteId == null) {
+            return;
+        }
+
+        const counts = await this._siteService.getCounts(this.siteId);
+
+        this.siteLogTabTitle = `Site Log (${counts.siteLogCount})`;
+        this.csiInspectionTabTitle = `CSI Inspections (${counts.csiInspectionCount})`;
+        this.backflowTestTabTitle = `Backflow Tests (${counts.backflowTestCount})`;
+        this.outOfServiceTabTitle = `Backflow OOS (${counts.outOfServiceCount})`;
+        this.fogTripTicketTabTitle = `FOG Trip Tickets (${counts.fogTripTicketCount})`;
+        this.fogInspectionTabTitle = `Fog Inspections (${counts.fogInspectionCount})`;
+    }
+
+    private async reloadRecordTabs(): Promise<void> {
+        const reloads: Promise<void>[] = [];
+
+        if (this.siteLogList) {
+            reloads.push(this.siteLogList.load());
+        }
+
+        if (this.csiInspectionList) {
+            reloads.push(this.csiInspectionList.load());
+        }
+
+        if (this.backflowTestList) {
+            reloads.push(this.backflowTestList.load());
+        }
+
+        if (this.outOfServiceList) {
+            reloads.push(this.outOfServiceList.load());
+        }
+
+        if (this.fogTripTicketList) {
+            reloads.push(this.fogTripTicketList.load());
+        }
+
+        if (this.fogInspectionList) {
+            reloads.push(this.fogInspectionList.load());
+        }
+
+        await allSettled(reloads);
     }
 
     private async loadRecordLogs(): Promise<void> {
@@ -519,6 +611,8 @@ export class SiteEditComponent implements OnInit, OnDestroy {
             this._windowReference.close();
         } else if (siteMerged.destinationSiteId === this.siteId) {
             this.loadRecordLogs();
+            this.loadCounts();
+            this.reloadRecordTabs();
         }
     }
 

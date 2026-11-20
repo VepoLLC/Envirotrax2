@@ -30,6 +30,7 @@ export class CsiInspection {
     waterSupplier?: WaterSupplier;
     inspectionDate?: string;
     inspectionResult?: boolean;
+    reasonForInspection?: CsiInspectionReason;
     transactionId?: string;
     propertyType?: PropertyType;
     propertyBusinessName?: string;

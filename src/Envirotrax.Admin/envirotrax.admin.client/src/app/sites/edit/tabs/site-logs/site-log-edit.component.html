@@ -1,0 +1,62 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="isLoading" />
+
+    <form #form="ngForm" (ngSubmit)="save(form)">
+        @if (isEditMode) {
+            <dl class="mb-2">
+                <dt>Log Date</dt>
+                <dd class="mb-0">{{ log.createdTime | date:'M/d/yyyy h:mm a' }}</dd>
+            </dl>
+        }
+
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <vp-input [(ngModel)]="logType"
+                          (ngModelChange)="onLogTypeChange()"
+                          name="logType"
+                          type="select"
+                          label="Type"
+                          [options]="logTypeOptions"
+                          [required]="true"
+                          [form]="form" />
+            </div>
+
+            @if (showReviewDate) {
+                <div class="col-md-6 mb-2">
+                    <vp-input [(ngModel)]="log.reviewDate"
+                              name="reviewDate"
+                              type="date"
+                              label="Review Date"
+                              [required]="true"
+                              [form]="form" />
+                </div>
+            }
+        </div>
+
+        <div class="mb-2">
+            <vp-input [(ngModel)]="log.noteText"
+                      name="noteText"
+                      type="textarea"
+                      label="Note"
+                      [form]="form" />
+        </div>
+
+        <div class="mb-2">
+            <vp-input [(ngModel)]="assemblyId"
+                      name="assemblyId"
+                      type="select"
+                      label="Referenced Assembly"
+                      [options]="assemblyOptions"
+                      [form]="form" />
+        </div>
+
+        <div class="mt-3">
+            <vp-validation-summary [form]="form" [validationErrors]="validationErrors" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary w-100" (click)="cancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary w-100" [disabled]="isLoading">Save</button>
+            </div>
+        </div>
+    </form>
+</div>

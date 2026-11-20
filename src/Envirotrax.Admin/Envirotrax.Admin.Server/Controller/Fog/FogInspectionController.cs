@@ -16,9 +16,9 @@ public class FogInspectionController : AdminBaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    public async Task<IActionResult> SearchAsync([FromQuery] PageInfo pageInfo, [FromQuery] Query query, [FromQuery] FogPaymentStatus? paymentStatus, CancellationToken cancellationToken)
     {
-        var inspections = await _inspectionService.SearchAsync(pageInfo, query, cancellationToken);
+        var inspections = await _inspectionService.SearchAsync(pageInfo, query, paymentStatus, cancellationToken);
 
         return Ok(inspections);
     }

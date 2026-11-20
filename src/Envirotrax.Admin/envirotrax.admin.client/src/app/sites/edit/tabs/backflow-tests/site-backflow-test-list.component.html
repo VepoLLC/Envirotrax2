@@ -1,0 +1,234 @@
+<div dp-spinner-parent>
+    <dp-loading-spinner *ngIf="table.isLoading" />
+
+    @if (!outOfService) {
+        <vp-section header="Backflow Test Filters" [isExpanded]="false">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <vp-input name="backflowViewType"
+                                  type="select"
+                                  label="View Type"
+                                  [options]="viewTypeOptions"
+                                  [(ngModel)]="viewType" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="backflowTestResult"
+                                  type="select"
+                                  label="Test Result"
+                                  [options]="testResultOptions"
+                                  [(ngModel)]="testResultFilter" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="backflowServiceStatus"
+                                  type="select"
+                                  label="Service Status"
+                                  [options]="serviceStatusOptions"
+                                  [(ngModel)]="serviceStatus" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <vp-input name="backflowPaymentStatus"
+                                  type="select"
+                                  label="Payment Status"
+                                  [options]="paymentStatusOptions"
+                                  [(ngModel)]="paymentStatus" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="backflowApprovalStatus"
+                                  type="select"
+                                  label="Approval Status"
+                                  [options]="approvalStatusOptions"
+                                  [(ngModel)]="approvalStatus" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="backflowRejectedStatus"
+                                  type="select"
+                                  label="Rejected Status"
+                                  [options]="rejectedStatusOptions"
+                                  [(ngModel)]="rejectedStatus" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-2">
+                        <vp-input name="backflowSerialNumber"
+                                  type="text"
+                                  label="Serial Number"
+                                  [(ngModel)]="serialNumber" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="backflowHazardType"
+                                  type="select"
+                                  label="Hazard Type"
+                                  [options]="hazardTypeOptions"
+                                  [(ngModel)]="hazardType" />
+                    </div>
+
+                    <div class="mb-2">
+                        <vp-input name="backflowSortBy"
+                                  type="select"
+                                  label="Sort By"
+                                  [options]="sortByOptions"
+                                  [(ngModel)]="sortBy" />
+                    </div>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-center">
+                    <button type="button" class="btn btn-primary w-100" [disabled]="table.isLoading" (click)="load()">
+                        Update
+                    </button>
+                </div>
+            </div>
+        </vp-section>
+    }
+
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-6 g-2 my-3">
+        <div class="col">
+            <div><i class="fa-solid fa-square text-success me-1"></i>Current Test</div>
+            <div><i class="fa-regular fa-square text-success me-1"></i>Non Current Test</div>
+        </div>
+
+        <div class="col">
+            <div><i class="fa-solid fa-square me-1" style="color: magenta;"></i>Passing Test</div>
+            <div><i class="fa-regular fa-square me-1" style="color: magenta;"></i>Failed Test</div>
+        </div>
+
+        <div class="col">
+            <div><i class="fa-solid fa-square text-primary me-1"></i>In Service</div>
+            <div><i class="fa-regular fa-square text-primary me-1"></i>Out of Service</div>
+        </div>
+
+        <div class="col">
+            <div><i class="fa-solid fa-square text-warning me-1"></i>Paid</div>
+            <div><i class="fa-regular fa-square text-warning me-1"></i>Unpaid</div>
+        </div>
+
+        <div class="col">
+            <div><i class="fa-solid fa-square text-info me-1"></i>Approved</div>
+            <div><i class="fa-regular fa-square text-info me-1"></i>Disapproved</div>
+        </div>
+
+        <div class="col">
+            <div><i class="fa-solid fa-square text-danger me-1"></i>Accepted</div>
+            <div><i class="fa-regular fa-square text-danger me-1"></i>Rejected</div>
+        </div>
+    </div>
+
+    <vp-table *ngIf="table.items"
+              [columns]="table.columns!"
+              [data]="table.items.data"
+              [canViewDetails]="true"
+              (viewDetails)="viewDetails($event)"
+              [(pageInfo)]="table.items.pageInfo"
+              (pageInfoChange)="getTests()"
+              [(query)]="table.query"
+              (queryChange)="getTests()"
+              (queryReset)="getTests()" />
+</div>
+
+<ng-template #statusCell let-rowData="rowData">
+    <div class="d-flex gap-1">
+        <i class="fa-square text-success"
+           [class.fa-solid]="rowData?.isCurrent"
+           [class.fa-regular]="!rowData?.isCurrent"
+           [title]="rowData?.isCurrent ? 'Current Test' : 'Non Current Test'"></i>
+
+        <i class="fa-square"
+           style="color: magenta;"
+           [class.fa-solid]="rowData?.testResult !== testResult.Fail"
+           [class.fa-regular]="rowData?.testResult === testResult.Fail"
+           [title]="rowData?.testResult === testResult.Fail ? 'Failed Test' : 'Passing Test'"></i>
+
+        <i class="fa-square text-primary"
+           [class.fa-solid]="!rowData?.outOfService"
+           [class.fa-regular]="rowData?.outOfService"
+           [title]="rowData?.outOfService ? 'Out of Service' : 'In Service'"></i>
+    </div>
+
+    <div class="d-flex gap-1">
+        <i class="fa-square text-warning"
+           [class.fa-solid]="rowData?.transactionId"
+           [class.fa-regular]="!rowData?.transactionId"
+           [title]="rowData?.transactionId ? 'Paid' : 'Unpaid'"></i>
+
+        <i class="fa-square text-info"
+           [class.fa-solid]="!rowData?.disapproved"
+           [class.fa-regular]="rowData?.disapproved"
+           [title]="rowData?.disapproved ? 'Disapproved' : 'Approved'"></i>
+
+        <i class="fa-square text-danger"
+           [class.fa-solid]="!rowData?.rejected"
+           [class.fa-regular]="rowData?.rejected"
+           [title]="rowData?.rejected ? 'Rejected' : 'Accepted'"></i>
+    </div>
+</ng-template>
+
+<ng-template #datesCell let-rowData="rowData">
+    <div class="text-nowrap">
+        <div>
+            <span class="fw-semibold">Submitted:</span>
+            @if (outOfService) {
+                <span class="ms-1">{{ rowData?.createdTime | date:'M/d/yyyy' }}</span>
+            } @else {
+                <span class="ms-1">{{ rowData?.transactionDate | date:'M/d/yyyy' }}</span>
+            }
+        </div>
+
+        <div>
+            <span class="fw-semibold">Tested:</span>
+            <span class="ms-1">{{ rowData?.testDate | date:'M/d/yyyy' }}</span>
+        </div>
+
+        <div>
+            <span class="fw-semibold">Expires:</span>
+            @if (outOfService) {
+                <span class="ms-1">{{ rowData?.expirationDate | date:'M/d/yyyy' }}</span>
+            } @else if (rowData?.renewalRequired && rowData?.expirationDate) {
+                <span class="badge ms-1"
+                      [ngClass]="rowData.expirationTextClass"
+                      [style.background-color]="rowData.expirationColor">
+                    {{ rowData.expirationDate | date:'M/d/yyyy' }}
+                </span>
+            } @else {
+                <span class="badge ms-1"
+                      [ngClass]="rowData?.expirationTextClass"
+                      [style.background-color]="rowData?.expirationColor">N/A</span>
+            }
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #serialNumberCell let-rowData="rowData">
+    <div>{{ rowData?.serialNumber }}</div>
+    @if (!outOfService && rowData?.bypassAssemblyDescription) {
+        <div>{{ rowData.serialNumber2 }}</div>
+    }
+</ng-template>
+
+<ng-template #assemblyCell let-rowData="rowData">
+    <div>
+        <span class="fw-semibold">Assembly:</span>
+        <span class="ms-1">{{ rowData?.assemblyDescription }}</span>
+        @if (rowData?.bypassAssemblyDescription) {
+            <div>{{ rowData.bypassAssemblyDescription }}</div>
+        }
+    </div>
+
+    <div>
+        <span class="fw-semibold">Hazard:</span>
+        <span class="ms-1">{{ rowData?.hazardType }}</span>
+    </div>
+
+    <div>
+        <span class="fw-semibold">Location:</span>
+        <span class="ms-1">{{ rowData?.locationDescription }}</span>
+    </div>
+</ng-template>

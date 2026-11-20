@@ -10,6 +10,7 @@ import { BackflowComplianceSnapshot } from "../shared/models/backflow/backflow-c
 import { FogInspectionSubmissionStats } from "../shared/models/water-suppliers/fog-inspection-submission-stats";
 import { FogTripTicketSubmissionStats } from "../shared/models/water-suppliers/fog-trip-ticket-submission-stats";
 import { FeatureType } from "../shared/models/feature-type";
+import { OutOfServiceType } from "../shared/models/backflow/out-of-service-type.enum";
 import { onThemeChange, readCssVar } from "../shared/utils/chart-theme.util";
 import { allSettled } from "@envirotrax/common-ui";
 
@@ -22,6 +23,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     @ViewChild(BaseChartDirective) private _complianceChart?: BaseChartDirective;
 
     private _disposeThemeObserver?: () => void;
+
+    public readonly OutOfServiceType = OutOfServiceType;
 
     public waterSupplierId?: number;
     public stats?: WaterSupplierDashboardStats;

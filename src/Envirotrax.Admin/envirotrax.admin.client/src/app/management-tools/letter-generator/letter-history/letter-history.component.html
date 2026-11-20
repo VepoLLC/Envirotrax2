@@ -9,12 +9,16 @@
                     <th class="w-100">Date</th>
                     <th></th>
                     <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let process of processes">
                     <td>{{ process.id }}</td>
                     <td>{{ process.processDate | date:'EEEE, MMMM d, y h:mm a' }}</td>
+                    <td>
+                        <button type="button" class="btn btn-primary btn-sm" (click)="downloadZipFile(process)">Download Zip File</button>
+                    </td>
                     <td>
                         <button type="button" class="btn btn-primary btn-sm" (click)="viewFiles(process)">View Files</button>
                     </td>
@@ -23,7 +27,7 @@
                     </td>
                 </tr>
                 <tr *ngIf="!isLoading && processes.length === 0">
-                    <td colspan="4" class="text-center">No letters have been generated.</td>
+                    <td colspan="5" class="text-center">No letters have been generated.</td>
                 </tr>
             </tbody>
         </table>

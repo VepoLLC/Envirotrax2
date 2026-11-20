@@ -694,7 +694,7 @@ public class BackflowTestRepository : Repository<BackflowTest>, IBackflowTestRep
         }
 
         var exists = await DbContext.Set<WaterSupplierUser>()
-            .AnyAsync(u => u.WaterSupplierId == waterSupplierId && u.UserId == userId);
+            .AnyAsync(u => u.WaterSupplierId == waterSupplierId && u.UserId == userId && u.DeletedTime == null);
 
         return exists ? userId : null;
     }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { InputOption, ModalHelperService, ToastService } from '@envirotrax/common-ui';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
@@ -65,6 +65,7 @@ export class BackflowOutOfServiceListComponent implements OnInit {
     constructor(
         private readonly _service: BackflowOutOfServiceRequestService,
         private readonly _router: Router,
+        private readonly _route: ActivatedRoute,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
         private readonly _containerHelper: AppContainerHelperService
@@ -72,6 +73,13 @@ export class BackflowOutOfServiceListComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this._containerHelper.setContainerVisibility(false);
+
+        const type = this._route.snapshot.queryParamMap.get('type');
+
+        if (this.typeOptions.some(option => option.id === type)) {
+            this.typeFilter = type!;
+        }
+
         await this.load();
     }
 

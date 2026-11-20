@@ -1,4 +1,5 @@
 using Envirotrax.App.Server.Data.DbContexts;
+using Envirotrax.App.Server.Data.Models.Backflow;
 using Envirotrax.App.Server.Data.Models.Sites;
 using Envirotrax.App.Server.Data.Repositories.Definitions.WaterSuppliers;
 using Envirotrax.App.Server.Data.Services.Definitions;
@@ -34,7 +35,12 @@ public class WaterSupplierDashboardRepository(IDbContextSelector dbContextSelect
             FogInspectorCount = await _context.ProfessionalUsers.CountAsync(pu => pu.DeletedTime == null && pu.IsFogInspector, cancellationToken),
 
             InsurancePolicyCount = await _context.ProfessionalInsurances.CountAsync(i => i.ExpirationDate == null
-                && _context.ProfessionalWaterSuppliers.Any(pws => pws.ProfessionalId == i.ProfessionalId), cancellationToken)
+                && _context.ProfessionalWaterSuppliers.Any(pws => pws.ProfessionalId == i.ProfessionalId), cancellationToken),
+
+            OutOfServiceReplacedCount = await _context.BackflowOutOfServiceRequests.CountAsync(r => r.Type == OutOfServiceType.Replaced
+                && r.OutOfServiceDate == null && r.ClearedDate == null && r.Test!.DeletedTime == null, cancellationToken),
+            OutOfServiceRemovedCount = await _context.BackflowOutOfServiceRequests.CountAsync(r => r.Type == OutOfServiceType.Removed
+                && r.OutOfServiceDate == null && r.ClearedDate == null && r.Test!.DeletedTime == null, cancellationToken)
         };
     }
 

@@ -1,3 +1,4 @@
+using System.Transactions;
 using DeveloperPartners.SortingFiltering;
 using DeveloperPartners.SortingFiltering.EntityFrameworkCore;
 using Envirotrax.App.Server.Data.Models.Users;
@@ -19,13 +20,15 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
         return base.GetListQuery()
             .Include(user => user.UserRoles!)
             .ThenInclude(userRole => userRole.Role)
-            .Include(user => user.User);
+            .Include(user => user.User)
+            .Where(user => user.DeletedTime == null);
     }
 
     protected override IQueryable<WaterSupplierUser> GetDetailsQuery()
     {
         return base.GetDetailsQuery()
-            .Include(user => user.User);
+            .Include(user => user.User)
+            .Where(user => user.DeletedTime == null);
     }
 
     public override Task<IEnumerable<WaterSupplierUser>> GetAllAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
@@ -51,7 +54,7 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
 
     public async Task<WaterSupplierUser?> UpdateUserAsync(WaterSupplierUser model)
     {
-        var user = await GetTrackedForUpdateAsync(model.UserId, default);
+        var user = await Entity.SingleOrDefaultAsync(u => u.UserId == model.UserId && u.DeletedTime == null);
 
         if (user == null)
         {
@@ -64,5 +67,33 @@ public class UserRepository : Repository<WaterSupplierUser>, IUserRepository
         await SaveChangesAsync(logData: true);
 
         return user;
+    }
+
+    public async Task<WaterSupplierUser?> RestoreDeletedAsync(WaterSupplierUser user, CancellationToken cancellationToken)
+    {
+        var deletedUser = Entity.Where(u => u.UserId == user.UserId && u.DeletedTime != null);
+
+        if (!await deletedUser.AnyAsync(cancellationToken))
+        {
+            return null;
+        }
+
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        // SaveChanges cannot clear these: AuditEntities keeps them unmodified on every save except a delete.
+        await deletedUser.ExecuteUpdateAsync(set => set
+            .SetProperty(u => u.DeletedTime, (DateTime?)null)
+            .SetProperty(u => u.DeletedById, (int?)null), cancellationToken);
+
+        var restored = await Entity.SingleAsync(u => u.UserId == user.UserId, cancellationToken);
+
+        restored.ContactName = user.ContactName;
+        restored.EmailAddress = user.EmailAddress;
+
+        await SaveChangesAsync(logData: true, cancellationToken);
+
+        scope.Complete();
+
+        return restored;
     }
 }

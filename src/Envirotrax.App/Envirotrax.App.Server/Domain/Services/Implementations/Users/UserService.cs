@@ -75,6 +75,13 @@ public class UserService : Service<WaterSupplierUser, WaterSupplierUserDto>, IUs
 
         dto.Id = addedInvitation.UserId;
 
+        var restored = await _userRepository.RestoreDeletedAsync(MapToModel(dto)!, CancellationToken.None);
+
+        if (restored != null)
+        {
+            return MapToDto(restored)!;
+        }
+
         return await base.AddAsync(dto);
     }
 

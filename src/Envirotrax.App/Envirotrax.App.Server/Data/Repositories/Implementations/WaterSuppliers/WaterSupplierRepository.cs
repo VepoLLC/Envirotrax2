@@ -15,6 +15,8 @@ namespace Envirotrax.App.Server.Data.Repositories.Implementations.WaterSuppliers
 
 public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplierRepository
 {
+    private static int _envirotraxAdminSupplierId;
+
     private readonly ITenantProvidersService _tenantProvider;
 
     public WaterSupplierRepository(IDbContextSelector dbContextSelector, ITenantProvidersService tenantProvider)
@@ -116,13 +118,22 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
             .FirstOrDefaultAsync(supplier => supplier.Id == waterSupplierId, cancellationToken);
     }
 
-    public Task<int> GetEnvirotraxAdminSupplierIdAsync(CancellationToken cancellationToken)
+    public async Task<int> GetEnvirotraxAdminSupplierIdAsync(CancellationToken cancellationToken)
     {
-        return DbContext
+        if (_envirotraxAdminSupplierId > 0)
+        {
+            return _envirotraxAdminSupplierId;
+        }
+
+        var supplierId = await DbContext
             .WaterSuppliers
             .Where(supplier => supplier.Domain == WaterSupplier.EnvirotraxAdminDomain)
             .Select(supplier => supplier.Id)
             .SingleAsync(cancellationToken);
+
+        _envirotraxAdminSupplierId = supplierId;
+
+        return supplierId;
     }
 
     public async Task<IEnumerable<int>> GetChildSupplierIdsAsync(int parentWaterSupplierId, CancellationToken cancellationToken)
@@ -383,7 +394,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
         var suppliersQuery = DbContext
             .WaterSupplierUsers
             .IgnoreQueryFilters()
-            .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId)
+            .Where(supplierUser => supplierUser.UserId == _tenantProvider.UserId && supplierUser.DeletedTime == null)
             .Select(supplierUser => supplierUser.WaterSupplier!);
 
         var childSupplierQuery = from supplier in DbContext.WaterSuppliers.IgnoreQueryFilters()
@@ -393,7 +404,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
                                  join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
                                  on supplier.Id equals supplierUser.WaterSupplierId
 
-                                 where supplierUser.UserId == _tenantProvider.UserId
+                                 where supplierUser.UserId == _tenantProvider.UserId && supplierUser.DeletedTime == null
 
                                  select childSupplier;
 
@@ -408,7 +419,7 @@ public class WaterSupplierRepository : Repository<WaterSupplier>, IWaterSupplier
                                  join supplierUser in DbContext.WaterSupplierUsers.IgnoreQueryFilters()
                                  on supplier.Id equals supplierUser.WaterSupplierId
 
-                                 where supplierUser.UserId == _tenantProvider.UserId
+                                 where supplierUser.UserId == _tenantProvider.UserId && supplierUser.DeletedTime == null
 
                                  select grandChild;
 

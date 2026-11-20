@@ -14,8 +14,9 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
 
     protected override IQueryable<NotificationSetting> GetListQuery()
     {
-        return base.GetListQuery().Include(setting => setting.User);
-
+        return base.GetListQuery()
+            .Include(setting => setting.User)
+            .Where(setting => setting.User!.DeletedTime == null);
     }
 
     protected override IQueryable<NotificationSetting> GetDetailsQuery()
@@ -47,7 +48,7 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
         return await DbContext.NotificationSettings
             .IgnoreQueryFilters()
             .Include(setting => setting.User)
-            .Where(setting => setting.WaterSupplierId == waterSupplierId)
+            .Where(setting => setting.WaterSupplierId == waterSupplierId && setting.User!.DeletedTime == null)
             .ToListAsync(cancellationToken);
     }
 
@@ -57,6 +58,7 @@ public class NotificationSettingRepository : Repository<NotificationSetting>, IN
         return await DbContext.NotificationSettings
             .IgnoreQueryFilters()
             .Where(setting => setting.Interval == interval
+                && setting.User!.DeletedTime == null
                 && DbContext.Notifications.Any(notification => notification.WaterSupplierId == setting.WaterSupplierId
                     && notification.NotificationSettingId == setting.Id
                     && notification.UserId == setting.UserId

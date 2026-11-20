@@ -49,4 +49,18 @@ export class LetterProcessService {
 
         return lastValueFrom(this._http.delete<void>(url));
     }
+
+    public getZipFileUrl(processId: string): Promise<string> {
+        const url = this._urlResolver.resolveUrl(`/api/letter-processes/${encodeURIComponent(processId)}/zip-file-url`);
+
+        return lastValueFrom(this._http.get(url, {
+            responseType: 'text'
+        }));
+    }
+
+    public createZipFile(processId: string): Promise<void> {
+        const url = this._urlResolver.resolveUrl(`/api/letter-processes/${encodeURIComponent(processId)}/zip-file`);
+
+        return lastValueFrom(this._http.post<void>(url, null));
+    }
 }

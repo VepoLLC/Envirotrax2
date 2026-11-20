@@ -95,12 +95,12 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return items.ToLookup(i => i.ProfessionalId, i => MapToDto(i)!);
     }
 
-    public async Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedByWaterSupplierAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public async Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
     {
         query.Sort = query.ConvertSortProperties<ProfessionalInsurance, WaterSupplierInsuranceDto>(Mapper);
         query.Filter = query.ConvertFilterProperties<ProfessionalInsurance, WaterSupplierInsuranceDto>(Mapper);
 
-        var items = (await _insuranceRepository.GetUnverifiedByWaterSupplierAsync(pageInfo, query, cancellationToken)).ToList();
+        var items = (await _insuranceRepository.GetUnverifiedAsync(pageInfo, query, cancellationToken)).ToList();
         var professionalIds = items.Select(i => i.ProfessionalId).Distinct().ToList();
 
         var professionalTypes = await _insuranceRepository.GetProfessionalTypesAsync(professionalIds, cancellationToken);
@@ -110,29 +110,9 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         return dtos.ToPagedData(pageInfo);
     }
 
-    public async Task<IPagedData<WaterSupplierInsuranceDto>> GetUnverifiedForAdminAsync(PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public Task<int> CountUnverifiedAsync(CancellationToken cancellationToken)
     {
-        query.Sort = query.ConvertSortProperties<ProfessionalInsurance, WaterSupplierInsuranceDto>(Mapper);
-        query.Filter = query.ConvertFilterProperties<ProfessionalInsurance, WaterSupplierInsuranceDto>(Mapper);
-
-        var insurances = (await _insuranceRepository.GetUnverifiedForAdminAsync(pageInfo, query, cancellationToken)).ToList();
-        var professionalIds = insurances.Select(insurance => insurance.ProfessionalId).Distinct().ToList();
-
-        var professionalTypes = new Dictionary<int, ProfessionalType?>();
-
-        foreach (var insurance in insurances)
-        {
-            professionalTypes[insurance.ProfessionalId] = GetAccountType(insurance.Professional!);
-        }
-
-        var dtos = await MapToWaterSupplierDtosAsync(insurances, professionalIds, professionalTypes, cancellationToken);
-
-        return dtos.ToPagedData(pageInfo);
-    }
-
-    public Task<int> CountUnverifiedForAdminAsync(CancellationToken cancellationToken)
-    {
-        return _insuranceRepository.CountUnverifiedForAdminAsync(cancellationToken);
+        return _insuranceRepository.CountUnverifiedAsync(cancellationToken);
     }
 
     private async Task<IEnumerable<WaterSupplierInsuranceDto>> MapToWaterSupplierDtosAsync(
@@ -167,31 +147,6 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
                 ProfessionalType = professionalTypes.GetValueOrDefault(i.ProfessionalId)
             };
         });
-    }
-
-    private static ProfessionalType? GetAccountType(Professional professional)
-    {
-        if (professional.HasBackflowTesting)
-        {
-            return ProfessionalType.Bpat;
-        }
-
-        if (professional.HasCsiInspection)
-        {
-            return ProfessionalType.CsiInspector;
-        }
-
-        if (professional.HasFogInspection)
-        {
-            return ProfessionalType.FogInspector;
-        }
-
-        if (professional.HasFogTransportation)
-        {
-            return ProfessionalType.FogTransporter;
-        }
-
-        return null;
     }
 
     private static ProfessionalUser? ResolveSubmitter(
@@ -355,6 +310,18 @@ public class ProfessionalInsuranceService : Service<ProfessionalInsurance, Profe
         }
 
         return MapToDto(saved)!;
+    }
+
+    public async Task<ProfessionalInsuranceDto?> UpdateForAdminAsync(int id, ProfessionalInsuranceDto insurance)
+    {
+        var existing = await Repository.GetNoIncludesAsync(id, CancellationToken.None);
+
+        if (existing == null)
+        {
+            return null;
+        }
+
+        return await UpdateForProfessionalAsync(existing.ProfessionalId, id, insurance, CancellationToken.None);
     }
 
     public override async Task<ProfessionalInsuranceDto?> DeleteAsync(int id)

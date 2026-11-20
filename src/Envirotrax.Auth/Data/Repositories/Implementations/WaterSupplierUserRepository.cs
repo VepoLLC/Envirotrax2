@@ -34,7 +34,7 @@ public class WaterSupplierUserRepository : IWaterSupplierUserRepository
 
         return await _dbContext
             .WaterSupplierUsers
-            .SingleOrDefaultAsync(s => s.WaterSupplierId == supplierId && s.UserId == userId);
+            .SingleOrDefaultAsync(s => s.WaterSupplierId == supplierId && s.UserId == userId && s.DeletedTime == null);
     }
 
     public async Task<IEnumerable<RolePermission>> GetAllPermissionsAsync(int supplierId, int userId)

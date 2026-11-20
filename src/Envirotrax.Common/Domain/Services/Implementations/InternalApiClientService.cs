@@ -134,7 +134,7 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
 
     public Task<T?> GetAsync<T>(int waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken)
     {
-        return GetAsync<T>(waterSupplierId: waterSupplierId, loggedInUserId: loggedInUserId, url: url, cancellationToken: cancellationToken);
+        return GetAsync<T>(waterSupplierId: (int?)waterSupplierId, loggedInUserId: loggedInUserId, url: url, cancellationToken: cancellationToken);
     }
 
     private Task<T?> GetAsync<T>(int? waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken)
@@ -206,7 +206,7 @@ public class InternalApiClientService<TOptions> : IInternalApiClientService<TOpt
 
     public Task<T?> DeleteAsync<T>(int waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken)
     {
-        return DeleteAsync<T>(waterSupplierId: waterSupplierId, loggedInUserId: loggedInUserId, url: url, cancellationToken: cancellationToken);
+        return DeleteAsync<T>(waterSupplierId: (int?)waterSupplierId, loggedInUserId: loggedInUserId, url: url, cancellationToken: cancellationToken);
     }
 
     private Task<T?> DeleteAsync<T>(int? waterSupplierId, int? loggedInUserId, string url, CancellationToken cancellationToken)

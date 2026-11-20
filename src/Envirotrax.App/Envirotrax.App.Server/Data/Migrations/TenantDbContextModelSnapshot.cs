@@ -1002,6 +1002,80 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.ToTable("Companies", "crm");
                 });
 
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Crm.CompanyContact", b =>
+                {
+                    b.Property<int>("WaterSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CellNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContactName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EmailAddress")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Position")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ZipCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("WaterSupplierId", "Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("StateId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("WaterSupplierId", "CompanyId");
+
+                    b.ToTable("CompanyContacts", "crm");
+                });
+
             modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Csi.CsiInspection", b =>
                 {
                     b.Property<int>("WaterSupplierId")
@@ -5159,6 +5233,46 @@ namespace Envirotrax.App.Server.Data.Migrations
                     b.Navigation("DeletedBy");
 
                     b.Navigation("LastContactedBy");
+
+                    b.Navigation("State");
+
+                    b.Navigation("UpdatedBy");
+
+                    b.Navigation("WaterSupplier");
+                });
+
+            modelBuilder.Entity("Envirotrax.App.Server.Data.Models.Crm.CompanyContact", b =>
+                {
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.States.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Users.AppUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.WaterSuppliers.WaterSupplier", "WaterSupplier")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Envirotrax.App.Server.Data.Models.Crm.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("WaterSupplierId", "CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("State");
 

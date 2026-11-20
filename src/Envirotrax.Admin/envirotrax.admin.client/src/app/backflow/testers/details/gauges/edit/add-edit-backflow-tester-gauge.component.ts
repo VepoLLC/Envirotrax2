@@ -13,6 +13,8 @@ const COMPANY_OPTION_ID = 0;
 export interface BackflowTesterGaugeModalData {
     professionalId: number;
     companyName: string;
+    // Set when adding from a user details window, which lists only the gauges assigned to that user.
+    userId?: number;
     gauge: BackflowGauge;
 }
 
@@ -31,6 +33,7 @@ export class AddEditBackflowTesterGaugeComponent {
     public validationErrors: string[] = [];
     public assignedToOptions: InputOption[] = [];
     public assignedUserId = COMPANY_OPTION_ID;
+    public isUserFixed: boolean = false;
 
     public readonly isEditMode: boolean;
 
@@ -44,7 +47,7 @@ export class AddEditBackflowTesterGaugeComponent {
         private readonly _helper: HelperService,
         private readonly _toastService: ToastService
     ) {
-        const { professionalId, gauge } = this._modalReference.config.model!;
+        const { professionalId, gauge, userId } = this._modalReference.config.model!;
 
         // The App's gauge update copies FilePath from the request, so it has to travel back as loaded or the
         // calibration certificate would be detached.
@@ -53,6 +56,11 @@ export class AddEditBackflowTesterGaugeComponent {
         this.idPrefix = `backflow-tester-${professionalId}-gauge-${gauge.id ?? 'new'}`;
 
         if (!this.isEditMode) {
+            if (userId) {
+                this.assignedUserId = userId;
+                this.isUserFixed = true;
+            }
+
             this.loadAssignedToOptions();
         }
     }

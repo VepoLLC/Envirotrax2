@@ -17,6 +17,7 @@ import {
     unvalidatedExpirationCssClass
 } from '../../../../../shared/models/professionals/licenses/professional-user-license';
 import { BackflowTesterLicenseService } from '../../../../../shared/services/backflow/backflow-tester-license.service';
+import { withLicenseUserFilter } from '../../../../../shared/utils/license-user-filter.util';
 import {
     AddEditBackflowTesterLicenseComponent,
     BackflowTesterLicenseModalData
@@ -37,6 +38,10 @@ interface BackflowTesterLicenseVm extends ProfessionalUserLicense {
 export class BackflowTesterLicenseListComponent implements OnInit {
     @Input()
     public professionalId!: number;
+
+    // Set in a user details window: only that user's licenses are listed, and a new one is theirs.
+    @Input()
+    public userId?: number;
 
     @ViewChild('expirationCell', { static: true })
     public expirationCell?: TemplateRef<CellTemplateData<BackflowTesterLicenseVm>>;
@@ -69,7 +74,7 @@ export class BackflowTesterLicenseListComponent implements OnInit {
             const licenses = await this._licenseService.getAll(
                 this.professionalId,
                 this.table.items?.pageInfo || {},
-                this.table.query
+                withLicenseUserFilter(this.table.query, this.userId)
             );
 
             this.table.items = {
@@ -112,7 +117,7 @@ export class BackflowTesterLicenseListComponent implements OnInit {
     private showEditor(title: string, license: ProfessionalUserLicense): void {
         this._modalHelper.show<BackflowTesterLicenseModalData, ProfessionalUserLicense>(AddEditBackflowTesterLicenseComponent, {
             title,
-            model: { professionalId: this.professionalId, license },
+            model: { professionalId: this.professionalId, userId: this.userId, license },
             size: ModalSize.medium,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.getLicenses());
@@ -130,11 +135,14 @@ export class BackflowTesterLicenseListComponent implements OnInit {
     }
 
     private getColumns(): TableColumn<BackflowTesterLicenseVm>[] {
-        return [
+        const columns: TableColumn<BackflowTesterLicenseVm>[] = [
             { field: 'licenseNumber', caption: 'License Number', type: ColumnType.text },
             { field: 'licenseType.name', caption: 'Type', type: ColumnType.text },
             { field: 'user.emailAddress', caption: 'User', type: ColumnType.text },
             { field: 'expirationDate', caption: 'Expiration Date', type: ColumnType.date, cellTemplate: this.expirationCell }
         ];
+
+        // Every license in a user details window is that user's, so the User column would only repeat it.
+        return this.userId ? columns.filter(column => column.field !== 'user.emailAddress') : columns;
     }
 }

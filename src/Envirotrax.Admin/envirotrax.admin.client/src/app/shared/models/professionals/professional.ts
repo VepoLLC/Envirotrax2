@@ -36,6 +36,7 @@ export interface ProfessionalUser {
     emailAddress?: string;
     contactName?: string;
     jobTitle?: string;
+    phoneNumber?: string;
     isAdmin?: boolean;
     isWiseGuy?: boolean;
     isCsiInspector?: boolean;

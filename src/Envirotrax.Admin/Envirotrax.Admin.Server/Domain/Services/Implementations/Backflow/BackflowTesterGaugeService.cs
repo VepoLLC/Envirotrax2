@@ -17,9 +17,13 @@ public class BackflowTesterGaugeService : IBackflowTesterGaugeService
         _apiClient = apiClient;
     }
 
-    public Task<IPagedData<BackflowGaugeDto>> GetAllAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public Task<IPagedData<BackflowGaugeDto>> GetAllAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, int? userId = null)
     {
-        return _apiClient.GetAsync<BackflowGaugeDto>($"{BaseUrl}/{professionalId}/gauges", pageInfo, query, cancellationToken);
+        var url = userId == null
+            ? $"{BaseUrl}/{professionalId}/gauges"
+            : $"{BaseUrl}/{professionalId}/users/{userId}/gauges";
+
+        return _apiClient.GetAsync<BackflowGaugeDto>(url, pageInfo, query, cancellationToken);
     }
 
     public Task<BackflowGaugeDto?> AddAsync(int professionalId, BackflowGaugeDto gauge, Stream fileStream, string fileName, CancellationToken cancellationToken)

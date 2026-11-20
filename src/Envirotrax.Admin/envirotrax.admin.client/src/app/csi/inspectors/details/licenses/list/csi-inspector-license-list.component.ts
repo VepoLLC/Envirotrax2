@@ -17,6 +17,7 @@ import {
     unvalidatedExpirationCssClass
 } from '../../../../../shared/models/professionals/licenses/professional-user-license';
 import { CsiInspectorLicenseService } from '../../../../../shared/services/csi/csi-inspector-license.service';
+import { withLicenseUserFilter } from '../../../../../shared/utils/license-user-filter.util';
 import {
     AddEditCsiInspectorLicenseComponent,
     CsiInspectorLicenseModalData
@@ -37,6 +38,10 @@ interface CsiInspectorLicenseVm extends ProfessionalUserLicense {
 export class CsiInspectorLicenseListComponent implements OnInit {
     @Input()
     public professionalId!: number;
+
+    // Set in a user details window: only that user's licenses are listed, and a new one is theirs.
+    @Input()
+    public userId?: number;
 
     @ViewChild('expirationCell', { static: true })
     public expirationCell?: TemplateRef<CellTemplateData<CsiInspectorLicenseVm>>;
@@ -69,7 +74,7 @@ export class CsiInspectorLicenseListComponent implements OnInit {
             const licenses = await this._licenseService.getAll(
                 this.professionalId,
                 this.table.items?.pageInfo || {},
-                this.table.query
+                withLicenseUserFilter(this.table.query, this.userId)
             );
 
             this.table.items = {
@@ -112,7 +117,7 @@ export class CsiInspectorLicenseListComponent implements OnInit {
     private showEditor(title: string, license: ProfessionalUserLicense): void {
         this._modalHelper.show<CsiInspectorLicenseModalData, ProfessionalUserLicense>(AddEditCsiInspectorLicenseComponent, {
             title,
-            model: { professionalId: this.professionalId, license },
+            model: { professionalId: this.professionalId, userId: this.userId, license },
             size: ModalSize.medium,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.getLicenses());
@@ -130,11 +135,14 @@ export class CsiInspectorLicenseListComponent implements OnInit {
     }
 
     private getColumns(): TableColumn<CsiInspectorLicenseVm>[] {
-        return [
+        const columns: TableColumn<CsiInspectorLicenseVm>[] = [
             { field: 'licenseNumber', caption: 'License Number', type: ColumnType.text },
             { field: 'licenseType.name', caption: 'Type', type: ColumnType.text },
             { field: 'user.emailAddress', caption: 'User', type: ColumnType.text },
             { field: 'expirationDate', caption: 'Expiration Date', type: ColumnType.date, cellTemplate: this.expirationCell }
         ];
+
+        // Every license in a user details window is that user's, so the User column would only repeat it.
+        return this.userId ? columns.filter(column => column.field !== 'user.emailAddress') : columns;
     }
 }

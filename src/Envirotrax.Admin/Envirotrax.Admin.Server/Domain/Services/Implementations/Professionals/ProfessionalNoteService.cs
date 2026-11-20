@@ -15,7 +15,7 @@ public class ProfessionalNoteService : IProfessionalNoteService
         _apiClient = apiClient;
     }
 
-    private static string GetNotesUrl(ProfessionalType professionalType, int professionalId)
+    private static string GetNotesUrl(ProfessionalType professionalType, int professionalId, int? userId)
     {
         var professionalsUrl = professionalType switch
         {
@@ -26,26 +26,28 @@ public class ProfessionalNoteService : IProfessionalNoteService
             _ => throw new ArgumentOutOfRangeException(nameof(professionalType), professionalType, null)
         };
 
-        return $"{professionalsUrl}/{professionalId}/notes";
+        return userId == null
+            ? $"{professionalsUrl}/{professionalId}/notes"
+            : $"{professionalsUrl}/{professionalId}/users/{userId}/notes";
     }
 
-    public Task<IPagedData<ProfessionalNoteDto>> GetAllAsync(ProfessionalType professionalType, int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken)
+    public Task<IPagedData<ProfessionalNoteDto>> GetAllAsync(ProfessionalType professionalType, int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, int? userId = null)
     {
-        return _apiClient.GetAsync<ProfessionalNoteDto>(GetNotesUrl(professionalType, professionalId), pageInfo, query, cancellationToken);
+        return _apiClient.GetAsync<ProfessionalNoteDto>(GetNotesUrl(professionalType, professionalId, userId), pageInfo, query, cancellationToken);
     }
 
-    public Task<ProfessionalNoteDto?> AddAsync(ProfessionalType professionalType, int professionalId, ProfessionalNoteDto note, CancellationToken cancellationToken)
+    public Task<ProfessionalNoteDto?> AddAsync(ProfessionalType professionalType, int professionalId, ProfessionalNoteDto note, CancellationToken cancellationToken, int? userId = null)
     {
-        return _apiClient.PostAsync<ProfessionalNoteDto, ProfessionalNoteDto>(GetNotesUrl(professionalType, professionalId), note, cancellationToken);
+        return _apiClient.PostAsync<ProfessionalNoteDto, ProfessionalNoteDto>(GetNotesUrl(professionalType, professionalId, userId), note, cancellationToken);
     }
 
-    public Task<ProfessionalNoteDto?> UpdateAsync(ProfessionalType professionalType, int professionalId, int noteId, ProfessionalNoteDto note, CancellationToken cancellationToken)
+    public Task<ProfessionalNoteDto?> UpdateAsync(ProfessionalType professionalType, int professionalId, int noteId, ProfessionalNoteDto note, CancellationToken cancellationToken, int? userId = null)
     {
-        return _apiClient.PutAsync<ProfessionalNoteDto, ProfessionalNoteDto>($"{GetNotesUrl(professionalType, professionalId)}/{noteId}", note, cancellationToken);
+        return _apiClient.PutAsync<ProfessionalNoteDto, ProfessionalNoteDto>($"{GetNotesUrl(professionalType, professionalId, userId)}/{noteId}", note, cancellationToken);
     }
 
-    public Task DeleteAsync(ProfessionalType professionalType, int professionalId, int noteId, CancellationToken cancellationToken)
+    public Task DeleteAsync(ProfessionalType professionalType, int professionalId, int noteId, CancellationToken cancellationToken, int? userId = null)
     {
-        return _apiClient.DeleteAsync<object>($"{GetNotesUrl(professionalType, professionalId)}/{noteId}", cancellationToken);
+        return _apiClient.DeleteAsync<object>($"{GetNotesUrl(professionalType, professionalId, userId)}/{noteId}", cancellationToken);
     }
 }

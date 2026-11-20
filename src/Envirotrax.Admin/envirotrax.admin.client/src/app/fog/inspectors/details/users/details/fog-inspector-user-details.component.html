@@ -1,0 +1,66 @@
+<dp-loading-spinner *ngIf="isLoading"></dp-loading-spinner>
+
+<ng-container *ngIf="!isLoading">
+    <div *ngIf="user; else userNotFound">
+        <vp-section header="User Account Information">
+            <vp-section-actions>
+                <button type="button" class="btn btn-primary btn-sm" (click)="editUser()">
+                    <i class="fa-solid fa-pencil me-1"></i>
+                    Edit
+                </button>
+            </vp-section-actions>
+
+            <div dp-spinner-parent>
+                <dp-loading-spinner *ngIf="isUserLoading"></dp-loading-spinner>
+
+                <vp-field-grid>
+                    <vp-input [ngModel]="professional.name"
+                              name="companyName"
+                              label="Master Account"
+                              labelStyle="horizontal"
+                              [readonly]="true" />
+
+                    <vp-input [ngModel]="user.emailAddress"
+                              name="emailAddress"
+                              label="User ID"
+                              labelStyle="horizontal"
+                              [readonly]="true" />
+
+                    <vp-input [ngModel]="user.contactName"
+                              name="contactName"
+                              label="Contact Name"
+                              labelStyle="horizontal"
+                              [readonly]="true" />
+
+                    <vp-input [ngModel]="user.jobTitle"
+                              name="jobTitle"
+                              label="Job Title"
+                              labelStyle="horizontal"
+                              [readonly]="true" />
+
+                    <vp-input [ngModel]="user.phoneNumber"
+                              name="phoneNumber"
+                              label="Cell #"
+                              labelStyle="horizontal"
+                              [readonly]="true" />
+                </vp-field-grid>
+            </div>
+        </vp-section>
+
+        <div class="mt-3">
+            <vp-fog-inspector-water-suppliers [professionalId]="professionalId" [readOnly]="true" />
+        </div>
+
+        <div class="mt-3">
+            <vp-fog-inspector-licenses [professionalId]="professionalId" [userId]="userId" />
+        </div>
+
+        <div class="mt-3">
+            <vp-professional-notes [professionalId]="professionalId" [professionalType]="professionalType" [userId]="userId" />
+        </div>
+    </div>
+
+    <ng-template #userNotFound>
+        <div class="alert alert-warning">User not found.</div>
+    </ng-template>
+</ng-container>

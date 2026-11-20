@@ -24,6 +24,12 @@ export class FogTransporterUserService {
         }));
     }
 
+    public get(professionalId: number, userId: number): Promise<ProfessionalUser> {
+        const url = this._urlResolver.resolveUrl(`/api/fog/transporters/${professionalId}/users/${userId}`);
+
+        return lastValueFrom(this._http.get<ProfessionalUser>(url));
+    }
+
     public async getAllAsOptions(professionalId: number): Promise<InputOption<ProfessionalUser>[]> {
         const users = await this.getAll(
             professionalId,

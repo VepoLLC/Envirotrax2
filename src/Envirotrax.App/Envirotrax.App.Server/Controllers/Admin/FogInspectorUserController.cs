@@ -29,6 +29,14 @@ public class FogInspectorUserController : AdminBaseController
         return Ok(users);
     }
 
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        var user = await _userService.GetForProfessionalAsync(professionalId, userId, cancellationToken, proUser => proUser.IsFogInspector);
+
+        return user == null ? NotFound() : Ok(user);
+    }
+
     [HttpPost]
     public async Task<IActionResult> AddAsync(int professionalId, [FromBody] ProfessionalUserDto user, CancellationToken cancellationToken)
     {

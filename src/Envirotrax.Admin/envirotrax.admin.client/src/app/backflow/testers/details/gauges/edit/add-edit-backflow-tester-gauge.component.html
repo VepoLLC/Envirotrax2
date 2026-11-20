@@ -7,6 +7,7 @@
                       [(ngModel)]="assignedUserId"
                       name="assignedUserId"
                       label="Assigned To"
+                      [disabled]="isUserFixed"
                       [options]="assignedToOptions"
                       [required]="true"
                       [form]="form" />

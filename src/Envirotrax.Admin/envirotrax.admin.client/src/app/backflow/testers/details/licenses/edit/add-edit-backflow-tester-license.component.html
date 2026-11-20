@@ -8,6 +8,7 @@
                       name="user"
                       type="select"
                       label="User"
+                      [disabled]="isUserFixed"
                       [required]="true"
                       [options]="users"
                       [form]="form" />

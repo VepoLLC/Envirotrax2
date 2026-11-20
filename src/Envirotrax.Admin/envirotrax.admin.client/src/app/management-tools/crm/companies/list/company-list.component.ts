@@ -2,6 +2,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import {
+    allSettled,
     CellTemplateData,
     ColumnType,
     DateRange,
@@ -16,6 +17,7 @@ import {
 import { SharedComponentsModule } from '../../../../shared/components/shared.components.module';
 import {
     Company,
+    CompanyCalendarRange,
     CompanyProgramBadge,
     CompanyRow,
     ContactType,
@@ -30,22 +32,29 @@ import { MODULE_COLORS } from '../../../../shared/models/module-colors';
 import { CompanyService } from '../../../../shared/services/crm/company.service';
 import { LookupService } from '../../../../shared/services/lookup/lookup.service';
 import { WindowService } from '../../../../shared/services/window.service';
+import { CompanyCalendarComponent } from '../calendar/company-calendar.component';
 import { CompanyDetailsComponent, CompanyWindowModel } from '../details/company-details.component';
 
 // V1 Vepo Manager's Search Contacts tab opens on the next contact dates from 180 days ago to 30 days ahead.
 const DEFAULT_NEXT_CONTACT_DAYS_BACK = 180;
 const DEFAULT_NEXT_CONTACT_DAYS_AHEAD = 30;
 
+// The API's page size limit. The days a month shows hold far fewer companies, so one page lists all of them.
+const CALENDAR_PAGE_SIZE = 2000;
+
+type ContactManagerTab = 'calendar' | 'search';
+
 /**
- * V1 Vepo Manager, Contact Management → Search Contacts. V1 calls them contacts, but they are the companies Vepo
- * works with.
+ * V1 Vepo Manager, Contact Management: the Contact Calendar and Search Contacts tabs. V1 calls them contacts, but
+ * they are the companies Vepo works with.
  */
 @Component({
     templateUrl: './company-list.component.html',
     imports: [
         CommonModule,
         FormsModule,
-        SharedComponentsModule
+        SharedComponentsModule,
+        CompanyCalendarComponent
     ],
     providers: [DatePipe]
 })
@@ -65,6 +74,9 @@ export class CompanyListComponent implements OnInit {
     @ViewChild(FilterPanelComponent, { static: true })
     private _filterPanel!: FilterPanelComponent;
 
+    // V1 opens on the calendar.
+    public activeTab: ContactManagerTab = 'calendar';
+
     public showResults: boolean = false;
 
     public table: TableViewModel<CompanyRow> = {
@@ -73,6 +85,16 @@ export class CompanyListComponent implements OnInit {
             filter: []
         }
     };
+
+    // The list under the calendar: the companies with a next contact date on one of the days the calendar shows.
+    public calendarTable: TableViewModel<CompanyRow> = {
+        query: {
+            sort: { nextContactDate: 'Asc' },
+            filter: []
+        }
+    };
+
+    public isDeleting: boolean = false;
 
     public readonly contactTypeOptions: InputOption[] = [{ id: '', text: 'Any Type' }, ...contactTypeOptions];
 
@@ -88,6 +110,13 @@ export class CompanyListComponent implements OnInit {
 
     private stateCodes = new Map<number, string>();
 
+    // The calendar loads its first month as soon as it renders, so its rows wait for the state codes too.
+    private _statesLoaded: Promise<void> = Promise.resolve();
+
+    // Numbers the calendar loads. The arrows can start one before the last one has finished, and a load that finishes
+    // late must not replace the newer month.
+    private _calendarLoadNumber: number = 0;
+
     constructor(
         private readonly _companyService: CompanyService,
         private readonly _lookupService: LookupService,
@@ -101,9 +130,51 @@ export class CompanyListComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         this.table.columns = this.getColumns();
+        this.calendarTable.columns = this.getColumns();
         this.defaultNextContactDateRange = this.buildDefaultNextContactDateRange();
 
-        await this.loadStates();
+        this._statesLoaded = this.loadStates();
+
+        await this._statesLoaded;
+    }
+
+    public setActiveTab(tab: ContactManagerTab): void {
+        this.activeTab = tab;
+    }
+
+    public async onCalendarRangeChange(range: CompanyCalendarRange): Promise<void> {
+        this.calendarTable.query.filter = [
+            { columnName: 'nextContactDate', value: range.startDate, comparisonOperator: 'Gte' },
+
+            // The end is the day after the last day shown, so a next contact date with a time on that day counts too.
+            { columnName: 'nextContactDate', value: range.endDate, comparisonOperator: 'Lt' }
+        ];
+
+        await this.getCalendarCompanies();
+    }
+
+    public async getCalendarCompanies(): Promise<void> {
+        const loadNumber = ++this._calendarLoadNumber;
+
+        try {
+            this.calendarTable.isLoading = true;
+
+            const companies = await this._companyService.getAll({ pageNumber: 1, pageSize: CALENDAR_PAGE_SIZE }, this.calendarTable.query);
+
+            await this._statesLoaded;
+
+            if (loadNumber === this._calendarLoadNumber) {
+                this.calendarTable.items = {
+                    pageInfo: companies.pageInfo,
+                    data: companies.data.map(company => this.toRow(company))
+                };
+            }
+        } finally {
+            // An older load leaves the spinner to the newest one, which is still running.
+            if (loadNumber === this._calendarLoadNumber) {
+                this.calendarTable.isLoading = false;
+            }
+        }
     }
 
     public onFilterChange(queryProperties: QueryProperty[]): void {
@@ -152,16 +223,16 @@ export class CompanyListComponent implements OnInit {
     public deleteCompany(row: CompanyRow): void {
         this._modalHelper.showDeleteConfirmation().result().subscribe(async () => {
             try {
-                this.table.isLoading = true;
+                this.isDeleting = true;
 
                 await this._companyService.delete(row.id!);
 
                 this._toastService.successFullyDeleted('Company');
             } finally {
-                this.table.isLoading = false;
+                this.isDeleting = false;
             }
 
-            await this.getCompanies();
+            await this.reload();
         });
     }
 
@@ -170,9 +241,24 @@ export class CompanyListComponent implements OnInit {
             title: company.id ? `${company.id} - ${company.name}` : 'New Company',
             model: {
                 id: company.id,
-                onChanged: () => this.getCompanies()
+                onChanged: () => this.reload()
             }
         });
+    }
+
+    // A saved or deleted company can change both tabs, and a new next contact date moves it on the calendar.
+    private async reload(): Promise<void> {
+        const reloads: Promise<void>[] = [];
+
+        if (this.calendarTable.items) {
+            reloads.push(this.getCalendarCompanies());
+        }
+
+        if (this.showResults) {
+            reloads.push(this.getCompanies());
+        }
+
+        await allSettled(reloads);
     }
 
     private buildDefaultNextContactDateRange(): DateRange {

@@ -1,0 +1,34 @@
+<!-- V1's month navigation: the arrows step a month at a time, and the lists go straight to any month. -->
+<div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+    <button type="button" class="btn btn-primary" title="Previous Month" aria-label="Previous Month" (click)="previousMonth()">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+
+    <div class="company-calendar-month">
+        <vp-input [(ngModel)]="monthId"
+                  (ngModelChange)="onMonthChange($event)"
+                  name="calendarMonth"
+                  type="select"
+                  [options]="monthOptions" />
+    </div>
+
+    <div class="company-calendar-year">
+        <vp-input [(ngModel)]="yearId"
+                  (ngModelChange)="onYearChange($event)"
+                  name="calendarYear"
+                  type="select"
+                  [options]="yearOptions" />
+    </div>
+
+    <button type="button" class="btn btn-primary" title="Next Month" aria-label="Next Month" (click)="nextMonth()">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+</div>
+
+<full-calendar [options]="calendarOptions" [events]="events">
+    <ng-template #eventContent let-arg>
+        <span class="text-truncate" [title]="arg.event.extendedProps.tooltip">
+            <i class="fa-solid fa-user me-1" [class]="arg.event.extendedProps.iconClass"></i>{{ arg.event.title }}
+        </span>
+    </ng-template>
+</full-calendar>

@@ -16,7 +16,7 @@ import { FogDisposalSiteListComponent } from './fog/disposal-sites/list/fog-disp
 import { FogTripTicketListComponent } from './fog/trip-tickets/list/fog-trip-ticket-list.component';
 import { LetterGeneratorComponent } from './management-tools/letter-generator/letter-generator.component';
 import { UserLogComponent } from './management-tools/user-log/user-log.component';
-import { CompanyListComponent } from './management-tools/companies/list/company-list.component';
+import { CompanyListComponent } from './management-tools/crm/companies/list/company-list.component';
 import { LicenseManagementComponent } from './licenses/license-management.component';
 import { SubmissionValidationListComponent } from './validations/list/submission-validation-list.component';
 import { NavigationEnd, Router } from '@angular/router';

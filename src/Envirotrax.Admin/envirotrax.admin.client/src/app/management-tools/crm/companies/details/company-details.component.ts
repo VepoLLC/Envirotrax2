@@ -2,14 +2,14 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HelperService, InputOption, ModalHelperService, ToastService, allSettled } from '@envirotrax/common-ui';
-import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
-import { Company, ContactType, contactTypeIconClasses, contactTypeOptions } from '../../../shared/models/crm/company';
-import { State } from '../../../shared/models/lookup/state';
-import { AppUser } from '../../../shared/models/users/app-user';
-import { AuthService } from '../../../shared/services/auth/auth.service';
-import { CompanyService } from '../../../shared/services/crm/company.service';
-import { LookupService } from '../../../shared/services/lookup/lookup.service';
-import { WindowReference } from '../../../window/window-config';
+import { SharedComponentsModule } from '../../../../shared/components/shared.components.module';
+import { Company, ContactType, contactTypeIconClasses, contactTypeOptions } from '../../../../shared/models/crm/company';
+import { State } from '../../../../shared/models/lookup/state';
+import { AppUser } from '../../../../shared/models/users/app-user';
+import { AuthService } from '../../../../shared/services/auth/auth.service';
+import { CompanyService } from '../../../../shared/services/crm/company.service';
+import { LookupService } from '../../../../shared/services/lookup/lookup.service';
+import { WindowReference } from '../../../../window/window-config';
 
 export interface CompanyWindowModel {
     id?: number;

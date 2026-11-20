@@ -39,4 +39,14 @@ public class LetterProcessService : ILetterProcessService
     {
         return _apiClient.DeleteAsync<object>($"{BaseUrl}/{Uri.EscapeDataString(processId)}", CancellationToken.None);
     }
+
+    public Task<string?> GetZipFileUrlAsync(string processId, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<string>($"{BaseUrl}/{Uri.EscapeDataString(processId)}/zip-file-url", cancellationToken);
+    }
+
+    public Task CreateZipFileAsync(string processId)
+    {
+        return _apiClient.PostAsync<object?, object>($"{BaseUrl}/{Uri.EscapeDataString(processId)}/zip-file", null, CancellationToken.None);
+    }
 }

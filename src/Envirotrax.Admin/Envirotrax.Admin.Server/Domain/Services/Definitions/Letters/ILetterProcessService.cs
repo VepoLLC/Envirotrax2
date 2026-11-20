@@ -13,4 +13,8 @@ public interface ILetterProcessService
     Task<string?> GetFileUrlAsync(string processId, string fileName, CancellationToken cancellationToken);
 
     Task DeleteAsync(string processId);
+
+    Task<string?> GetZipFileUrlAsync(string processId, CancellationToken cancellationToken);
+
+    Task CreateZipFileAsync(string processId);
 }

@@ -1,7 +1,7 @@
 import { CommonModule, formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
-import { ModalHelperService, ToastService } from '@envirotrax/common-ui';
+import { DownloadService, ModalHelperService, ToastService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { LetterProcess } from '../../../shared/models/letters/letter-process';
 import { LetterProcessService } from '../../../shared/services/letters/letter-process.service';
@@ -23,13 +23,26 @@ export class LetterHistoryComponent implements OnInit {
     constructor(
         private readonly _letterProcessService: LetterProcessService,
         private readonly _modalHelper: ModalHelperService,
-        private readonly _toastService: ToastService
+        private readonly _toastService: ToastService,
+        private readonly _downloadService: DownloadService
     ) {
 
     }
 
     public async ngOnInit(): Promise<void> {
         await this.loadProcesses();
+    }
+
+    public async downloadZipFile(process: LetterProcess): Promise<void> {
+        try {
+            this.isLoading = true;
+
+            const url = await this._letterProcessService.getZipFileUrl(process.id!);
+
+            this._downloadService.downloadFileFromUrl(url, `Vepo PDF's Generated for ${process.id}.zip`);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     public viewFiles(process: LetterProcess): void {

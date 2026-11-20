@@ -32,7 +32,6 @@ public class LetterGeneratorService : ILetterGeneratorService
 
     private const string BackflowFilePrefix = "BF";
     private const string CsiFilePrefix = "CSI";
-    private const string LettersFolder = "letters";
     private const string EmailsFolder = "Emails";
     private const string PdfTemplateName = "Letters.Letters";
     private const string PageSiteIdsScript = "Array.from(document.querySelectorAll('.letter-page'), page => Number(page.dataset.siteId))";
@@ -121,6 +120,7 @@ public class LetterGeneratorService : ILetterGeneratorService
 
         return new GeneratedLettersDto
         {
+            ProcessId = LetterProcessId.FromProcessDate(context.ProcessDate),
             ProcessDate = context.ProcessDate,
             Counts = context.Counts,
             EmailCount = context.Emails.Count
@@ -689,10 +689,10 @@ public class LetterGeneratorService : ILetterGeneratorService
     private static string GetFolderPath(GenerationContext context)
     {
         var waterSupplier = context.Details.WaterSupplier;
-        var processId = LetterProcessId.FromProcessDate(context.ProcessDate);
+        var processFolder = LetterProcessId.GetFolderPath(context.ProcessDate);
         var waterSupplierFolder = RemoveInvalidFileNameChars($"{waterSupplier.Id} - {waterSupplier.Name}");
 
-        return $"{LettersFolder}/{processId}/{waterSupplierFolder}";
+        return $"{processFolder}/{waterSupplierFolder}";
     }
 
     private static string RemoveInvalidFileNameChars(string name)

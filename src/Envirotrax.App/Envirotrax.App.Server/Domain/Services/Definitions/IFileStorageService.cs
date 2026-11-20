@@ -15,5 +15,9 @@ public interface IFileStorageService
 
     Task<bool> DeleteAsync(string blobName);
 
+    Task<bool> ExistsAsync(string blobName, CancellationToken cancellationToken);
+
+    Task DownloadAsync(string blobName, Stream destination);
+
     Task<Dictionary<string, long>> GetFileSizesAsync(string folderPath, CancellationToken cancellationToken);
 }

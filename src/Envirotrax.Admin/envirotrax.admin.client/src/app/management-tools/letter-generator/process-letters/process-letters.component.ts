@@ -5,6 +5,7 @@ import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { InputOption, ModalHelperService } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../shared/components/shared.components.module';
 import { LetterCounts } from '../../../shared/models/water-suppliers/generated-letters';
+import { LetterProcessService } from '../../../shared/services/letters/letter-process.service';
 import { WaterSupplierLetterSettings, WaterSupplierLetterSettingsRow } from '../../../shared/models/water-suppliers/water-supplier-letter-settings';
 import { WaterSupplierDetails } from '../../../shared/models/water-suppliers/water-supplier-details';
 import { WaterSupplierService } from '../../../shared/services/water-suppliers/water-supplier.service';
@@ -44,6 +45,7 @@ export class ProcessLettersComponent implements OnInit, OnDestroy {
 
     constructor(
         private readonly _waterSupplierService: WaterSupplierService,
+        private readonly _letterProcessService: LetterProcessService,
         private readonly _modalHelper: ModalHelperService
     ) {
 
@@ -124,6 +126,7 @@ export class ProcessLettersComponent implements OnInit, OnDestroy {
             }
         }
 
+        let processId: string | undefined;
         let processDate: string | undefined;
         let letterCount = 0;
         let emailCount = 0;
@@ -146,11 +149,18 @@ export class ProcessLettersComponent implements OnInit, OnDestroy {
 
                 const letters = await this._waterSupplierService.generateLetters(waterSupplier.id!, processDate);
 
+                processId = letters.processId;
                 processDate = letters.processDate;
 
                 waterSupplier.letterCounts = letters.counts;
                 letterCount += this.getTotalLetterCount(letters.counts);
                 emailCount += letters.emailCount;
+            }
+
+            if (processId && !this.isCancelRequested) {
+                this.status = 'Creating ZIP file...';
+
+                await this._letterProcessService.createZipFile(processId);
             }
         } finally {
             this.status = `Total Letters: ${letterCount}`;

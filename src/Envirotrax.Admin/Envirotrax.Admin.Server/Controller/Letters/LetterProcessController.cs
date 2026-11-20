@@ -61,6 +61,27 @@ public class LetterProcessController : AdminBaseController
         return Ok(url);
     }
 
+    [HttpGet("{processId}/zip-file-url")]
+    public async Task<IActionResult> GetZipFileUrlAsync(string processId, CancellationToken cancellationToken)
+    {
+        var url = await _letterProcessService.GetZipFileUrlAsync(processId, cancellationToken);
+
+        if (url == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(url);
+    }
+
+    [HttpPost("{processId}/zip-file")]
+    public async Task<IActionResult> CreateZipFileAsync(string processId)
+    {
+        await _letterProcessService.CreateZipFileAsync(processId);
+
+        return Ok();
+    }
+
     [HttpDelete("{processId}")]
     public async Task<IActionResult> DeleteAsync(string processId)
     {

@@ -2,6 +2,8 @@ namespace Envirotrax.Admin.Server.Domain.DataTransferObjects.Letters;
 
 public class GeneratedLettersDto
 {
+    public string ProcessId { get; set; } = null!;
+
     public DateTime ProcessDate { get; set; }
 
     public LetterCountsDto Counts { get; set; } = new();

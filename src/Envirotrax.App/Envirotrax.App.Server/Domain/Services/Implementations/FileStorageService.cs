@@ -102,6 +102,21 @@ public class FileStorageService : IFileStorageService
         return await blobClient.DeleteIfExistsAsync();
     }
 
+    public async Task<bool> ExistsAsync(string blobName, CancellationToken cancellationToken)
+    {
+        var blobClient = _defaultContainerClient.GetBlobClient(blobName);
+        var response = await blobClient.ExistsAsync(cancellationToken);
+
+        return response.Value;
+    }
+
+    public async Task DownloadAsync(string blobName, Stream destination)
+    {
+        var blobClient = _defaultContainerClient.GetBlobClient(blobName);
+
+        await blobClient.DownloadToAsync(destination);
+    }
+
     // Lists only the files directly inside the folder. A subfolder comes back as a single prefix and is not listed.
     public async Task<Dictionary<string, long>> GetFileSizesAsync(string folderPath, CancellationToken cancellationToken)
     {

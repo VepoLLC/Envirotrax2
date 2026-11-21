@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { CreateUserComponent } from "../create/create-user.component";
 import { AuthService } from "../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../shared/models/permission-type";
-import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { ColumnType, ModalHelperService, TableColumn, ToastService } from "@envirotrax/common-ui";
 import { STANDALONE_GRID_PAGE_SIZE } from "../../../shared/models/page-info";
 
 @Component({
@@ -38,6 +38,7 @@ export class UserListComponent implements OnInit {
         private readonly _router: Router,
         private readonly _activatedRoute: ActivatedRoute,
         private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService,
         private readonly _authService: AuthService
     ) {
 
@@ -96,11 +97,12 @@ export class UserListComponent implements OnInit {
         try {
             this.table.isLoading = true;
             await this._userService.delete(user.id!);
+            this._toastService.successFullyDeleted('User');
         } finally {
             this.table.isLoading = false;
         }
 
-        this.getUsers();
+        await this.getUsers();
     }
 
     public delete(user: WaterSupplierUser): void {

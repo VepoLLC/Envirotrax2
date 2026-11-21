@@ -7,7 +7,7 @@ import { Role } from "../../../../shared/models/users/role";
 import { RoleService } from "../../../../shared/services/users/role.service";
 import { AuthService } from "../../../../shared/services/auth/auth.service";
 import { PermissionAction, PermissionType } from "../../../../shared/models/permission-type";
-import { ColumnType, ModalHelperService, TableColumn } from "@envirotrax/common-ui";
+import { ColumnType, ModalHelperService, TableColumn, ToastService } from "@envirotrax/common-ui";
 import { STANDALONE_GRID_PAGE_SIZE } from "../../../../shared/models/page-info";
 
 @Component({
@@ -36,6 +36,7 @@ export class RoleListComponent implements OnInit {
     constructor(
         private readonly _roleService: RoleService,
         private readonly _modalHelper: ModalHelperService,
+        private readonly _toastService: ToastService,
         private readonly _router: Router,
         private readonly _activeRoute: ActivatedRoute,
         private readonly _authService: AuthService
@@ -91,12 +92,13 @@ export class RoleListComponent implements OnInit {
     private async processDelete(role: Role): Promise<void> {
         try {
             this.table.isLoading = true;
-            this._roleService.delete(role.id!);
+            await this._roleService.delete(role.id!);
+            this._toastService.successFullyDeleted('Role');
         } finally {
             this.table.isLoading = false;
         }
 
-        this.getRoles();
+        await this.getRoles();
     }
 
     public delete(role: Role): void {

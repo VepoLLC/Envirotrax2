@@ -75,6 +75,7 @@ public static class ServiceRegistration
                 services.AddTransient<IFogTripTicketService, FogTripTicketService>();
                 services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
                 services.AddTransient<ICompanyService, CompanyService>();
+                services.AddTransient<ICompanyContactService, CompanyContactService>();
                 services.AddTransient<ILetterGeneratorService, LetterGeneratorService>();
                 services.AddTransient<IRecordLogService, RecordLogService>();
                 services.AddTransient<IProfessionalNoteService, ProfessionalNoteService>();

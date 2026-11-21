@@ -519,3 +519,34 @@ input:-webkit-autofill:active {
 .min-h-0 {
     min-height: 0;
 }
+
+/* Contact Manager calendar (FullCalendar's classic theme). It takes the Admin's blue, and like V1 Vepo Manager's
+   calendar it has blue weekday headers, grey weekend headers, shaded weekends and greyed-out days from the months
+   before and after. FullCalendar builds its own elements, outside Angular's component styles, so these rules are
+   global. */
+.vp-calendar {
+    --fc-classic-primary: #008fd4;
+}
+
+.vp-calendar-day-header {
+    background-color: #337ab7;
+    color: #fff;
+}
+
+.vp-calendar-weekend-header {
+    background-color: #78797b;
+    color: #fff;
+}
+
+/* :where() ranks these below the theme's own day backgrounds, so today's highlight still shows on a weekend. */
+:where(.vp-calendar-weekend) {
+    background-color: #e8f3fb;
+}
+
+:where(.vp-calendar-other-month) {
+    background-color: #f2f2f2;
+}
+
+.vp-calendar-event {
+    cursor: pointer;
+}

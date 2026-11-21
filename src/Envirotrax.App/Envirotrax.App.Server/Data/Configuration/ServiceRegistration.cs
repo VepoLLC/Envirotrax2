@@ -122,6 +122,7 @@ public static class ServiceRegistration
         services.AddTransient<IFogTransporterDisposalSiteRepository, FogTransporterDisposalSiteRepository>();
         services.AddTransient<IFogDisposalSiteRepository, FogDisposalSiteRepository>();
         services.AddTransient<ICompanyRepository, CompanyRepository>();
+        services.AddTransient<ICompanyContactRepository, CompanyContactRepository>();
         services.AddTransient<IFogTripTicketRepository, FogTripTicketRepository>();
         services.AddTransient<IFogSettingsRepository, FogSettingsRepository>();
         services.AddTransient<IFogTripTicketReportRepository, FogTripTicketReportRepository>();

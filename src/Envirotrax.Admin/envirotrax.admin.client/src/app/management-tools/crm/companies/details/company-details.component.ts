@@ -10,6 +10,7 @@ import { AuthService } from '../../../../shared/services/auth/auth.service';
 import { CompanyService } from '../../../../shared/services/crm/company.service';
 import { LookupService } from '../../../../shared/services/lookup/lookup.service';
 import { WindowReference } from '../../../../window/window-config';
+import { CompanyContactListComponent } from './contacts/list/company-contact-list.component';
 
 export interface CompanyWindowModel {
     id?: number;
@@ -37,15 +38,16 @@ const NEXT_CONTACT_INTERVALS: Record<string, NextContactInterval> = {
 };
 
 /**
- * V1 Vepo Manager's contact window: the company's contact information and contact settings. The additional
- * contacts and the contact log come with later tickets.
+ * V1 Vepo Manager's contact window: the company's contact information, contact settings and additional contacts.
+ * The contact log comes with a later ticket.
  */
 @Component({
     templateUrl: './company-details.component.html',
     imports: [
         CommonModule,
         FormsModule,
-        SharedComponentsModule
+        SharedComponentsModule,
+        CompanyContactListComponent
     ],
     providers: [DatePipe],
     styles: `

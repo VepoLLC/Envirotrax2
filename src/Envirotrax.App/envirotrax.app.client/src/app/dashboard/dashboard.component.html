@@ -63,17 +63,17 @@
                                 <a routerLink="/sites/reports/property-log-management"
                                    [queryParams]="{logType: 1}"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                    <i class="fa-regular fa-file-exclamation me-2 fs-4" [ngClass]="getPropertyLogPastDueTextClass(stats?.pastDuePropertyLogCount ?? 0)"></i>
+                                    <i class="fa-regular fa-file-exclamation me-2 fs-4" [ngClass]="statsVm.pastDuePropertyLogs.textClass"></i>
                                     <span class="flex-fill ms-2">Past Due</span>
-                                    <span class="badge" [ngClass]="getPropertyLogPastDueBgClass(stats?.pastDuePropertyLogCount ?? 0)">{{stats?.pastDuePropertyLogCount ?? 0}}</span>
+                                    <span class="badge" [ngClass]="statsVm.pastDuePropertyLogs.bgClass">{{statsVm.pastDuePropertyLogs.count}}</span>
                                 </a>
 
                                 <a routerLink="/sites/reports/property-log-management"
                                    [queryParams]="{logType: 2}"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                    <i class="fa-regular fa-file-exclamation me-2 fs-4" [ngClass]="getPropertyLogExpiringTextClass(stats?.expiringPropertyLogCount ?? 0)"></i>
+                                    <i class="fa-regular fa-file-exclamation me-2 fs-4" [ngClass]="statsVm.expiringPropertyLogs.textClass"></i>
                                     <span class="flex-fill ms-2">Expiring Within 30 Days</span>
-                                    <span class="badge" [ngClass]="getPropertyLogExpiringBgClass(stats?.expiringPropertyLogCount ?? 0)">{{stats?.expiringPropertyLogCount ?? 0}}</span>
+                                    <span class="badge" [ngClass]="statsVm.expiringPropertyLogs.bgClass">{{statsVm.expiringPropertyLogs.count}}</span>
                                 </a>
 
                                 <a routerLink="/sites/reports/property-log-management"
@@ -81,7 +81,7 @@
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
                                     <i class="fa-regular fa-file-exclamation me-2 fs-4 text-success"></i>
                                     <span class="flex-fill ms-2">All Property Logs</span>
-                                    <span class="badge bg-success">{{stats?.allPropertyLogCount ?? 0}}</span>
+                                    <span class="badge bg-success">{{statsVm.allPropertyLogCount}}</span>
                                 </a>
                             </div>
                         </vp-section>
@@ -96,7 +96,7 @@
                                        class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
                                         <i class="fa-solid fa-users me-2 text-primary fs-4"></i>
                                         <span class="flex-fill ms-2">BPATs</span>
-                                        <span class="badge bg-primary">{{stats?.bpatCount ?? 0}}</span>
+                                        <span class="badge bg-primary">{{statsVm.bpatCount}}</span>
                                     </a>
                                 }
 
@@ -105,7 +105,7 @@
                                        class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
                                         <i class="fa-solid fa-users me-2 text-primary fs-4"></i>
                                         <span class="flex-fill ms-2">CSI Inspectors</span>
-                                        <span class="badge bg-primary">{{stats?.csiInspectorCount ?? 0}}</span>
+                                        <span class="badge bg-primary">{{statsVm.csiInspectorCount}}</span>
                                     </a>
                                 }
 
@@ -114,7 +114,7 @@
                                        class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
                                         <i class="fa-solid fa-users me-2 text-primary fs-4"></i>
                                         <span class="flex-fill ms-2">FOG Inspectors</span>
-                                        <span class="badge bg-primary">{{stats?.fogInspectorCount ?? 0}}</span>
+                                        <span class="badge bg-primary">{{statsVm.fogInspectorCount}}</span>
                                     </a>
                                 }
 
@@ -123,7 +123,7 @@
                                        class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
                                         <i class="fa-solid fa-users me-2 text-primary fs-4"></i>
                                         <span class="flex-fill ms-2">FOG Transporters</span>
-                                        <span class="badge bg-primary">{{stats?.fogTransporterCount ?? 0}}</span>
+                                        <span class="badge bg-primary">{{statsVm.fogTransporterCount}}</span>
                                     </a>
                                 }
 
@@ -138,25 +138,25 @@
                                 <a routerLink="/licenses"
                                    [queryParams]="{filter: 'unverified'}"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                    <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.unverifiedLicenseCount ?? 0)"></i>
+                                    <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="statsVm.unverifiedLicenses.textClass"></i>
                                     <span class="flex-fill ms-2">Unverified Licenses</span>
-                                    <span class="badge" [ngClass]="getThresholdBgClass(stats?.unverifiedLicenseCount ?? 0)">{{stats?.unverifiedLicenseCount ?? 0}}</span>
+                                    <span class="badge" [ngClass]="statsVm.unverifiedLicenses.bgClass">{{statsVm.unverifiedLicenses.count}}</span>
                                 </a>
 
                                 <a routerLink="/licenses"
                                    [queryParams]="{filter: 'expired'}"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                    <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.expiredLicenseCount ?? 0)"></i>
+                                    <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="statsVm.expiredLicenses.textClass"></i>
                                     <span class="flex-fill ms-2">Expired Licenses</span>
-                                    <span class="badge" [ngClass]="getThresholdBgClass(stats?.expiredLicenseCount ?? 0)">{{stats?.expiredLicenseCount ?? 0}}</span>
+                                    <span class="badge" [ngClass]="statsVm.expiredLicenses.bgClass">{{statsVm.expiredLicenses.count}}</span>
                                 </a>
 
                                 <a routerLink="/licenses"
                                    [queryParams]="{filter: 'expiring'}"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                    <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.expiringLicenseCount ?? 0)"></i>
+                                    <i class="fa-regular fa-id-card me-2 fs-4" [ngClass]="statsVm.expiringLicenses.textClass"></i>
                                     <span class="flex-fill ms-2">Expiring Licenses</span>
-                                    <span class="badge" [ngClass]="getThresholdBgClass(stats?.expiringLicenseCount ?? 0)">{{stats?.expiringLicenseCount ?? 0}}</span>
+                                    <span class="badge" [ngClass]="statsVm.expiringLicenses.bgClass">{{statsVm.expiringLicenses.count}}</span>
                                 </a>
 
                             </div>
@@ -171,27 +171,27 @@
                                 @if (hasAnyProgram) {
                                     <a routerLink="/insurances"
                                        class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                        <i class="fa-regular fa-umbrella me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.insurancePolicyCount ?? 0)"></i>
+                                        <i class="fa-regular fa-umbrella me-2 fs-4" [ngClass]="statsVm.insurancePolicies.textClass"></i>
                                         <span class="flex-fill ms-2">Insurance Policies</span>
-                                        <span class="badge" [ngClass]="getThresholdBgClass(stats?.insurancePolicyCount ?? 0)">{{stats?.insurancePolicyCount ?? 0}}</span>
+                                        <span class="badge" [ngClass]="statsVm.insurancePolicies.bgClass">{{statsVm.insurancePolicies.count}}</span>
                                     </a>
                                 }
 
                                 @if (hasBackflow) {
                                     <a routerLink="/gauges"
                                        class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                        <i class="fa-regular fa-gauge me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.testGaugeCount ?? 0)"></i>
+                                        <i class="fa-regular fa-gauge me-2 fs-4" [ngClass]="statsVm.testGauges.textClass"></i>
                                         <span class="flex-fill ms-2">Test Gauges</span>
-                                        <span class="badge" [ngClass]="getThresholdBgClass(stats?.testGaugeCount ?? 0)">{{stats?.testGaugeCount ?? 0}}</span>
+                                        <span class="badge" [ngClass]="statsVm.testGauges.bgClass">{{statsVm.testGauges.count}}</span>
                                     </a>
                                 }
 
                                 @if (hasFogTransportation) {
                                     <a routerLink="/fog/transporters/registrations"
                                        class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                        <i class="fa-regular fa-truck me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.transporterRegistrationCount ?? 0)"></i>
+                                        <i class="fa-regular fa-truck me-2 fs-4" [ngClass]="statsVm.transporterRegistrations.textClass"></i>
                                         <span class="flex-fill ms-2">Transporter Registrations</span>
-                                        <span class="badge" [ngClass]="getThresholdBgClass(stats?.transporterRegistrationCount ?? 0)">{{stats?.transporterRegistrationCount ?? 0}}</span>
+                                        <span class="badge" [ngClass]="statsVm.transporterRegistrations.bgClass">{{statsVm.transporterRegistrations.count}}</span>
                                     </a>
                                 }
 
@@ -208,17 +208,17 @@
                                 <a routerLink="/backflow/out-of-service"
                                    [queryParams]="{ type: OutOfServiceType.Replaced }"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                    <i class="fa-regular fa-arrows-repeat me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.outOfServiceReplacedCount ?? 0)"></i>
+                                    <i class="fa-regular fa-arrows-repeat me-2 fs-4" [ngClass]="statsVm.outOfServiceReplaced.textClass"></i>
                                     <span class="flex-fill ms-2">Assemblies Replaced</span>
-                                    <span class="badge" [ngClass]="getThresholdBgClass(stats?.outOfServiceReplacedCount ?? 0)">{{stats?.outOfServiceReplacedCount ?? 0}}</span>
+                                    <span class="badge" [ngClass]="statsVm.outOfServiceReplaced.bgClass">{{statsVm.outOfServiceReplaced.count}}</span>
                                 </a>
 
                                 <a routerLink="/backflow/out-of-service"
                                    [queryParams]="{ type: OutOfServiceType.Removed }"
                                    class="d-flex align-items-center justify-content-between text-dark text-decoration-none px-3 py-2 rounded-3">
-                                    <i class="fa-regular fa-trash-xmark me-2 fs-4" [ngClass]="getThresholdTextClass(stats?.outOfServiceRemovedCount ?? 0)"></i>
+                                    <i class="fa-regular fa-trash-xmark me-2 fs-4" [ngClass]="statsVm.outOfServiceRemoved.textClass"></i>
                                     <span class="flex-fill ms-2">Assemblies Removed</span>
-                                    <span class="badge" [ngClass]="getThresholdBgClass(stats?.outOfServiceRemovedCount ?? 0)">{{stats?.outOfServiceRemovedCount ?? 0}}</span>
+                                    <span class="badge" [ngClass]="statsVm.outOfServiceRemoved.bgClass">{{statsVm.outOfServiceRemoved.count}}</span>
                                 </a>
 
                             </div>
@@ -299,7 +299,7 @@
                                                         <td>
                                                             <a class="btn btn-sm btn-primary py-0"
                                                                [routerLink]="['/auth/login-redirect']"
-                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/backflow/tests', backflowVm!.rangeStartDate, backflowVm!.rangeEndDate)}"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: backflowVm!.returnUrl}"
                                                                target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
@@ -391,7 +391,7 @@
                                                         <td>
                                                             <a class="btn btn-sm btn-primary py-0"
                                                                [routerLink]="['/auth/login-redirect']"
-                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/csi', csiVm!.rangeStartDate, csiVm!.rangeEndDate)}"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: csiVm!.returnUrl}"
                                                                target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
@@ -483,7 +483,7 @@
                                                         <td>
                                                             <a class="btn btn-sm btn-primary py-0"
                                                                [routerLink]="['/auth/login-redirect']"
-                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/fog/inspections', fogInspectionVm!.rangeStartDate, fogInspectionVm!.rangeEndDate)}"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: fogInspectionVm!.returnUrl}"
                                                                target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>
@@ -575,7 +575,7 @@
                                                         <td>
                                                             <a class="btn btn-sm btn-primary py-0"
                                                                [routerLink]="['/auth/login-redirect']"
-                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: buildReturnUrl('/fog/trip-tickets', fogTripTicketVm!.rangeStartDate, fogTripTicketVm!.rangeEndDate)}"
+                                                               [queryParams]="{waterSupplierId: sub.waterSupplierId, returnUrl: fogTripTicketVm!.returnUrl}"
                                                                target="_blank" rel="noopener">View</a>
                                                         </td>
                                                     </tr>

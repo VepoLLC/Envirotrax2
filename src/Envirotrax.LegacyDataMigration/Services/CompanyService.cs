@@ -40,7 +40,7 @@ public class CompanyService
             var sql = await File.ReadAllTextAsync(file);
 
             var addedRows = await _appDbContext.Database.ExecuteSqlRawAsync(sql);
-            _logger.LogInformation("Imported CRM companies. Count: {count}", addedRows);
+            _logger.LogInformation("Imported CRM companies and their additional contacts. Count: {count}", addedRows);
         }
 
         _logger.LogInformation("Completed executing database scripts from {folderName}.", ScriptsFolder);

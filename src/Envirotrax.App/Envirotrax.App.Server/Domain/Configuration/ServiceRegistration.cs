@@ -99,6 +99,7 @@ public static class ServiceRegistration
         services.AddTransient<IFogTransporterDisposalSiteService, FogTransporterDisposalSiteService>();
         services.AddTransient<IFogDisposalSiteService, FogDisposalSiteService>();
         services.AddTransient<ICompanyService, CompanyService>();
+        services.AddTransient<ICompanyContactService, CompanyContactService>();
         services.AddTransient<IFogTripTicketService, FogTripTicketService>();
         services.AddTransient<IFogTripTicketCheckoutService, FogTripTicketCheckoutService>();
         services.AddTransient<IFogTripTicketCheckoutEmailService, FogTripTicketCheckoutEmailService>();

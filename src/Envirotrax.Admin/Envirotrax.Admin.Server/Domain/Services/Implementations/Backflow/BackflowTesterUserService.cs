@@ -21,6 +21,11 @@ public class BackflowTesterUserService : IBackflowTesterUserService
         return _apiClient.GetAsync<ProfessionalUserDto>($"{BaseUrl}/{professionalId}/users", pageInfo, query, cancellationToken);
     }
 
+    public Task<ProfessionalUserDto?> GetAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        return _apiClient.GetAsync<ProfessionalUserDto>($"{BaseUrl}/{professionalId}/users/{userId}", cancellationToken);
+    }
+
     public Task<ProfessionalUserDto?> AddAsync(int professionalId, ProfessionalUserDto user, CancellationToken cancellationToken)
     {
         return _apiClient.PostAsync<ProfessionalUserDto, ProfessionalUserDto>($"{BaseUrl}/{professionalId}/users", user, cancellationToken);

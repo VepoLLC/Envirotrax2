@@ -417,7 +417,8 @@ original V1 records.
 
 V1 Vepo Manager's Contact Manager keeps the companies Vepo works with in `ContactManagerContacts`.
 `Scripts/Companies` copies them to `crm.Companies`. V2 gives each company a new `Id`; the V1 id goes into
-`LegacyRecordId`, which is how the later additional contact and contact log migrations will find a company.
+`LegacyRecordId`, which is how the additional contact migration below, and the later contact log migration,
+find a company.
 
 - **Every company belongs to the Vepo LLC supplier** (domain `vepollc`). Only Vepo administrators use the
   Contact Manager, and V2 has them as users of that supplier.
@@ -429,6 +430,25 @@ V1 Vepo Manager's Contact Manager keeps the companies Vepo works with in `Contac
   did not migrate leaves the field blank, and the company still migrates.
 - **V1 has no FOG transportation program**, so `HasFogTransportation` starts false.
 - Blank V1 text (an empty string in a NOT NULL column) becomes NULL.
+
+### How additional contacts are migrated
+
+V1 keeps a company's other contacts in `ContactManagerAdditionalContacts`, linked to the company by
+`ContactID`. `03_CompanyContacts.sql` copies them to `crm.CompanyContacts`, under the company found through
+its `LegacyRecordId` and in that company's water supplier. V2 gives each contact a new `Id`, in V1's order,
+which is the order the Admin lists them in; the V1 id goes into `LegacyRecordId`.
+
+- **The state is matched by code**, which is what V1 stores here (`TX`), or by full name in case a row holds one.
+- **No field is required.** Some V1 contacts have only a position, a phone number or an email address, and they
+  migrate as they are.
+- **`CreatedTime` is V1's `CreationDate`.** V1 records nothing else about a contact's history, so `CreatedBy` and
+  the update fields stay NULL. V1 deletes a contact outright, so V2 has no soft delete for contacts either.
+- Blank V1 text (an empty string in a NOT NULL column) becomes NULL.
+
+Contacts that could not be migrated are queryable:
+
+`SELECT * FROM MigrationSkippedCompanyContacts` — the contact's company is no longer in V1 (V1 has no foreign
+key from a contact to its company), or the row is blank in every field.
 
 ## Running it
 

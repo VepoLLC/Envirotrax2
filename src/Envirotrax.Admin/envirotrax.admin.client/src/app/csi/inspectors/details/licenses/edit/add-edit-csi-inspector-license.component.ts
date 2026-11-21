@@ -15,6 +15,8 @@ import { CsiInspectorUserService } from '../../../../../shared/services/csi/csi-
 
 export interface CsiInspectorLicenseModalData {
     professionalId: number;
+    // Set from a user details window: the license is that user's.
+    userId?: number;
     license: ProfessionalUserLicense;
 }
 
@@ -38,6 +40,8 @@ export class AddEditCsiInspectorLicenseComponent implements OnInit {
         return !!this._modalReference.config.model?.license?.id;
     }
 
+    public isUserFixed: boolean = false;
+
     constructor(
         private readonly _modalReference: ModalReference<CsiInspectorLicenseModalData, ProfessionalUserLicense>,
         private readonly _licenseService: CsiInspectorLicenseService,
@@ -51,6 +55,13 @@ export class AddEditCsiInspectorLicenseComponent implements OnInit {
             ...this._modalReference.config.model!.license,
             professionalType: ProfessionalType.CsiInspector
         };
+
+        const { userId } = this._modalReference.config.model!;
+
+        if (userId) {
+            this.license.user ??= { id: userId };
+            this.isUserFixed = true;
+        }
     }
 
     public async ngOnInit(): Promise<void> {

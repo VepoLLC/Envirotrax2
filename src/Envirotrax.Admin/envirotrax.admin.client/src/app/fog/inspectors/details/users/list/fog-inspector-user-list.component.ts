@@ -3,9 +3,13 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { CheckboxCellComponent, ColumnType, ModalHelperService, TableColumn, TableCustomAction, TableViewModel, ToastService, ToastType } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../../../shared/components/shared.components.module';
+import { MODULE_COLORS } from '../../../../../shared/models/module-colors';
 import { ProfessionalUser } from '../../../../../shared/models/professionals/professional';
+import { ProfessionalUserWindowModel } from '../../../../../shared/models/professionals/professional-user-window';
 import { AuthService } from '../../../../../shared/services/auth/auth.service';
 import { FogInspectorUserService } from '../../../../../shared/services/fog/fog-inspector-user.service';
+import { WindowService } from '../../../../../shared/services/window.service';
+import { FogInspectorUserDetailsComponent } from '../details/fog-inspector-user-details.component';
 import { AddEditFogInspectorUserComponent, FogInspectorUserModalData } from '../edit/add-edit-fog-inspector-user.component';
 
 @Component({
@@ -19,6 +23,9 @@ import { AddEditFogInspectorUserComponent, FogInspectorUserModalData } from '../
 export class FogInspectorUserListComponent implements OnInit {
     @Input()
     public professionalId!: number;
+
+    @Input()
+    public companyName = '';
 
     public table: TableViewModel<ProfessionalUser> = {
         query: {
@@ -44,7 +51,8 @@ export class FogInspectorUserListComponent implements OnInit {
         private readonly _userService: FogInspectorUserService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _windowService: WindowService
     ) {
 
     }
@@ -72,8 +80,13 @@ export class FogInspectorUserListComponent implements OnInit {
         this.showEditor('Add User Account', {});
     }
 
-    public editUser(user: ProfessionalUser): void {
-        this.showEditor('Edit User Account', user);
+    // The user's details open in a window of their own, where the account is also edited.
+    public viewUser(user: ProfessionalUser): void {
+        this._windowService.addWindow<FogInspectorUserDetailsComponent, ProfessionalUserWindowModel>(FogInspectorUserDetailsComponent, {
+            title: [this.companyName, user.contactName, user.emailAddress].filter(part => part).join(' - '),
+            color: MODULE_COLORS.FOG,
+            model: { professionalId: this.professionalId, userId: user.id! }
+        });
     }
 
     public loginAsUser(user: ProfessionalUser): void {

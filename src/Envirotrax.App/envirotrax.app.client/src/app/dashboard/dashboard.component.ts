@@ -27,7 +27,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public readonly OutOfServiceType = OutOfServiceType;
 
     public waterSupplierId?: number;
-    public stats?: WaterSupplierDashboardStats;
+    public statsVm: DashboardStatsVm = this.buildStatsVm();
     public csiVm?: CsiStatsVm;
     public backflowVm?: BackflowStatsVm;
     public backflowComplianceVm: BackflowComplianceVm | null = null;
@@ -40,6 +40,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public hasBackflow: boolean = false;
     public hasFogInspection: boolean = false;
     public hasFogTransportation: boolean = false;
+    public hasAnyProgram: boolean = false;
 
     public readonly complianceTotalColor = '#adb5bd';
     public readonly complianceCompliantColor = '#20a845';
@@ -90,10 +91,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
     }];
 
-    public get hasAnyProgram(): boolean {
-        return this.hasCsi || this.hasBackflow || this.hasFogInspection || this.hasFogTransportation;
-    }
-
     constructor(
         private readonly _authService: AuthService,
         private readonly _dashboardService: WaterSupplierDashboardService
@@ -116,6 +113,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this._authService.hasAnyFeatures(FeatureType.FogTransportation)
         ]);
 
+        this.hasAnyProgram = this.hasCsi || this.hasBackflow || this.hasFogInspection || this.hasFogTransportation;
+
         if (this.hasAnyProgram) {
             await this.loadPageData();
         }
@@ -128,7 +127,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public async loadPageData(): Promise<void> {
         try {
             this.isLoading = true;
-            const requests: Promise<unknown>[] = [this._dashboardService.getStats().then(s => this.stats = s)];
+            const requests: Promise<unknown>[] = [this._dashboardService.getStats().then(s => this.statsVm = this.buildStatsVm(s))];
 
             if (this.hasCsi) {
                 requests.push(this._dashboardService.getCsiSubmissionStats().then(s => this.csiVm = this.buildCsiVm(s)));
@@ -153,40 +152,52 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
     }
 
-    public getPropertyLogPastDueBgClass(count: number): string {
-        return count > 0 ? 'bg-danger' : 'bg-success';
+    private buildStatsVm(stats?: WaterSupplierDashboardStats): DashboardStatsVm {
+        return {
+            pastDuePropertyLogs: this.buildPresenceBadge(stats?.pastDuePropertyLogCount ?? 0, 'danger'),
+            expiringPropertyLogs: this.buildPresenceBadge(stats?.expiringPropertyLogCount ?? 0, 'warning'),
+            allPropertyLogCount: stats?.allPropertyLogCount ?? 0,
+
+            bpatCount: stats?.bpatCount ?? 0,
+            csiInspectorCount: stats?.csiInspectorCount ?? 0,
+            fogInspectorCount: stats?.fogInspectorCount ?? 0,
+            fogTransporterCount: stats?.fogTransporterCount ?? 0,
+
+            unverifiedLicenses: this.buildThresholdBadge(stats?.unverifiedLicenseCount ?? 0),
+            expiredLicenses: this.buildThresholdBadge(stats?.expiredLicenseCount ?? 0),
+            expiringLicenses: this.buildThresholdBadge(stats?.expiringLicenseCount ?? 0),
+
+            insurancePolicies: this.buildThresholdBadge(stats?.insurancePolicyCount ?? 0),
+            testGauges: this.buildThresholdBadge(stats?.testGaugeCount ?? 0),
+            transporterRegistrations: this.buildThresholdBadge(stats?.transporterRegistrationCount ?? 0),
+
+            outOfServiceReplaced: this.buildThresholdBadge(stats?.outOfServiceReplacedCount ?? 0),
+            outOfServiceRemoved: this.buildThresholdBadge(stats?.outOfServiceRemovedCount ?? 0)
+        };
     }
 
-    public getPropertyLogPastDueTextClass(count: number): string {
-        return count > 0 ? 'text-danger' : 'text-success';
+    private buildPresenceBadge(count: number, presentColor: string): CountBadgeVm {
+        return this.buildBadge(count, count > 0 ? presentColor : 'success');
     }
 
-    public getPropertyLogExpiringBgClass(count: number): string {
-        return count > 0 ? 'bg-warning' : 'bg-success';
-    }
-
-    public getPropertyLogExpiringTextClass(count: number): string {
-        return count > 0 ? 'text-warning' : 'text-success';
-    }
-
-    public getThresholdBgClass(count: number): string {
+    private buildThresholdBadge(count: number): CountBadgeVm {
         if (count === 0) {
-            return 'bg-success';
-        } else if (count < 5) {
-            return 'bg-warning';
-        } else {
-            return 'bg-danger';
+            return this.buildBadge(count, 'success');
         }
+
+        if (count < 5) {
+            return this.buildBadge(count, 'warning');
+        }
+
+        return this.buildBadge(count, 'danger');
     }
 
-    public getThresholdTextClass(count: number): string {
-        if (count === 0) {
-            return 'text-success';
-        } else if (count < 5) {
-            return 'text-warning';
-        } else {
-            return 'text-danger';
-        }
+    private buildBadge(count: number, color: string): CountBadgeVm {
+        return {
+            count,
+            textClass: `text-${color}`,
+            bgClass: `bg-${color}`
+        };
     }
 
     private buildCsiVm(stats: CsiSubmissionStats): CsiStatsVm {
@@ -217,8 +228,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             subAccountStats,
             subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
             subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0),
-            rangeStartDate: dailyStats[dailyStats.length - 1]?.date,
-            rangeEndDate: dailyStats[0]?.date
+            returnUrl: this.buildReturnUrl('/csi', dailyStats[dailyStats.length - 1]?.date, dailyStats[0]?.date)
         };
     }
 
@@ -250,8 +260,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             subAccountStats,
             subAccountTotalTests: subAccountStats.reduce((s, sub) => s + sub.totalTests, 0),
             subAccountTotalPaidTests: subAccountStats.reduce((s, sub) => s + sub.totalPaidTests, 0),
-            rangeStartDate: dailyStats[dailyStats.length - 1]?.date,
-            rangeEndDate: dailyStats[0]?.date
+            returnUrl: this.buildReturnUrl('/backflow/tests', dailyStats[dailyStats.length - 1]?.date, dailyStats[0]?.date)
         };
     }
 
@@ -305,8 +314,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             subAccountStats,
             subAccountTotalInspections: subAccountStats.reduce((s, sub) => s + sub.totalInspections, 0),
             subAccountTotalPaidInspections: subAccountStats.reduce((s, sub) => s + sub.totalPaidInspections, 0),
-            rangeStartDate: dailyStats[dailyStats.length - 1]?.date,
-            rangeEndDate: dailyStats[0]?.date
+            returnUrl: this.buildReturnUrl('/fog/inspections', dailyStats[dailyStats.length - 1]?.date, dailyStats[0]?.date)
         };
     }
 
@@ -338,12 +346,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
             subAccountStats,
             subAccountTotalTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalTripTickets, 0),
             subAccountTotalPaidTripTickets: subAccountStats.reduce((s, sub) => s + sub.totalPaidTripTickets, 0),
-            rangeStartDate: dailyStats[dailyStats.length - 1]?.date,
-            rangeEndDate: dailyStats[0]?.date
+            returnUrl: this.buildReturnUrl('/fog/trip-tickets', dailyStats[dailyStats.length - 1]?.date, dailyStats[0]?.date)
         };
     }
 
-    public buildReturnUrl(basePath: string, startDate: string, endDate: string): string {
+    private buildReturnUrl(basePath: string, startDate: string, endDate: string): string {
         return `${basePath}?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
     }
 
@@ -354,6 +361,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private formatDate(date: string): string {
         return new Date(date + 'T00:00:00').toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
     }
+}
+
+interface CountBadgeVm {
+    count: number;
+    textClass: string;
+    bgClass: string;
+}
+
+interface DashboardStatsVm {
+    pastDuePropertyLogs: CountBadgeVm;
+    expiringPropertyLogs: CountBadgeVm;
+    allPropertyLogCount: number;
+
+    bpatCount: number;
+    csiInspectorCount: number;
+    fogInspectorCount: number;
+    fogTransporterCount: number;
+
+    unverifiedLicenses: CountBadgeVm;
+    expiredLicenses: CountBadgeVm;
+    expiringLicenses: CountBadgeVm;
+
+    insurancePolicies: CountBadgeVm;
+    testGauges: CountBadgeVm;
+    transporterRegistrations: CountBadgeVm;
+
+    outOfServiceReplaced: CountBadgeVm;
+    outOfServiceRemoved: CountBadgeVm;
 }
 
 interface CsiDailyStatsVm {
@@ -380,8 +415,7 @@ interface CsiStatsVm {
     subAccountStats: CsiSubAccountVm[];
     subAccountTotalInspections: number;
     subAccountTotalPaidInspections: number;
-    rangeStartDate: string;
-    rangeEndDate: string;
+    returnUrl: string;
 }
 
 interface BackflowDailyStatsVm {
@@ -408,8 +442,7 @@ interface BackflowStatsVm {
     subAccountStats: BackflowSubAccountVm[];
     subAccountTotalTests: number;
     subAccountTotalPaidTests: number;
-    rangeStartDate: string;
-    rangeEndDate: string;
+    returnUrl: string;
 }
 
 interface BackflowComplianceVm {
@@ -445,8 +478,7 @@ interface FogInspectionStatsVm {
     subAccountStats: FogInspectionSubAccountVm[];
     subAccountTotalInspections: number;
     subAccountTotalPaidInspections: number;
-    rangeStartDate: string;
-    rangeEndDate: string;
+    returnUrl: string;
 }
 
 interface FogTripTicketDailyStatsVm {
@@ -473,6 +505,5 @@ interface FogTripTicketStatsVm {
     subAccountStats: FogTripTicketSubAccountVm[];
     subAccountTotalTripTickets: number;
     subAccountTotalPaidTripTickets: number;
-    rangeStartDate: string;
-    rangeEndDate: string;
+    returnUrl: string;
 }

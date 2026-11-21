@@ -38,6 +38,10 @@ export class FogTransporterLicenseListComponent implements OnInit {
     @Input()
     public professionalId!: number;
 
+    // Transporter registrations belong to the company, so a user details window lists them read-only.
+    @Input()
+    public readOnly: boolean = false;
+
     @ViewChild('expirationCell', { static: true })
     public expirationCell?: TemplateRef<CellTemplateData<FogTransporterLicenseVm>>;
 

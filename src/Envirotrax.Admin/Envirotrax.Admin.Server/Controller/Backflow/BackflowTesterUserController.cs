@@ -9,10 +9,12 @@ namespace Envirotrax.Admin.Server.Controllers.Backflow;
 public class BackflowTesterUserController : AdminBaseController
 {
     private readonly IBackflowTesterUserService _userService;
+    private readonly IBackflowTesterGaugeService _gaugeService;
 
-    public BackflowTesterUserController(IBackflowTesterUserService userService)
+    public BackflowTesterUserController(IBackflowTesterUserService userService, IBackflowTesterGaugeService gaugeService)
     {
         _userService = userService;
+        _gaugeService = gaugeService;
     }
 
     [HttpGet]
@@ -21,6 +23,22 @@ public class BackflowTesterUserController : AdminBaseController
         var users = await _userService.GetAllAsync(professionalId, pageInfo, query, cancellationToken);
 
         return Ok(users);
+    }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        var user = await _userService.GetAsync(professionalId, userId, cancellationToken);
+
+        return user == null ? NotFound() : Ok(user);
+    }
+
+    [HttpGet("{userId}/gauges")]
+    public async Task<IActionResult> GetGaugesAsync(int professionalId, int userId, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var gauges = await _gaugeService.GetAllAsync(professionalId, pageInfo, query, cancellationToken, userId);
+
+        return Ok(gauges);
     }
 
     [HttpPost]

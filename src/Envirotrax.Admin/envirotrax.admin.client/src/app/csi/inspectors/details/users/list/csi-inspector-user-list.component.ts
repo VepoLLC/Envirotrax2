@@ -3,9 +3,13 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalSize } from '@developer-partners/ngx-modal-dialog';
 import { CheckboxCellComponent, ColumnType, ModalHelperService, TableColumn, TableCustomAction, TableViewModel, ToastService, ToastType } from '@envirotrax/common-ui';
 import { SharedComponentsModule } from '../../../../../shared/components/shared.components.module';
+import { MODULE_COLORS } from '../../../../../shared/models/module-colors';
 import { ProfessionalUser } from '../../../../../shared/models/professionals/professional';
+import { ProfessionalUserWindowModel } from '../../../../../shared/models/professionals/professional-user-window';
 import { AuthService } from '../../../../../shared/services/auth/auth.service';
 import { CsiInspectorUserService } from '../../../../../shared/services/csi/csi-inspector-user.service';
+import { WindowService } from '../../../../../shared/services/window.service';
+import { CsiInspectorUserDetailsComponent } from '../details/csi-inspector-user-details.component';
 import { AddEditCsiInspectorUserComponent, CsiInspectorUserModalData } from '../edit/add-edit-csi-inspector-user.component';
 
 @Component({
@@ -19,6 +23,9 @@ import { AddEditCsiInspectorUserComponent, CsiInspectorUserModalData } from '../
 export class CsiInspectorUserListComponent implements OnInit {
     @Input()
     public professionalId!: number;
+
+    @Input()
+    public companyName = '';
 
     public table: TableViewModel<ProfessionalUser> = {
         query: {
@@ -44,7 +51,8 @@ export class CsiInspectorUserListComponent implements OnInit {
         private readonly _userService: CsiInspectorUserService,
         private readonly _modalHelper: ModalHelperService,
         private readonly _toastService: ToastService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _windowService: WindowService
     ) {
 
     }
@@ -72,8 +80,13 @@ export class CsiInspectorUserListComponent implements OnInit {
         this.showEditor('Add User Account', {});
     }
 
-    public editUser(user: ProfessionalUser): void {
-        this.showEditor('Edit User Account', user);
+    // The user's details open in a window of their own, where the account is also edited.
+    public viewUser(user: ProfessionalUser): void {
+        this._windowService.addWindow<CsiInspectorUserDetailsComponent, ProfessionalUserWindowModel>(CsiInspectorUserDetailsComponent, {
+            title: [this.companyName, user.contactName, user.emailAddress].filter(part => part).join(' - '),
+            color: MODULE_COLORS.CSI,
+            model: { professionalId: this.professionalId, userId: user.id! }
+        });
     }
 
     public loginAsUser(user: ProfessionalUser): void {

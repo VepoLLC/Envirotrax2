@@ -12,7 +12,7 @@
                   [columns]="table.columns!"
                   [data]="table.items.data"
                   [showActionLabels]="false"
-                  [canEdit]="true"
+                  [canEdit]="!readOnly"
                   (edit)="editRegistration($event)"
                   [(pageInfo)]="table.items.pageInfo"
                   (pageInfoChange)="getRegistrations()"

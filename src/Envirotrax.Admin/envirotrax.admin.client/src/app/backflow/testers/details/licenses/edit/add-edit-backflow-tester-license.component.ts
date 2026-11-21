@@ -15,6 +15,8 @@ import { BackflowTesterUserService } from '../../../../../shared/services/backfl
 
 export interface BackflowTesterLicenseModalData {
     professionalId: number;
+    // Set from a user details window: the license is that user's.
+    userId?: number;
     license: ProfessionalUserLicense;
 }
 
@@ -35,6 +37,7 @@ export class AddEditBackflowTesterLicenseComponent implements OnInit {
     public users: InputOption<ProfessionalUser>[] = [];
 
     public readonly isEditMode: boolean;
+    public isUserFixed: boolean = false;
 
     constructor(
         private readonly _modalReference: ModalReference<BackflowTesterLicenseModalData, ProfessionalUserLicense>,
@@ -51,6 +54,13 @@ export class AddEditBackflowTesterLicenseComponent implements OnInit {
             professionalType: ProfessionalType.Bpat
         };
         this.isEditMode = !!this.license.id;
+
+        const { userId } = this._modalReference.config.model!;
+
+        if (userId) {
+            this.license.user ??= { id: userId };
+            this.isUserFixed = true;
+        }
     }
 
     public async ngOnInit(): Promise<void> {

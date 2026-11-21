@@ -18,6 +18,8 @@ public class ProfessionalUserDto
     [StringLength(150)]
     public string? JobTitle { get; set; }
 
+    public string? PhoneNumber { get; set; }
+
     public bool IsAdmin { get; set; }
 
     public bool IsWiseGuy { get; set; }

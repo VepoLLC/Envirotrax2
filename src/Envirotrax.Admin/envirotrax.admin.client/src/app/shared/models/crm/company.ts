@@ -98,3 +98,11 @@ export interface CompanyRow extends Company {
     cityState: string;
     nextContactDateClass: string;
 }
+
+/**
+ * The days the contact calendar shows, as yyyy-MM-dd dates. The end date is the day after the last day shown.
+ */
+export interface CompanyCalendarRange {
+    startDate: string;
+    endDate: string;
+}

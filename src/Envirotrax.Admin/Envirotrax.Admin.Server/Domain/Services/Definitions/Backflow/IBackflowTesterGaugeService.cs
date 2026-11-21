@@ -5,7 +5,8 @@ namespace Envirotrax.Admin.Server.Domain.Services.Definitions.Backflow;
 
 public interface IBackflowTesterGaugeService
 {
-    Task<IPagedData<BackflowGaugeDto>> GetAllAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
+    // With a userId, only the gauges assigned to that user of the company.
+    Task<IPagedData<BackflowGaugeDto>> GetAllAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken, int? userId = null);
 
     Task<BackflowGaugeDto?> AddAsync(int professionalId, BackflowGaugeDto gauge, Stream fileStream, string fileName, CancellationToken cancellationToken);
 

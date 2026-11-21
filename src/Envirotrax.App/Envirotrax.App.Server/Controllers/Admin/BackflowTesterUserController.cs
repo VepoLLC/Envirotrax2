@@ -1,6 +1,7 @@
 using DeveloperPartners.SortingFiltering;
 using Envirotrax.App.Server.Data.Models.Professionals.Licenses;
 using Envirotrax.App.Server.Domain.DataTransferObjects.Professionals;
+using Envirotrax.App.Server.Domain.Services.Definitions.Backflow;
 using Envirotrax.App.Server.Domain.Services.Definitions.Professionals;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,12 @@ namespace Envirotrax.App.Server.Controllers.Admin;
 public class BackflowTesterUserController : AdminBaseController
 {
     private readonly IProfessionalUserService _userService;
+    private readonly IBackflowGaugeService _gaugeService;
 
-    public BackflowTesterUserController(IProfessionalUserService userService)
+    public BackflowTesterUserController(IProfessionalUserService userService, IBackflowGaugeService gaugeService)
     {
         _userService = userService;
+        _gaugeService = gaugeService;
     }
 
     [HttpGet]
@@ -27,6 +30,22 @@ public class BackflowTesterUserController : AdminBaseController
             proUser => proUser.IsBackflowTester);
 
         return Ok(users);
+    }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetAsync(int professionalId, int userId, CancellationToken cancellationToken)
+    {
+        var user = await _userService.GetForProfessionalAsync(professionalId, userId, cancellationToken, proUser => proUser.IsBackflowTester);
+
+        return user == null ? NotFound() : Ok(user);
+    }
+
+    [HttpGet("{userId}/gauges")]
+    public async Task<IActionResult> GetGaugesAsync(int professionalId, int userId, [FromQuery] PageInfo pageInfo, [FromQuery] Query query, CancellationToken cancellationToken)
+    {
+        var gauges = await _gaugeService.GetAllByProfessionalUserAsync(professionalId, userId, pageInfo, query, cancellationToken);
+
+        return Ok(gauges);
     }
 
     [HttpPost]

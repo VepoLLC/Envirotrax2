@@ -40,6 +40,9 @@
               "node_modules/flatpickr/dist/plugins/confirmDate/confirmDate.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
+              "node_modules/@fullcalendar/angular/skeleton.css",
+              "node_modules/@fullcalendar/angular/themes/classic/theme.css",
+              "node_modules/@fullcalendar/angular/themes/classic/palette.css",
               "src/styles.css"
             ]
           },
@@ -160,6 +163,9 @@
               "node_modules/flatpickr/dist/plugins/confirmDate/confirmDate.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
+              "node_modules/@fullcalendar/angular/skeleton.css",
+              "node_modules/@fullcalendar/angular/themes/classic/theme.css",
+              "node_modules/@fullcalendar/angular/themes/classic/palette.css",
               "src/styles.css"
             ],
             "karmaConfig": "karma.conf.js"

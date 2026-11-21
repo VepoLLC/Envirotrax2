@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { InputOption, ModalHelperService, ToastService } from '@envirotrax/common-ui';
 import { BackflowTest } from '../../shared/models/backflow/backflow-test';
 import { BackflowTestResult } from '../../shared/models/backflow/backflow-test-enums';
@@ -63,6 +64,7 @@ export class BackflowOutOfServiceListComponent implements OnInit {
     ];
 
     constructor(
+        private readonly _destroyRef: DestroyRef,
         private readonly _service: BackflowOutOfServiceRequestService,
         private readonly _router: Router,
         private readonly _route: ActivatedRoute,
@@ -71,14 +73,18 @@ export class BackflowOutOfServiceListComponent implements OnInit {
         private readonly _containerHelper: AppContainerHelperService
     ) { }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         this._containerHelper.setContainerVisibility(false);
 
-        const type = this._route.snapshot.queryParamMap.get('type');
+        this._route.queryParamMap
+            .pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe(params => this.applyQueryParams(params));
+    }
 
-        if (this.typeOptions.some(option => option.id === type)) {
-            this.typeFilter = type!;
-        }
+    private async applyQueryParams(params: ParamMap): Promise<void> {
+        const type = params.get('type') ?? '';
+
+        this.typeFilter = this.typeOptions.some(option => option.id === type) ? type : '';
 
         await this.load();
     }

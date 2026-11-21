@@ -45,6 +45,10 @@ export class BackflowTesterGaugeListComponent implements OnInit {
     @Input()
     public companyName = '';
 
+    // Set in a user details window: only the gauges assigned to that user are listed, and a new gauge is assigned to them.
+    @Input()
+    public userId?: number;
+
     @ViewChild('assignedToCell', { static: true })
     public assignedToCell?: TemplateRef<CellTemplateData<BackflowTesterGaugeVm>>;
 
@@ -91,7 +95,8 @@ export class BackflowTesterGaugeListComponent implements OnInit {
             const gauges = await this._gaugeService.getAll(
                 this.professionalId,
                 this.table.items?.pageInfo || {},
-                this.table.query
+                this.table.query,
+                this.userId
             );
 
             this.table.items = {
@@ -147,7 +152,7 @@ export class BackflowTesterGaugeListComponent implements OnInit {
     private showEditor(title: string, gauge: BackflowGauge): void {
         this._modalHelper.show<BackflowTesterGaugeModalData, BackflowGauge>(AddEditBackflowTesterGaugeComponent, {
             title,
-            model: { professionalId: this.professionalId, companyName: this.companyName, gauge },
+            model: { professionalId: this.professionalId, companyName: this.companyName, userId: this.userId, gauge },
             size: ModalSize.medium,
             mode: 'disableFullScreen'
         }).result().subscribe(() => this.getGauges());
@@ -165,7 +170,7 @@ export class BackflowTesterGaugeListComponent implements OnInit {
     }
 
     private getColumns(): TableColumn<BackflowTesterGaugeVm>[] {
-        return [
+        const columns: TableColumn<BackflowTesterGaugeVm>[] = [
             { field: 'professionalUser.contactName', caption: 'Assigned To', type: ColumnType.text, cellTemplate: this.assignedToCell },
             { field: 'manufacturer', caption: 'Manufacturer', type: ColumnType.text },
             { field: 'model', caption: 'Model', type: ColumnType.text },
@@ -173,5 +178,8 @@ export class BackflowTesterGaugeListComponent implements OnInit {
             { field: 'serialNumber', caption: 'Serial Number', type: ColumnType.text },
             { field: 'lastCalibrationDate', caption: 'Calibration Date', type: ColumnType.date, cellTemplate: this.calibrationCell }
         ];
+
+        // Every gauge in a user details window is assigned to that user, so the Assigned To column would only repeat it.
+        return this.userId ? columns.filter(column => column.field !== 'professionalUser.contactName') : columns;
     }
 }

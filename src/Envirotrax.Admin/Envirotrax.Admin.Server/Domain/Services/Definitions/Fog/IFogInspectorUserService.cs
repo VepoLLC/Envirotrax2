@@ -7,6 +7,8 @@ public interface IFogInspectorUserService
 {
     Task<IPagedData<ProfessionalUserDto>> GetAllAsync(int professionalId, PageInfo pageInfo, Query query, CancellationToken cancellationToken);
 
+    Task<ProfessionalUserDto?> GetAsync(int professionalId, int userId, CancellationToken cancellationToken);
+
     Task<ProfessionalUserDto?> AddAsync(int professionalId, ProfessionalUserDto user, CancellationToken cancellationToken);
 
     Task<ProfessionalUserDto?> UpdateAsync(int professionalId, int userId, ProfessionalUserDto user, CancellationToken cancellationToken);
